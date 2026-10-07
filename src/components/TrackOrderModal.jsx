@@ -52,20 +52,20 @@ export const TrackOrderModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none animate-fadeIn">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 select-none animate-fadeIn">
       <div className="bg-[#121217] border border-white/15 rounded-xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden font-sans text-right">
         
         {/* Header */}
-        <div className="bg-[#181822] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-white text-black rounded shadow">
-              <ShoppingBag size={18} />
+        <div className="bg-[#181822] border-b border-white/10 px-4 py-3.5 sm:px-6 sm:py-4 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-white text-black rounded shadow">
+              <ShoppingBag size={17} />
             </div>
             <div>
-              <h2 className="text-base font-black text-white">
+              <h2 className="text-sm sm:text-base font-black text-white">
                 {language === 'ar' ? 'تتبع الطلبات والشحنات • KESWA' : 'Track Your Orders • KESWA'}
               </h2>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-[10px] sm:text-[11px] text-gray-400">
                 {language === 'ar' ? 'ابحث برقم الهاتف أو رقم الطلب لمتابعة حالة شحنتك' : 'Search by phone number or order ID'}
               </p>
             </div>
@@ -80,11 +80,11 @@ export const TrackOrderModal = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="p-6 border-b border-white/10 bg-[#14141c] shrink-0">
+        <div className="p-4 sm:p-6 border-b border-white/10 bg-[#14141c] shrink-0">
           <div className="relative">
             <Search size={16} className="absolute top-3.5 right-3.5 text-gray-400" />
             <input 
-              type="text"
+              type="text" 
               placeholder={language === 'ar' ? 'أدخل رقم الهاتف أو رقم الطلب (مثال: 010... أو KSW-...)' : 'Enter phone number or order number...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -95,7 +95,7 @@ export const TrackOrderModal = () => {
         </div>
 
         {/* Orders Content */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 sm:space-y-6 flex-1">
           {matchingOrders.length === 0 ? (
             <div className="text-center py-12 text-gray-400 space-y-3">
               <ShoppingBag size={48} className="mx-auto text-gray-600" />

@@ -17,7 +17,7 @@ export const HeroHoodies = () => {
   const buttonText = getLocalized(banner, 'buttonText');
 
   return (
-    <section id="hoodies-hero" className="relative w-full h-[78vh] min-h-[520px] max-h-[850px] bg-black overflow-hidden flex items-center justify-center">
+    <section id="hoodies-hero" className="relative w-full h-[75vh] min-h-[440px] sm:min-h-[540px] max-h-[850px] bg-black overflow-hidden flex items-center justify-center">
       {/* Background Image with Streetwear Overlay */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -31,23 +31,23 @@ export const HeroHoodies = () => {
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 text-center flex flex-col items-center">
         {badge && (
-          <span className="inline-block bg-white text-black text-[11px] font-black tracking-widest px-3.5 py-1 mb-4 uppercase rounded-sm shadow-lg font-sans">
+          <span className="inline-block bg-white text-black text-[10px] sm:text-[11px] font-black tracking-widest px-3 sm:px-3.5 py-1 mb-3 sm:mb-4 uppercase rounded-sm shadow-lg font-sans">
             {badge}
           </span>
         )}
 
-        <h1 className="text-5xl sm:text-7xl md:text-8xl font-black uppercase font-display tracking-tight text-white mb-3 drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+        <h1 className="text-3xl sm:text-6xl md:text-8xl font-black uppercase font-display tracking-tight text-white mb-2.5 sm:mb-3 drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] leading-[1.1]">
           {title}
         </h1>
 
-        <p className="text-sm sm:text-base font-medium tracking-wide text-gray-300 max-w-xl mb-8 uppercase font-sans">
+        <p className="text-xs sm:text-base font-medium tracking-wide text-gray-300 max-w-xl mb-6 sm:mb-8 uppercase font-sans">
           {subtitle}
         </p>
 
         <a
           href={banner.buttonLink || "#hoodies"}
           onClick={() => setActiveCategory('hoodies')}
-          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm tracking-wider uppercase px-8 py-4 rounded-none transition-all duration-300 transform hover:-translate-y-0.5 shadow-2xl"
+          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm tracking-wider uppercase px-6 sm:px-8 py-3.5 sm:py-4 rounded-none transition-all duration-300 transform hover:-translate-y-0.5 shadow-2xl active:scale-95 touch-manipulation"
         >
           <span>{buttonText}</span>
           {language === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
@@ -168,7 +168,7 @@ export const HeroTshirts = () => {
   if (!banner || !banner.enabled) return null;
 
   return (
-    <section id="tshirts-banner" className="relative w-full h-[65vh] min-h-[460px] max-h-[700px] my-14 bg-black overflow-hidden flex items-center">
+    <section id="tshirts-banner" className="relative w-full h-[60vh] sm:h-[65vh] min-h-[380px] sm:min-h-[460px] max-h-[700px] my-8 sm:my-14 bg-black overflow-hidden flex items-center">
       <div className="absolute inset-0 z-0">
         <img 
           src={banner.image || banner.bgImage} 
@@ -178,23 +178,23 @@ export const HeroTshirts = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent rtl:bg-gradient-to-l" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-12 w-full">
         <div className="max-w-xl">
           {banner.badge && (
-            <span className="inline-block bg-white text-black text-[10px] font-black tracking-widest px-3 py-1 mb-3 uppercase rounded-sm">
+            <span className="inline-block bg-white text-black text-[10px] font-black tracking-widest px-3 py-1 mb-2.5 sm:mb-3 uppercase rounded-sm">
               {getLocalized(banner, 'badge')}
             </span>
           )}
-          <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-2">
+          <h2 className="text-2xl sm:text-5xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-2 leading-tight">
             {getLocalized(banner, 'title')}
           </h2>
-          <p className="text-xs sm:text-sm font-sans tracking-wide text-gray-300 uppercase mb-6">
+          <p className="text-xs sm:text-sm font-sans tracking-wide text-gray-300 uppercase mb-5 sm:mb-6">
             {getLocalized(banner, 'subtitle')}
           </p>
           <a
             href={banner.buttonLink || "#tshirts"}
             onClick={() => setActiveCategory('tshirts')}
-            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-wider uppercase px-7 py-3.5 transition-all"
+            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-wider uppercase px-6 sm:px-7 py-3 sm:py-3.5 transition-all active:scale-95 touch-manipulation"
           >
             <span>{getLocalized(banner, 'buttonText')}</span>
             {language === 'ar' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
@@ -215,7 +215,7 @@ export const HeroSweatpants = () => {
   if (!banner || !banner.enabled) return null;
 
   return (
-    <section id="sweatpants-banner" className="relative w-full h-[65vh] min-h-[460px] max-h-[700px] my-14 bg-black overflow-hidden flex items-center justify-end">
+    <section id="sweatpants-banner" className="relative w-full h-[60vh] sm:h-[65vh] min-h-[380px] sm:min-h-[460px] max-h-[700px] my-8 sm:my-14 bg-black overflow-hidden flex items-center justify-end">
       <div className="absolute inset-0 z-0">
         <img 
           src={banner.image || banner.bgImage} 
@@ -225,23 +225,23 @@ export const HeroSweatpants = () => {
         <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/40 to-transparent rtl:bg-gradient-to-r" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full flex justify-end rtl:justify-start">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-12 w-full flex justify-end rtl:justify-start">
         <div className="max-w-xl text-right rtl:text-left">
           {banner.badge && (
-            <span className="inline-block bg-white text-black text-[10px] font-black tracking-widest px-3 py-1 mb-3 uppercase rounded-sm">
+            <span className="inline-block bg-white text-black text-[10px] font-black tracking-widest px-3 py-1 mb-2.5 sm:mb-3 uppercase rounded-sm">
               {getLocalized(banner, 'badge')}
             </span>
           )}
-          <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-2">
+          <h2 className="text-2xl sm:text-5xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-2 leading-tight">
             {getLocalized(banner, 'title')}
           </h2>
-          <p className="text-xs sm:text-sm font-sans tracking-wide text-gray-300 uppercase mb-6">
+          <p className="text-xs sm:text-sm font-sans tracking-wide text-gray-300 uppercase mb-5 sm:mb-6">
             {getLocalized(banner, 'subtitle')}
           </p>
           <a
             href={banner.buttonLink || "#sweatpants"}
             onClick={() => setActiveCategory('sweatpants')}
-            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-wider uppercase px-7 py-3.5 transition-all"
+            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-wider uppercase px-6 sm:px-7 py-3 sm:py-3.5 transition-all active:scale-95 touch-manipulation"
           >
             <span>{getLocalized(banner, 'buttonText')}</span>
             {language === 'ar' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
@@ -457,7 +457,7 @@ export const DynamicCategoryBanner = ({ category }) => {
   const buttonText = getLocalized(category, 'buttonText') || (language === 'ar' ? 'تسوق التشكيلة' : 'SHOP NOW');
 
   return (
-    <section id={`${category.id}-hero`} className="relative w-full h-[65vh] min-h-[460px] max-h-[750px] bg-black overflow-hidden flex items-center justify-center my-4">
+    <section id={`${category.id}-hero`} className="relative w-full h-[60vh] sm:h-[65vh] min-h-[380px] sm:min-h-[460px] max-h-[750px] bg-black overflow-hidden flex items-center justify-center my-6 sm:my-10">
       <div className="absolute inset-0 z-0">
         <img 
           src={category.bannerImage} 
@@ -469,22 +469,22 @@ export const DynamicCategoryBanner = ({ category }) => {
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 text-center flex flex-col items-center">
         {badge && (
-          <span className="inline-block bg-white text-black text-[11px] font-black tracking-widest px-3.5 py-1 mb-3 uppercase rounded-sm shadow-lg font-sans">
+          <span className="inline-block bg-white text-black text-[10px] sm:text-[11px] font-black tracking-widest px-3 sm:px-3.5 py-1 mb-2.5 sm:mb-3 uppercase rounded-sm shadow-lg font-sans">
             {badge}
           </span>
         )}
-        <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-3 drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+        <h2 className="text-2xl sm:text-5xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-2.5 sm:mb-3 drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] leading-tight">
           {title}
         </h2>
         {subtitle && (
-          <p className="text-xs sm:text-sm font-medium tracking-wide text-gray-300 max-w-xl mb-6 uppercase font-sans">
+          <p className="text-xs sm:text-sm font-medium tracking-wide text-gray-300 max-w-xl mb-5 sm:mb-6 uppercase font-sans">
             {subtitle}
           </p>
         )}
         <a
           href={`#${category.id}`}
           onClick={() => setActiveCategory(category.id)}
-          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm tracking-wider uppercase px-7 py-3.5 rounded-none transition-all duration-300 shadow-2xl"
+          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm tracking-wider uppercase px-6 sm:px-7 py-3 sm:py-3.5 rounded-none transition-all duration-300 shadow-2xl active:scale-95 touch-manipulation"
         >
           <span>{buttonText}</span>
           {language === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}

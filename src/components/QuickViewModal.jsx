@@ -43,13 +43,13 @@ export const QuickViewModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="relative w-full max-w-4xl bg-[#0e0e12] border border-white/20 rounded-sm shadow-2xl overflow-hidden animate-fadeIn my-6">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+      <div className="relative w-full max-w-4xl bg-[#0e0e12] border border-white/20 rounded-sm shadow-2xl overflow-hidden animate-fadeIn my-4 sm:my-6">
         
         {/* Close Button */}
         <button 
           onClick={() => setQuickViewProduct(null)}
-          className="absolute top-4 end-4 z-20 p-2 bg-black/60 hover:bg-black text-gray-300 hover:text-white rounded-full transition-colors"
+          className="absolute top-3 end-3 sm:top-4 sm:end-4 z-20 p-2 bg-black/70 hover:bg-black text-gray-300 hover:text-white rounded-full transition-colors touch-manipulation"
           aria-label="Close modal"
         >
           <X size={20} />

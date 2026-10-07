@@ -8,7 +8,6 @@ export const Navbar = () => {
     siteContent, 
     cartItemsCount, 
     setIsCartOpen, 
-    setIsAdminOpen, 
     wishlist,
     setActiveCategory,
     searchQuery,
@@ -16,7 +15,8 @@ export const Navbar = () => {
     language,
     toggleLanguage,
     t,
-    getLocalized
+    getLocalized,
+    setIsTrackOrderOpen
   } = useStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,10 +41,10 @@ export const Navbar = () => {
     <header className="sticky top-0 z-40 w-full shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
       {/* Top Announcement Bar */}
       {isAnnouncementVisible && (
-        <aside aria-label="Announcement" className="bg-[#121216] text-[11px] font-medium tracking-wider text-gray-200 py-1.5 px-4 text-center flex items-center justify-center gap-2 relative z-50">
+        <aside aria-label="Announcement" className="bg-[#121216] text-[10px] sm:text-[11px] font-medium tracking-wider text-gray-200 py-1.5 px-3 sm:px-4 text-center flex items-center justify-center gap-2 relative z-50">
           <a 
             href={announcement.link || "#sale"} 
-            className="hover:text-white transition-colors duration-200 flex items-center gap-1.5 font-sans"
+            className="hover:text-white transition-colors duration-200 flex items-center gap-1.5 font-sans truncate max-w-full"
           >
             {announcementText}
           </a>
@@ -52,9 +52,9 @@ export const Navbar = () => {
       )}
 
       {/* Main Glass Navbar for Off-White Background */}
-      <nav className="glass-nav-light transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
+      <nav className="glass-nav-light transition-all duration-300 relative">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
             
             {/* Left: Navigation Links (Desktop) */}
             <div className="hidden lg:flex items-center space-x-6 rtl:space-x-reverse">
@@ -77,7 +77,7 @@ export const Navbar = () => {
             <div className="flex items-center lg:hidden">
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-neutral-800 hover:text-black"
+                className="p-2 -m-1 text-neutral-800 hover:text-black touch-manipulation"
                 aria-label="Toggle Menu"
               >
                 {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -98,17 +98,17 @@ export const Navbar = () => {
               </a>
             </div>
 
-            {/* Right: Actions (Language Switcher, Search, Wishlist, Cart, Admin) */}
-            <div className="flex items-center space-x-2.5 sm:space-x-4 rtl:space-x-reverse">
+            {/* Right: Actions (Language Switcher, Search, Wishlist, Cart) - 100% Zero Admin */}
+            <div className="flex items-center space-x-2 sm:space-x-4 rtl:space-x-reverse">
               
               {/* Language Switcher Button (عربي / EN) */}
               <button
                 onClick={toggleLanguage}
-                className="flex items-center gap-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-[#dedcd4] px-2.5 py-1.5 rounded text-xs font-bold transition-all shadow-sm"
+                className="flex items-center gap-1 bg-white hover:bg-neutral-100 text-neutral-800 border border-[#dedcd4] px-2 py-1 sm:px-2.5 sm:py-1.5 rounded text-[11px] font-bold transition-all shadow-sm active:scale-95 touch-manipulation"
                 title={language === 'ar' ? "Switch to English" : "التحويل للغة العربية"}
               >
                 <Globe size={13} className="text-neutral-600" />
-                <span className="text-[11px] font-sans">
+                <span className="font-sans">
                   {language === 'ar' ? 'EN' : 'العربية'}
                 </span>
               </button>
@@ -116,18 +116,18 @@ export const Navbar = () => {
               {/* Search Toggle / Input */}
               <div className="relative flex items-center">
                 {showSearchInput ? (
-                  <div className="flex items-center bg-white border border-[#dedcd4] rounded-full px-3 py-1.5 shadow-sm">
+                  <div className="flex items-center bg-white border border-[#dedcd4] rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5 shadow-sm">
                     <input 
                       type="text"
                       placeholder={t('nav.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-transparent text-xs text-neutral-800 placeholder-neutral-400 outline-none w-32 sm:w-44 font-sans"
+                      className="bg-transparent text-xs text-neutral-800 placeholder-neutral-400 outline-none w-24 sm:w-44 font-sans"
                       autoFocus
                     />
                     <button 
                       onClick={() => setShowSearchInput(false)}
-                      className="text-neutral-400 hover:text-neutral-700 ml-1 text-xs"
+                      className="text-neutral-400 hover:text-neutral-700 ml-1 text-xs p-0.5"
                     >
                       ✕
                     </button>
@@ -135,7 +135,7 @@ export const Navbar = () => {
                 ) : (
                   <button 
                     onClick={() => setShowSearchInput(true)}
-                    className="p-2 text-neutral-700 hover:text-black transition-colors"
+                    className="p-1.5 sm:p-2 text-neutral-700 hover:text-black transition-colors touch-manipulation"
                     title={t('nav.searchPlaceholder')}
                   >
                     <Search size={19} />
@@ -149,7 +149,7 @@ export const Navbar = () => {
                   const target = document.querySelector('#shop');
                   if (target) target.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="relative p-2 text-neutral-700 hover:text-black transition-colors hidden sm:block"
+                className="relative p-1.5 sm:p-2 text-neutral-700 hover:text-black transition-colors hidden sm:block touch-manipulation"
                 title={t('nav.favorites')}
               >
                 <Heart size={19} />
@@ -163,7 +163,7 @@ export const Navbar = () => {
               {/* Cart Button */}
               <button 
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 text-neutral-700 hover:text-black transition-colors group flex items-center"
+                className="relative p-1.5 sm:p-2 text-neutral-700 hover:text-black transition-colors group flex items-center touch-manipulation"
                 title={t('nav.cart')}
               >
                 <ShoppingBag size={20} className="group-hover:scale-110 transition-transform" />
@@ -174,50 +174,72 @@ export const Navbar = () => {
                 )}
               </button>
 
-              {/* Admin Panel Toggle Button */}
-              <button 
-                onClick={() => setIsAdminOpen(true)}
-                className="flex items-center gap-1.5 bg-black hover:bg-neutral-800 text-white px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wider transition-all duration-300 shadow-md"
-                title="فتح لوحة تحكم المتجر"
-              >
-                <Sliders size={13} className="text-amber-400" />
-                <span className="font-sans">لوحة التحكم</span>
-              </button>
-
             </div>
 
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Dropdown Menu (Enhanced UX & Zero Admin) */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#f8f7f4] border-b border-[#e5e4de] px-4 pt-3 pb-6 space-y-3 animate-fadeIn">
-            {navigation?.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id, item.link)}
-                className="block w-full text-left rtl:text-right py-2 text-sm font-bold uppercase tracking-wider text-neutral-800 hover:text-black border-b border-black/5"
-              >
-                {getLocalized(item, 'label')}
-              </button>
-            ))}
-            <div className="pt-2 flex flex-wrap justify-between items-center gap-2 text-xs text-neutral-600">
-              <button 
-                onClick={toggleLanguage}
-                className="flex items-center gap-1.5 text-neutral-800 bg-white border border-[#dedcd4] px-3 py-1.5 rounded shadow-sm"
-              >
-                <Globe size={13} />
-                <span>{language === 'ar' ? 'English Language' : 'اللغة العربية'}</span>
-              </button>
+          <>
+            {/* Backdrop to dismiss menu */}
+            <div 
+              className="lg:hidden fixed inset-0 top-[64px] bg-black/40 backdrop-blur-xs z-30"
+              onClick={() => setMobileMenuOpen(false)}
+            />
 
-              <button 
-                onClick={() => { setMobileMenuOpen(false); setIsAdminOpen(true); }}
-                className="text-white bg-black px-3 py-1.5 rounded font-bold"
-              >
-                لوحة التحكم
-              </button>
+            <div className="lg:hidden relative z-40 bg-[#f8f7f4] border-b border-[#dedcd4] px-4 pt-3 pb-6 space-y-4 shadow-xl animate-fadeIn">
+              {/* Category Links */}
+              <div className="space-y-1">
+                {navigation?.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id, item.link)}
+                    className="block w-full text-left rtl:text-right py-2.5 px-2 text-sm font-bold uppercase tracking-wider text-neutral-800 hover:text-black hover:bg-black/5 rounded transition-colors"
+                  >
+                    {getLocalized(item, 'label')}
+                  </button>
+                ))}
+              </div>
+
+              {/* Quick Customer Links */}
+              <div className="pt-2 border-t border-[#dedcd4] grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsTrackOrderOpen(true);
+                  }}
+                  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs"
+                >
+                  <span>📦</span>
+                  <span>{language === 'ar' ? 'تتبع طلبي' : 'Track Order'}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    const target = document.querySelector('#shop');
+                    if (target) target.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs"
+                >
+                  <Heart size={14} className="text-red-500" />
+                  <span>{language === 'ar' ? 'المفضلة' : 'Wishlist'} ({wishlist.length})</span>
+                </button>
+              </div>
+
+              {/* Language Switcher in Mobile Drawer */}
+              <div className="pt-2 flex justify-between items-center text-xs text-neutral-600 border-t border-[#dedcd4]">
+                <button 
+                  onClick={toggleLanguage}
+                  className="w-full flex items-center justify-center gap-2 text-neutral-800 bg-white border border-[#dedcd4] py-2 px-3 rounded font-bold shadow-xs"
+                >
+                  <Globe size={14} />
+                  <span>{language === 'ar' ? 'Switch to English' : 'التحويل للغة العربية'}</span>
+                </button>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </nav>
     </header>

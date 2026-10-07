@@ -18,7 +18,7 @@ const FacebookIcon = () => (
 );
 
 export const Footer = () => {
-  const { siteContent, setActiveCategory, setIsAdminOpen, setIsTrackOrderOpen, getLocalized, language, t } = useStore();
+  const { siteContent, setActiveCategory, setIsTrackOrderOpen, getLocalized, language, t } = useStore();
   const { footer, brand } = siteContent;
 
   const scrollToTop = () => {

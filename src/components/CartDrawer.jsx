@@ -51,8 +51,8 @@ export const CartDrawer = () => {
       />
 
       {/* Drawer */}
-      <div className={`fixed inset-y-0 ${language === 'ar' ? 'left-0 pr-10' : 'right-0 pl-10'} max-w-full flex`}>
-        <aside aria-label="Shopping Cart Drawer" className="w-screen max-w-md bg-[#0e0e12] border-x border-white/10 flex flex-col shadow-2xl">
+      <div className={`fixed inset-y-0 ${language === 'ar' ? 'left-0 sm:pr-10' : 'right-0 sm:pl-10'} max-w-full flex`}>
+        <aside aria-label="Shopping Cart Drawer" className="w-full sm:w-[420px] bg-[#0e0e12] border-x border-white/10 flex flex-col shadow-2xl">
           
           {/* Header */}
           <div className="p-5 border-b border-white/10 flex items-center justify-between">

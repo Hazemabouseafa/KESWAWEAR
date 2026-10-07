@@ -145,6 +145,15 @@ export const ProductCard = ({ product }) => {
           </div>
         </div>
 
+        {/* Mobile Direct Add to Cart Action */}
+        <button
+          onClick={handleQuickAdd}
+          className="sm:hidden mt-2.5 w-full bg-black active:bg-neutral-800 text-white font-extrabold text-[11px] py-2 px-2 flex items-center justify-center gap-1.5 transition-transform active:scale-95 font-sans touch-manipulation shadow-xs"
+        >
+          <ShoppingBag size={12} />
+          <span>{t('actions.addToCart')}</span>
+        </button>
+
       </div>
     </article>
   );

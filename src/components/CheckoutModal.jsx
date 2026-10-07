@@ -95,11 +95,11 @@ export const CheckoutModal = () => {
   if (!isCheckoutOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="relative w-full max-w-2xl bg-[#0e0e12] border border-white/20 rounded-sm shadow-2xl overflow-hidden my-8 animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4">
+      <div className="relative w-full max-w-2xl bg-[#0e0e12] border border-white/20 rounded-sm shadow-2xl overflow-hidden my-3 sm:my-8 animate-fadeIn">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-white/10 bg-neutral-900">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-white/10 bg-neutral-900">
           <div>
             <h3 className="font-display font-black text-xl uppercase tracking-wider text-white">
               {completedOrder ? t('checkout.orderSuccessTitle') : t('checkout.title')}
