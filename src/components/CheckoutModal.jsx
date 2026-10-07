@@ -4,10 +4,33 @@ import { X, CheckCircle, ShieldCheck, MapPin, Phone, User, Truck, CreditCard } f
 import confetti from 'canvas-confetti';
 
 const EGYPT_GOVERNORATES = [
-  "Alexandria", "Cairo", "Giza", "Dakahlia", "Red Sea", "Beheira", "Fayoum", 
-  "Gharbia", "Ismailia", "Monufia", "Minya", "Qalyubia", "New Valley", "Suez", 
-  "Aswan", "Assiut", "Beni Suef", "Port Said", "Damietta", "Sharkia", "South Sinai", 
-  "Kafr El Sheikh", "Matrouh", "Luxor", "Qena", "North Sinai", "Sohag"
+  { en: "Alexandria", ar: "الإسكندرية" },
+  { en: "Cairo", ar: "القاهرة" },
+  { en: "Giza", ar: "الجيزة" },
+  { en: "Dakahlia", ar: "الدقهلية" },
+  { en: "Red Sea", ar: "البحر الأحمر" },
+  { en: "Beheira", ar: "البحيرة" },
+  { en: "Fayoum", ar: "الفيوم" },
+  { en: "Gharbia", ar: "الغربية" },
+  { en: "Ismailia", ar: "الإسماعيلية" },
+  { en: "Monufia", ar: "المنوفية" },
+  { en: "Minya", ar: "المنيا" },
+  { en: "Qalyubia", ar: "القليوبية" },
+  { en: "New Valley", ar: "الوادي الجديد" },
+  { en: "Suez", ar: "السويس" },
+  { en: "Aswan", ar: "أسوان" },
+  { en: "Assiut", ar: "أسيوط" },
+  { en: "Beni Suef", ar: "بني سويف" },
+  { en: "Port Said", ar: "بورسعيد" },
+  { en: "Damietta", ar: "دمياط" },
+  { en: "Sharkia", ar: "الشرقية" },
+  { en: "South Sinai", ar: "جنوب سيناء" },
+  { en: "Kafr El Sheikh", ar: "كفر الشيخ" },
+  { en: "Matrouh", ar: "مطروح" },
+  { en: "Luxor", ar: "الأقصر" },
+  { en: "Qena", ar: "قنا" },
+  { en: "North Sinai", ar: "شمال سيناء" },
+  { en: "Sohag", ar: "سوهاج" }
 ];
 
 export const CheckoutModal = () => {
@@ -18,8 +41,9 @@ export const CheckoutModal = () => {
     cartSubtotal, 
     shippingCost, 
     cartTotal, 
-    siteContent,
-    createOrder 
+    createOrder,
+    language,
+    t
   } = useStore();
 
   const [formData, setFormData] = useState({
@@ -34,7 +58,7 @@ export const CheckoutModal = () => {
   const [completedOrder, setCompletedOrder] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const currency = siteContent.general?.currency || 'EGP';
+  const currency = t('actions.egp');
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -43,7 +67,7 @@ export const CheckoutModal = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.name || !formData.phone || !formData.address) {
-      alert("Please fill in all required fields.");
+      alert(language === 'ar' ? "يرجى ملء جميع الحقول المطلوبة." : "Please fill in all required fields.");
       return;
     }
 
@@ -53,7 +77,6 @@ export const CheckoutModal = () => {
       setCompletedOrder(order);
       setSubmitting(false);
 
-      // Trigger Confetti Celebration!
       try {
         confetti({
           particleCount: 120,
@@ -79,10 +102,10 @@ export const CheckoutModal = () => {
         <div className="flex items-center justify-between p-5 border-b border-white/10 bg-neutral-900">
           <div>
             <h3 className="font-display font-black text-xl uppercase tracking-wider text-white">
-              {completedOrder ? "ORDER CONFIRMED 🎉" : "CHECKOUT • إتمام الطلب"}
+              {completedOrder ? t('checkout.orderSuccessTitle') : t('checkout.title')}
             </h3>
-            <p className="text-xs font-mono text-gray-400 mt-0.5">
-              {completedOrder ? "Thank you for shopping with KESWA" : "Fast delivery across all governorates of Egypt"}
+            <p className="text-xs font-sans text-gray-400 mt-0.5">
+              {completedOrder ? t('checkout.orderSuccessDesc') : t('checkout.subtitle')}
             </p>
           </div>
           <button 
@@ -102,33 +125,37 @@ export const CheckoutModal = () => {
 
             <div>
               <h4 className="text-2xl font-black font-display uppercase text-white mb-2">
-                ORDER #{completedOrder.id} PLACED!
+                {t('checkout.orderNumber')} #{completedOrder.id}
               </h4>
-              <p className="text-sm text-gray-300 max-w-md mx-auto">
-                We have received your order, <strong className="text-white">{completedOrder.customer.name}</strong>. Our team will contact you on <strong className="text-white">{completedOrder.customer.phone}</strong> before dispatching.
+              <p className="text-sm text-gray-300 max-w-md mx-auto font-sans">
+                {language === 'ar' ? (
+                  <>تم استلام طلبك بنجاح، <strong className="text-white">{completedOrder.customer.name}</strong>. سنتواصل معك هاتفياً على <strong className="text-white">{completedOrder.customer.phone}</strong> لتأكيد الشحن.</>
+                ) : (
+                  <>Order received, <strong className="text-white">{completedOrder.customer.name}</strong>. We will call you on <strong className="text-white">{completedOrder.customer.phone}</strong> before dispatching.</>
+                )}
               </p>
             </div>
 
-            <div className="bg-neutral-900 border border-white/10 p-5 rounded text-left max-w-md mx-auto space-y-2 text-xs font-mono">
+            <div className="bg-neutral-900 border border-white/10 p-5 rounded text-left rtl:text-right max-w-md mx-auto space-y-2 text-xs font-sans">
               <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-gray-400">Delivery Address:</span>
+                <span className="text-gray-400">{t('checkout.deliveryAddress')}:</span>
                 <span className="text-white font-bold">{completedOrder.customer.address}, {completedOrder.customer.city}</span>
               </div>
               <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-gray-400">Payment:</span>
+                <span className="text-gray-400">{t('checkout.payment')}:</span>
                 <span className="text-white font-bold">{completedOrder.paymentMethod}</span>
               </div>
               <div className="flex justify-between text-sm pt-1">
-                <span className="text-gray-300 font-bold">Total Amount:</span>
-                <span className="text-emerald-400 font-black text-base">{completedOrder.total} {currency}</span>
+                <span className="text-gray-300 font-bold">{t('checkout.totalPaid')}:</span>
+                <span className="text-emerald-400 font-black text-base font-mono">{completedOrder.total} {currency}</span>
               </div>
             </div>
 
             <button
               onClick={handleClose}
-              className="bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-widest uppercase px-8 py-3.5 transition-all shadow-xl"
+              className="bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-wider uppercase px-8 py-3.5 transition-all shadow-xl font-sans"
             >
-              CONTINUE SHOPPING
+              {t('actions.continueShopping')}
             </button>
           </div>
         ) : (
@@ -136,36 +163,36 @@ export const CheckoutModal = () => {
             
             {/* Customer Information */}
             <div className="space-y-4">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5 border-b border-white/5 pb-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5 border-b border-white/5 pb-2 font-sans">
                 <User size={14} className="text-white" />
-                <span>CUSTOMER INFORMATION • بيانات العميل</span>
+                <span>{t('checkout.customerInfo')}</span>
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">
-                    Full Name / الاسم بالكامل *
+                  <label className="block text-[11px] font-sans text-gray-400 mb-1">
+                    {t('checkout.fullName')}
                   </label>
                   <input 
                     type="text" 
                     name="name"
                     required
-                    placeholder="e.g. Hazem M."
+                    placeholder={t('checkout.fullNamePlaceholder')}
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full bg-neutral-900 border border-white/15 px-3 py-2.5 text-xs text-white rounded-none outline-none focus:border-white"
+                    className="w-full bg-neutral-900 border border-white/15 px-3 py-2.5 text-xs text-white rounded-none outline-none focus:border-white font-sans"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">
-                    Phone Number / رقم الهاتف *
+                  <label className="block text-[11px] font-sans text-gray-400 mb-1">
+                    {t('checkout.phone')}
                   </label>
                   <input 
                     type="tel" 
                     name="phone"
                     required
-                    placeholder="010 / 011 / 012 / 015..."
+                    placeholder={t('checkout.phonePlaceholder')}
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full bg-neutral-900 border border-white/15 px-3 py-2.5 text-xs text-white rounded-none outline-none focus:border-white font-mono"
@@ -175,57 +202,59 @@ export const CheckoutModal = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">
-                    Governorate / المحافظة *
+                  <label className="block text-[11px] font-sans text-gray-400 mb-1">
+                    {t('checkout.governorate')}
                   </label>
                   <select 
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full bg-neutral-900 border border-white/15 px-3 py-2.5 text-xs text-white rounded-none outline-none focus:border-white"
+                    className="w-full bg-neutral-900 border border-white/15 px-3 py-2.5 text-xs text-white rounded-none outline-none focus:border-white font-sans"
                   >
                     {EGYPT_GOVERNORATES.map(gov => (
-                      <option key={gov} value={gov}>{gov}</option>
+                      <option key={gov.en} value={gov.en}>
+                        {language === 'ar' ? `${gov.ar} (${gov.en})` : `${gov.en} - ${gov.ar}`}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">
-                    Detailed Address / العنوان بالتفصيل *
+                  <label className="block text-[11px] font-sans text-gray-400 mb-1">
+                    {t('checkout.address')}
                   </label>
                   <input 
                     type="text" 
                     name="address"
                     required
-                    placeholder="Street, Building No, Apartment..."
+                    placeholder={t('checkout.addressPlaceholder')}
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full bg-neutral-900 border border-white/15 px-3 py-2.5 text-xs text-white rounded-none outline-none focus:border-white"
+                    className="w-full bg-neutral-900 border border-white/15 px-3 py-2.5 text-xs text-white rounded-none outline-none focus:border-white font-sans"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono uppercase text-gray-400 mb-1">
-                  Order Notes / ملاحظات خاصة (اختياري)
+                <label className="block text-[11px] font-sans text-gray-400 mb-1">
+                  {t('checkout.notes')}
                 </label>
                 <input 
                   type="text" 
                   name="notes"
-                  placeholder="e.g. Please call before arriving"
+                  placeholder={t('checkout.notesPlaceholder')}
                   value={formData.notes}
                   onChange={handleChange}
-                  className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded-none outline-none focus:border-white"
+                  className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded-none outline-none focus:border-white font-sans"
                 />
               </div>
             </div>
 
             {/* Payment Method */}
             <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5 border-b border-white/5 pb-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5 border-b border-white/5 pb-2 font-sans">
                 <Truck size={14} className="text-white" />
-                <span>PAYMENT METHOD • طريقة الدفع</span>
+                <span>{t('checkout.paymentMethod')}</span>
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -243,8 +272,8 @@ export const CheckoutModal = () => {
                     className="accent-white"
                   />
                   <div>
-                    <span className="block text-xs font-bold text-white uppercase">Cash On Delivery</span>
-                    <span className="block text-[10px] text-gray-400 font-mono">الدفع نقدًا عند الاستلام</span>
+                    <span className="block text-xs font-bold text-white font-sans">{t('checkout.cod')}</span>
+                    <span className="block text-[10px] text-gray-400 font-sans">{t('checkout.codDesc')}</span>
                   </div>
                 </label>
 
@@ -262,27 +291,27 @@ export const CheckoutModal = () => {
                     className="accent-white"
                   />
                   <div>
-                    <span className="block text-xs font-bold text-white uppercase">Credit / Debit Card</span>
-                    <span className="block text-[10px] text-gray-400 font-mono">فيزا / ماستركارد (تجريبي)</span>
+                    <span className="block text-xs font-bold text-white font-sans">{t('checkout.card')}</span>
+                    <span className="block text-[10px] text-gray-400 font-sans">{t('checkout.cardDesc')}</span>
                   </div>
                 </label>
               </div>
             </div>
 
             {/* Summary */}
-            <div className="bg-neutral-900/80 border border-white/10 p-4 rounded-none space-y-2">
-              <div className="flex justify-between text-xs font-mono text-gray-400">
-                <span>Items Subtotal ({cart.length} items):</span>
-                <span className="text-white font-bold">{cartSubtotal} {currency}</span>
+            <div className="bg-neutral-900/80 border border-white/10 p-4 rounded-none space-y-2 font-sans">
+              <div className="flex justify-between text-xs text-gray-400">
+                <span>{t('cart.subtotal')} ({cart.length}):</span>
+                <span className="text-white font-bold font-mono">{cartSubtotal} {currency}</span>
               </div>
-              <div className="flex justify-between text-xs font-mono text-gray-400">
-                <span>Delivery Shipping:</span>
-                <span className="text-white font-bold">
-                  {shippingCost === 0 ? <span className="text-emerald-400">FREE</span> : `${shippingCost} ${currency}`}
+              <div className="flex justify-between text-xs text-gray-400">
+                <span>{t('cart.shipping')}:</span>
+                <span className="text-white font-bold font-mono">
+                  {shippingCost === 0 ? <span className="text-emerald-400">{t('actions.freeShipping')}</span> : `${shippingCost} ${currency}`}
                 </span>
               </div>
               <div className="flex justify-between text-sm font-bold text-white border-t border-white/10 pt-2">
-                <span>Total Due:</span>
+                <span>{t('cart.total')}:</span>
                 <span className="font-mono text-emerald-400 text-lg">{cartTotal} {currency}</span>
               </div>
             </div>
@@ -291,10 +320,10 @@ export const CheckoutModal = () => {
             <button
               type="submit"
               disabled={submitting || cart.length === 0}
-              className="w-full bg-white hover:bg-neutral-200 disabled:opacity-50 text-black font-black text-xs tracking-[0.25em] uppercase py-4 transition-all shadow-xl flex items-center justify-center gap-2"
+              className="w-full bg-white hover:bg-neutral-200 disabled:opacity-50 text-black font-black text-xs tracking-wider uppercase py-4 transition-all shadow-xl flex items-center justify-center gap-2 font-sans"
             >
               <ShieldCheck size={16} />
-              <span>{submitting ? "CONFIRMING ORDER..." : "PLACE ORDER NOW • تأكيد الطلب"}</span>
+              <span>{submitting ? t('checkout.confirming') : t('checkout.placeOrder')}</span>
             </button>
 
           </form>

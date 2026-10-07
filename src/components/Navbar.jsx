@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { KeswaLogo } from './KeswaLogo';
-import { ShoppingBag, Search, Heart, Sliders, Menu, X, ShieldAlert } from 'lucide-react';
+import { ShoppingBag, Search, Heart, Sliders, Menu, X, Globe } from 'lucide-react';
 
 export const Navbar = () => {
   const { 
@@ -12,7 +12,11 @@ export const Navbar = () => {
     wishlist,
     setActiveCategory,
     searchQuery,
-    setSearchQuery
+    setSearchQuery,
+    language,
+    toggleLanguage,
+    t,
+    getLocalized
   } = useStore();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,12 +28,13 @@ export const Navbar = () => {
     setActiveCategory(navId === 'shop' ? 'all' : navId);
     setMobileMenuOpen(false);
 
-    // Smooth scroll if element exists
     const target = document.querySelector(link);
     if (target) {
       target.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const announcementText = getLocalized(announcement, 'text');
 
   return (
     <header className="sticky top-0 z-40 w-full">
@@ -38,9 +43,9 @@ export const Navbar = () => {
         <aside aria-label="Announcement" className="bg-[#121217] border-b border-white/10 text-[11px] font-medium tracking-wider text-gray-300 py-1.5 px-4 text-center flex items-center justify-center gap-2 relative z-50">
           <a 
             href={announcement.link || "#sale"} 
-            className="hover:text-white transition-colors duration-200 flex items-center gap-1.5 uppercase font-mono"
+            className="hover:text-white transition-colors duration-200 flex items-center gap-1.5 font-sans"
           >
-            {announcement.text}
+            {announcementText}
           </a>
         </aside>
       )}
@@ -51,17 +56,20 @@ export const Navbar = () => {
           <div className="flex items-center justify-between h-20">
             
             {/* Left: Navigation Links (Desktop) */}
-            <div className="hidden lg:flex items-center space-x-7">
-              {navigation?.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id, item.link)}
-                  className="text-xs font-bold uppercase tracking-[0.2em] text-gray-300 hover:text-white transition-colors py-2 relative group"
-                >
-                  {item.label}
-                  <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                </button>
-              ))}
+            <div className="hidden lg:flex items-center space-x-6 rtl:space-x-reverse">
+              {navigation?.map((item) => {
+                const label = getLocalized(item, 'label');
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id, item.link)}
+                    className="text-xs font-bold uppercase tracking-[0.15em] text-gray-300 hover:text-white transition-colors py-2 relative group"
+                  >
+                    {label}
+                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Mobile Menu Button */}
@@ -89,19 +97,31 @@ export const Navbar = () => {
               </a>
             </div>
 
-            {/* Right: Actions (Search, Wishlist, Cart, Admin) */}
-            <div className="flex items-center space-x-3 sm:space-x-5">
+            {/* Right: Actions (Language Switcher, Search, Wishlist, Cart, Admin) */}
+            <div className="flex items-center space-x-2.5 sm:space-x-4 rtl:space-x-reverse">
               
+              {/* Language Switcher Button (عربي / EN) */}
+              <button
+                onClick={toggleLanguage}
+                className="flex items-center gap-1.5 bg-neutral-900/90 hover:bg-neutral-800 text-gray-200 border border-white/15 px-2.5 py-1.5 rounded text-xs font-bold font-mono transition-all hover:border-white/40"
+                title={language === 'ar' ? "Switch to English" : "التحويل للغة العربية"}
+              >
+                <Globe size={13} className="text-cyan-400" />
+                <span className="text-[11px] font-sans">
+                  {language === 'ar' ? 'EN' : 'العربية'}
+                </span>
+              </button>
+
               {/* Search Toggle / Input */}
               <div className="relative flex items-center">
                 {showSearchInput ? (
                   <div className="flex items-center bg-[#1a1a22] border border-white/20 rounded-full px-3 py-1.5">
                     <input 
                       type="text"
-                      placeholder="Search hoodies, tees..."
+                      placeholder={t('nav.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-transparent text-xs text-white placeholder-gray-400 outline-none w-32 sm:w-48"
+                      className="bg-transparent text-xs text-white placeholder-gray-400 outline-none w-32 sm:w-44"
                       autoFocus
                     />
                     <button 
@@ -115,7 +135,7 @@ export const Navbar = () => {
                   <button 
                     onClick={() => setShowSearchInput(true)}
                     className="p-2 text-gray-300 hover:text-white transition-colors"
-                    title="Search catalog"
+                    title={t('nav.searchPlaceholder')}
                   >
                     <Search size={19} />
                   </button>
@@ -129,7 +149,7 @@ export const Navbar = () => {
                   if (target) target.scrollIntoView({ behavior: 'smooth' });
                 }}
                 className="relative p-2 text-gray-300 hover:text-white transition-colors hidden sm:block"
-                title="Favorites"
+                title={t('nav.favorites')}
               >
                 <Heart size={19} />
                 {wishlist.length > 0 && (
@@ -143,7 +163,7 @@ export const Navbar = () => {
               <button 
                 onClick={() => setIsCartOpen(true)}
                 className="relative p-2 text-gray-300 hover:text-white transition-colors group flex items-center"
-                title="View Shopping Cart"
+                title={t('nav.cart')}
               >
                 <ShoppingBag size={20} className="group-hover:scale-110 transition-transform" />
                 {cartItemsCount > 0 && (
@@ -160,8 +180,7 @@ export const Navbar = () => {
                 title="Open CMS Admin Dashboard"
               >
                 <Sliders size={13} className="text-amber-400 group-hover:text-black" />
-                <span className="hidden sm:inline">لوحة التحكم</span>
-                <span className="sm:hidden">ADMIN</span>
+                <span className="font-sans">لوحة التحكم</span>
               </button>
 
             </div>
@@ -176,18 +195,24 @@ export const Navbar = () => {
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id, item.link)}
-                className="block w-full text-left py-2 text-sm font-bold uppercase tracking-widest text-gray-200 hover:text-white border-b border-white/5"
+                className="block w-full text-left rtl:text-right py-2 text-sm font-bold uppercase tracking-wider text-gray-200 hover:text-white border-b border-white/5"
               >
-                {item.label}
+                {getLocalized(item, 'label')}
               </button>
             ))}
             <div className="pt-2 flex justify-between items-center text-xs text-gray-400">
-              <span className="font-mono">KESWA STREETWEAR</span>
+              <button 
+                onClick={toggleLanguage}
+                className="flex items-center gap-1.5 text-white bg-neutral-800 px-3 py-1.5 rounded"
+              >
+                <Globe size={13} />
+                <span>{language === 'ar' ? 'English Language' : 'اللغة العربية'}</span>
+              </button>
               <button 
                 onClick={() => { setMobileMenuOpen(false); setIsAdminOpen(true); }}
-                className="text-white bg-white/10 px-3 py-1 rounded"
+                className="text-white bg-white/10 px-3 py-1.5 rounded font-bold"
               >
-                فتح لوحة التحكم
+                لوحة التحكم
               </button>
             </div>
           </div>

@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
-import { ArrowRight, Clock, Sparkles, Flame, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Clock, Sparkles, Flame, Check } from 'lucide-react';
 
 /**
  * 1. Main Hero: Hoodies
  */
 export const HeroHoodies = () => {
-  const { siteContent, setActiveCategory } = useStore();
+  const { siteContent, setActiveCategory, getLocalized, language } = useStore();
   const banner = siteContent.banners?.heroHoodies;
 
   if (!banner || !banner.enabled) return null;
+
+  const title = getLocalized(banner, 'title');
+  const subtitle = getLocalized(banner, 'subtitle');
+  const badge = getLocalized(banner, 'badge');
+  const buttonText = getLocalized(banner, 'buttonText');
 
   return (
     <section id="hoodies-hero" className="relative w-full h-[78vh] min-h-[520px] max-h-[850px] bg-black overflow-hidden flex items-center justify-center">
@@ -17,7 +22,7 @@ export const HeroHoodies = () => {
       <div className="absolute inset-0 z-0">
         <img 
           src={banner.image} 
-          alt={banner.title}
+          alt={title}
           className="w-full h-full object-cover object-top opacity-75 transform scale-105 transition-transform duration-1000 ease-out hover:scale-100" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-black/30 to-black/60" />
@@ -25,27 +30,27 @@ export const HeroHoodies = () => {
 
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 text-center flex flex-col items-center">
-        {banner.badge && (
-          <span className="inline-block bg-white text-black text-[11px] font-black tracking-[0.25em] px-3.5 py-1 mb-4 uppercase rounded-sm shadow-lg">
-            {banner.badge}
+        {badge && (
+          <span className="inline-block bg-white text-black text-[11px] font-black tracking-widest px-3.5 py-1 mb-4 uppercase rounded-sm shadow-lg font-sans">
+            {badge}
           </span>
         )}
 
         <h1 className="text-5xl sm:text-7xl md:text-8xl font-black uppercase font-display tracking-tight text-white mb-3 drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-          {banner.title}
+          {title}
         </h1>
 
-        <p className="text-sm sm:text-base font-medium tracking-[0.15em] text-gray-300 max-w-xl mb-8 uppercase font-mono">
-          {banner.subtitle}
+        <p className="text-sm sm:text-base font-medium tracking-wide text-gray-300 max-w-xl mb-8 uppercase font-sans">
+          {subtitle}
         </p>
 
         <a
           href={banner.buttonLink || "#hoodies"}
           onClick={() => setActiveCategory('hoodies')}
-          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm tracking-[0.2em] uppercase px-8 py-4 rounded-none transition-all duration-300 transform hover:-translate-y-0.5 shadow-2xl"
+          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm tracking-wider uppercase px-8 py-4 rounded-none transition-all duration-300 transform hover:-translate-y-0.5 shadow-2xl"
         >
-          <span>{banner.buttonText}</span>
-          <ArrowRight size={16} />
+          <span>{buttonText}</span>
+          {language === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
         </a>
       </div>
 
@@ -59,7 +64,7 @@ export const HeroHoodies = () => {
  * 2. Category Feature 3-Card Masonry Grid (Matching Image 1)
  */
 export const CategoryFeatureGrid = () => {
-  const { siteContent, setActiveCategory } = useStore();
+  const { siteContent, setActiveCategory, getLocalized, language } = useStore();
   const grid = siteContent.banners?.categoryGrid;
 
   if (!grid || !grid.enabled) return null;
@@ -75,19 +80,20 @@ export const CategoryFeatureGrid = () => {
         >
           <img 
             src={grid.card1?.image} 
-            alt={grid.card1?.title}
+            alt=""
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85" 
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6">
+          <div className="absolute bottom-6 left-6 right-6 rtl:text-right">
             <span className="text-[10px] font-mono tracking-widest uppercase text-gray-400 block mb-1">
-              {grid.card1?.subtitle}
+              {getLocalized(grid.card1, 'subtitle')}
             </span>
             <h3 className="text-2xl sm:text-3xl font-black uppercase text-white font-display mb-3">
-              {grid.card1?.title}
+              {getLocalized(grid.card1, 'title')}
             </h3>
             <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white group-hover:underline">
-              {grid.card1?.buttonText} <ArrowRight size={14} />
+              <span>{getLocalized(grid.card1, 'buttonText')}</span>
+              {language === 'ar' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
             </span>
           </div>
         </div>
@@ -102,19 +108,20 @@ export const CategoryFeatureGrid = () => {
           >
             <img 
               src={grid.card2?.image} 
-              alt={grid.card2?.title}
+              alt=""
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85" 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            <div className="absolute bottom-5 left-5 right-5">
+            <div className="absolute bottom-5 left-5 right-5 rtl:text-right">
               <span className="text-[10px] font-mono tracking-widest uppercase text-gray-400 block mb-1">
-                {grid.card2?.subtitle}
+                {getLocalized(grid.card2, 'subtitle')}
               </span>
               <h3 className="text-xl sm:text-2xl font-black uppercase text-white font-display mb-2">
-                {grid.card2?.title}
+                {getLocalized(grid.card2, 'title')}
               </h3>
               <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white group-hover:underline">
-                {grid.card2?.buttonText} <ArrowRight size={14} />
+                <span>{getLocalized(grid.card2, 'buttonText')}</span>
+                {language === 'ar' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
               </span>
             </div>
           </div>
@@ -126,19 +133,20 @@ export const CategoryFeatureGrid = () => {
           >
             <img 
               src={grid.card3?.image} 
-              alt={grid.card3?.title}
+              alt=""
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85" 
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            <div className="absolute bottom-5 left-5 right-5">
+            <div className="absolute bottom-5 left-5 right-5 rtl:text-right">
               <span className="text-[10px] font-mono tracking-widest uppercase text-gray-400 block mb-1">
-                {grid.card3?.subtitle}
+                {getLocalized(grid.card3, 'subtitle')}
               </span>
               <h3 className="text-xl sm:text-2xl font-black uppercase text-white font-display mb-2">
-                {grid.card3?.title}
+                {getLocalized(grid.card3, 'title')}
               </h3>
               <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white group-hover:underline">
-                {grid.card3?.buttonText} <ArrowRight size={14} />
+                <span>{getLocalized(grid.card3, 'buttonText')}</span>
+                {language === 'ar' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
               </span>
             </div>
           </div>
@@ -154,7 +162,7 @@ export const CategoryFeatureGrid = () => {
  * 3. T-Shirts Cinematic Banner
  */
 export const HeroTshirts = () => {
-  const { siteContent, setActiveCategory } = useStore();
+  const { siteContent, setActiveCategory, getLocalized, language } = useStore();
   const banner = siteContent.banners?.heroTshirts;
 
   if (!banner || !banner.enabled) return null;
@@ -164,32 +172,32 @@ export const HeroTshirts = () => {
       <div className="absolute inset-0 z-0">
         <img 
           src={banner.image} 
-          alt={banner.title}
+          alt=""
           className="w-full h-full object-cover object-center opacity-80" 
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/40 to-transparent rtl:bg-gradient-to-l" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full">
         <div className="max-w-xl">
           {banner.badge && (
             <span className="inline-block bg-white text-black text-[10px] font-black tracking-widest px-3 py-1 mb-3 uppercase rounded-sm">
-              {banner.badge}
+              {getLocalized(banner, 'badge')}
             </span>
           )}
           <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-2">
-            {banner.title}
+            {getLocalized(banner, 'title')}
           </h2>
-          <p className="text-xs sm:text-sm font-mono tracking-widest text-gray-300 uppercase mb-6">
-            {banner.subtitle}
+          <p className="text-xs sm:text-sm font-sans tracking-wide text-gray-300 uppercase mb-6">
+            {getLocalized(banner, 'subtitle')}
           </p>
           <a
             href={banner.buttonLink || "#tshirts"}
             onClick={() => setActiveCategory('tshirts')}
-            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-[0.2em] uppercase px-7 py-3.5 transition-all"
+            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-wider uppercase px-7 py-3.5 transition-all"
           >
-            <span>{banner.buttonText}</span>
-            <ArrowRight size={14} />
+            <span>{getLocalized(banner, 'buttonText')}</span>
+            {language === 'ar' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
           </a>
         </div>
       </div>
@@ -201,7 +209,7 @@ export const HeroTshirts = () => {
  * 4. Sweatpants Urban Banner
  */
 export const HeroSweatpants = () => {
-  const { siteContent, setActiveCategory } = useStore();
+  const { siteContent, setActiveCategory, getLocalized, language } = useStore();
   const banner = siteContent.banners?.heroSweatpants;
 
   if (!banner || !banner.enabled) return null;
@@ -211,32 +219,32 @@ export const HeroSweatpants = () => {
       <div className="absolute inset-0 z-0">
         <img 
           src={banner.image} 
-          alt={banner.title}
+          alt=""
           className="w-full h-full object-cover object-center opacity-80" 
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-l from-black/90 via-black/40 to-transparent rtl:bg-gradient-to-r" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full flex justify-end">
-        <div className="max-w-xl text-right">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-12 w-full flex justify-end rtl:justify-start">
+        <div className="max-w-xl text-right rtl:text-left">
           {banner.badge && (
             <span className="inline-block bg-white text-black text-[10px] font-black tracking-widest px-3 py-1 mb-3 uppercase rounded-sm">
-              {banner.badge}
+              {getLocalized(banner, 'badge')}
             </span>
           )}
           <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-2">
-            {banner.title}
+            {getLocalized(banner, 'title')}
           </h2>
-          <p className="text-xs sm:text-sm font-mono tracking-widest text-gray-300 uppercase mb-6">
-            {banner.subtitle}
+          <p className="text-xs sm:text-sm font-sans tracking-wide text-gray-300 uppercase mb-6">
+            {getLocalized(banner, 'subtitle')}
           </p>
           <a
             href={banner.buttonLink || "#sweatpants"}
             onClick={() => setActiveCategory('sweatpants')}
-            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-[0.2em] uppercase px-7 py-3.5 transition-all"
+            className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-wider uppercase px-7 py-3.5 transition-all"
           >
-            <span>{banner.buttonText}</span>
-            <ArrowRight size={14} />
+            <span>{getLocalized(banner, 'buttonText')}</span>
+            {language === 'ar' ? <ArrowLeft size={14} /> : <ArrowRight size={14} />}
           </a>
         </div>
       </div>
@@ -248,7 +256,7 @@ export const HeroSweatpants = () => {
  * 5. Super Sale Section with Real-Time Interactive Countdown
  */
 export const SuperSaleSection = () => {
-  const { siteContent, setActiveCategory } = useStore();
+  const { siteContent, setActiveCategory, getLocalized, language, t } = useStore();
   const banner = siteContent.banners?.superSale;
 
   const [timeLeft, setTimeLeft] = useState({
@@ -293,11 +301,10 @@ export const SuperSaleSection = () => {
 
   return (
     <section id="sale" className="relative w-full py-20 my-16 bg-[#0e0e12] overflow-hidden border-y border-white/10">
-      {/* Background Graphic */}
       <div className="absolute inset-0 z-0">
         <img 
           src={banner.image} 
-          alt={banner.title}
+          alt=""
           className="w-full h-full object-cover opacity-30 grayscale" 
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/85 to-black" />
@@ -306,33 +313,32 @@ export const SuperSaleSection = () => {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
           
-          {/* Left: Headline */}
-          <div className="max-w-xl text-center lg:text-left">
-            <div className="inline-flex items-center gap-1.5 text-rose-500 font-mono text-xs font-bold tracking-widest uppercase mb-3">
+          <div className="max-w-xl text-center lg:text-left rtl:lg:text-right">
+            <div className="inline-flex items-center gap-1.5 text-rose-500 font-sans text-xs font-bold tracking-widest uppercase mb-3">
               <Flame size={16} />
-              <span>{banner.badge || "SPECIAL FLASH DROP"}</span>
+              <span>{getLocalized(banner, 'badge')}</span>
             </div>
             <h2 className="text-3xl sm:text-5xl font-black uppercase font-display text-white mb-3">
-              {banner.title}
+              {getLocalized(banner, 'title')}
             </h2>
-            <p className="text-gray-400 font-mono text-xs sm:text-sm tracking-wider uppercase mb-6">
-              {banner.subtitle}
+            <p className="text-gray-400 font-sans text-xs sm:text-sm tracking-wide uppercase mb-6">
+              {getLocalized(banner, 'subtitle')}
             </p>
             <a
               href={banner.buttonLink || "#shop"}
               onClick={() => setActiveCategory('all')}
-              className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-[0.2em] uppercase px-8 py-4 transition-all"
+              className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs tracking-wider uppercase px-8 py-4 transition-all"
             >
-              <span>{banner.buttonText}</span>
-              <ArrowRight size={15} />
+              <span>{getLocalized(banner, 'buttonText')}</span>
+              {language === 'ar' ? <ArrowLeft size={15} /> : <ArrowRight size={15} />}
             </a>
           </div>
 
-          {/* Right: Live Countdown Display */}
+          {/* Countdown Display */}
           <div className="bg-black/80 border border-white/20 p-6 sm:p-8 rounded-sm backdrop-blur-md shadow-2xl">
-            <div className="flex items-center justify-center gap-1 text-gray-400 text-xs font-mono tracking-widest uppercase mb-4">
+            <div className="flex items-center justify-center gap-1.5 text-gray-400 text-xs font-sans tracking-wide uppercase mb-4">
               <Clock size={14} className="text-amber-400" />
-              <span>OFFER ENDS IN</span>
+              <span>{t('countdown.offerEndsIn')}</span>
             </div>
 
             <div className="grid grid-cols-4 gap-3 sm:gap-5 text-center">
@@ -340,32 +346,32 @@ export const SuperSaleSection = () => {
                 <span className="font-display font-black text-3xl sm:text-5xl text-white font-mono">
                   {timeLeft.days}
                 </span>
-                <span className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mt-1">
-                  DAYS
+                <span className="text-[10px] font-bold tracking-wider uppercase text-gray-400 mt-1 font-sans">
+                  {t('countdown.days')}
                 </span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="font-display font-black text-3xl sm:text-5xl text-white font-mono">
                   {timeLeft.hours}
                 </span>
-                <span className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mt-1">
-                  HOURS
+                <span className="text-[10px] font-bold tracking-wider uppercase text-gray-400 mt-1 font-sans">
+                  {t('countdown.hours')}
                 </span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="font-display font-black text-3xl sm:text-5xl text-white font-mono">
                   {timeLeft.minutes}
                 </span>
-                <span className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mt-1">
-                  MINUTES
+                <span className="text-[10px] font-bold tracking-wider uppercase text-gray-400 mt-1 font-sans">
+                  {t('countdown.minutes')}
                 </span>
               </div>
               <div className="flex flex-col items-center">
                 <span className="font-display font-black text-3xl sm:text-5xl text-rose-500 font-mono">
                   {timeLeft.seconds}
                 </span>
-                <span className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mt-1">
-                  SECONDS
+                <span className="text-[10px] font-bold tracking-wider uppercase text-gray-400 mt-1 font-sans">
+                  {t('countdown.seconds')}
                 </span>
               </div>
             </div>
@@ -381,7 +387,7 @@ export const SuperSaleSection = () => {
  * 6. Newsletter Subscription Section
  */
 export const NewsletterSection = () => {
-  const { siteContent, showToast } = useStore();
+  const { siteContent, showToast, getLocalized, t } = useStore();
   const banner = siteContent.banners?.newsletter;
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -391,30 +397,30 @@ export const NewsletterSection = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
-      showToast("Please enter a valid email address", "error");
+      showToast("يرجى إدخال بريد إلكتروني صحيح", "error");
       return;
     }
     setSubscribed(true);
-    showToast("🎉 Welcome to KESWA SQUAD! 10% coupon code: KESWA10", "success");
+    showToast("🎉 مرحباً بك في عائلة كسوة! كود الخصم: KESWA10", "success");
   };
 
   return (
     <section className="relative w-full py-20 bg-[#0a0a0c] overflow-hidden border-t border-white/10 text-center">
       <div className="max-w-2xl mx-auto px-4">
-        <span className="inline-block text-[11px] font-mono tracking-[0.3em] uppercase text-gray-400 mb-2">
-          {banner.badgeText || "STREET CULTURE"}
+        <span className="inline-block text-[11px] font-mono tracking-widest uppercase text-gray-400 mb-2">
+          {getLocalized(banner, 'badgeText') || t('newsletter.badge')}
         </span>
         <h2 className="text-3xl sm:text-4xl font-black uppercase font-display text-white mb-2">
-          {banner.title}
+          {getLocalized(banner, 'title')}
         </h2>
-        <p className="text-gray-400 text-xs sm:text-sm font-mono tracking-wider uppercase mb-8">
-          {banner.subtitle}
+        <p className="text-gray-400 text-xs sm:text-sm font-sans tracking-wide uppercase mb-8">
+          {getLocalized(banner, 'subtitle')}
         </p>
 
         {subscribed ? (
-          <div className="bg-neutral-900 border border-white/20 p-4 rounded-sm flex items-center justify-center gap-2 text-sm text-green-400 font-mono">
+          <div className="bg-neutral-900 border border-white/20 p-4 rounded-sm flex items-center justify-center gap-2 text-sm text-green-400 font-sans">
             <Check size={18} />
-            <span>YOU ARE IN! USE CODE <strong className="text-white">KESWA10</strong> AT CHECKOUT.</span>
+            <span>{t('newsletter.successMsg')} <strong className="text-white">KESWA10</strong></span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-2 max-w-md mx-auto">
@@ -422,15 +428,15 @@ export const NewsletterSection = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder={banner.placeholder}
+              placeholder={getLocalized(banner, 'placeholder') || "Enter email..."}
               required
               className="w-full bg-[#16161d] border border-white/20 px-4 py-3 text-xs text-white placeholder-gray-500 outline-none focus:border-white transition-colors"
             />
             <button 
               type="submit"
-              className="w-full sm:w-auto bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-widest uppercase px-6 py-3 transition-colors shrink-0"
+              className="w-full sm:w-auto bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-wider uppercase px-6 py-3 transition-colors shrink-0"
             >
-              {banner.buttonText}
+              {getLocalized(banner, 'buttonText')}
             </button>
           </form>
         )}

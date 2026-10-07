@@ -1,18 +1,30 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { initialSiteContent, initialProducts, initialOrders } from '../data/initialData';
+import { translations } from '../data/translations';
 
 const StoreContext = createContext();
 
 const STORAGE_KEYS = {
-  CONTENT: 'keswa_site_content_v1',
-  PRODUCTS: 'keswa_products_v1',
-  ORDERS: 'keswa_orders_v1',
-  CART: 'keswa_cart_v1',
-  WISHLIST: 'keswa_wishlist_v1'
+  CONTENT: 'keswa_site_content_v2',
+  PRODUCTS: 'keswa_products_v2',
+  ORDERS: 'keswa_orders_v2',
+  CART: 'keswa_cart_v2',
+  WISHLIST: 'keswa_wishlist_v2',
+  LANG: 'keswa_language_v2'
 };
 
 export const StoreProvider = ({ children }) => {
-  // 1. Site Content (Texts, Banners, Buttons, Footer, Branding)
+  // 0. Language State ('ar' by default as requested by user, togglable to 'en')
+  const [language, setLanguage] = useState(() => {
+    try {
+      const savedLang = localStorage.getItem(STORAGE_KEYS.LANG);
+      return savedLang ? savedLang : 'ar';
+    } catch (e) {
+      return 'ar';
+    }
+  });
+
+  // 1. Site Content
   const [siteContent, setSiteContent] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.CONTENT);
@@ -68,8 +80,42 @@ export const StoreProvider = ({ children }) => {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all'); // 'all', 'hoodies', 'tshirts', 'sweatpants', 'sale'
+  const [activeCategory, setActiveCategory] = useState('all');
   const [notification, setNotification] = useState(null);
+
+  // Sync Language and Direction
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.LANG, language);
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  }, [language]);
+
+  const toggleLanguage = () => {
+    setLanguage(prev => (prev === 'ar' ? 'en' : 'ar'));
+  };
+
+  // Helper for translations dictionary
+  const t = (path) => {
+    const keys = path.split('.');
+    let res = translations[language];
+    for (const k of keys) {
+      if (res && res[k] !== undefined) {
+        res = res[k];
+      } else {
+        return path;
+      }
+    }
+    return res;
+  };
+
+  // Helper for localized object properties
+  const getLocalized = (obj, field) => {
+    if (!obj) return '';
+    if (language === 'ar') {
+      return obj[`${field}_ar`] || obj[`${field}`] || obj[`${field}_en`] || '';
+    }
+    return obj[`${field}_en`] || obj[`${field}`] || obj[`${field}_ar`] || '';
+  };
 
   // Sync to LocalStorage
   useEffect(() => {
@@ -113,7 +159,7 @@ export const StoreProvider = ({ children }) => {
       current[keys[keys.length - 1]] = value;
       return copy;
     });
-    showToast("Changes saved in real-time!", "success");
+    showToast(language === 'ar' ? "تم حفظ التعديلات فورياً!" : "Changes saved in real-time!", "success");
   };
 
   const updateBanner = (bannerKey, updatedFields) => {
@@ -127,7 +173,7 @@ export const StoreProvider = ({ children }) => {
         }
       }
     }));
-    showToast(`Banner "${bannerKey}" updated!`, "success");
+    showToast(language === 'ar' ? `تم تحديث البنر بنجاح!` : `Banner updated successfully!`, "success");
   };
 
   const updateSectionHeader = (sectionKey, updatedFields) => {
@@ -141,7 +187,7 @@ export const StoreProvider = ({ children }) => {
         }
       }
     }));
-    showToast(`Section header updated!`, "success");
+    showToast(language === 'ar' ? "تم تحديث عنوان القسم!" : "Section header updated!", "success");
   };
 
   // Products CRUD
@@ -151,25 +197,27 @@ export const StoreProvider = ({ children }) => {
       id: newProduct.id || `keswa-${Date.now()}`
     };
     setProducts(prev => [productWithId, ...prev]);
-    showToast(`Product "${newProduct.name}" added!`, "success");
+    showToast(language === 'ar' ? `تمت إضافة المنتج بنجاح!` : `Product added!`, "success");
     return productWithId;
   };
 
   const updateProduct = (id, updatedFields) => {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updatedFields } : p));
-    showToast("Product updated successfully!", "success");
+    showToast(language === 'ar' ? "تم تحديث بيانات المنتج بنجاح!" : "Product updated successfully!", "success");
   };
 
   const deleteProduct = (id) => {
     setProducts(prev => prev.filter(p => p.id !== id));
-    showToast("Product deleted from store.", "info");
+    showToast(language === 'ar' ? "تم حذف المنتج من المتجر." : "Product deleted from store.", "info");
   };
 
   // Cart Management
   const addToCart = (product, size = 'L', color = null, quantity = 1) => {
-    const selectedColor = color || (product.colors?.[0]?.name || 'Standard');
+    const selectedColor = color || (product.colors?.[0]?.name_ar || product.colors?.[0]?.name_en || 'Standard');
     const selectedSize = size || (product.sizes?.[0] || 'L');
     const cartItemId = `${product.id}-${selectedSize}-${selectedColor}`;
+
+    const productName = getLocalized(product, 'name');
 
     setCart(prev => {
       const existing = prev.find(item => item.cartItemId === cartItemId);
@@ -185,7 +233,9 @@ export const StoreProvider = ({ children }) => {
         {
           cartItemId,
           id: product.id,
-          name: product.name,
+          name: productName,
+          name_ar: product.name_ar,
+          name_en: product.name_en,
           price: product.price,
           image: product.images?.[0] || '',
           size: selectedSize,
@@ -195,7 +245,12 @@ export const StoreProvider = ({ children }) => {
       ];
     });
 
-    showToast(`Added ${product.name} (${selectedSize}) to cart!`, "success");
+    showToast(
+      language === 'ar' 
+        ? `تمت إضافة ${productName} (${selectedSize}) إلى السلة!` 
+        : `Added ${productName} (${selectedSize}) to cart!`, 
+      "success"
+    );
     setIsCartOpen(true);
   };
 
@@ -229,7 +284,7 @@ export const StoreProvider = ({ children }) => {
       shipping,
       total,
       status: "Pending",
-      paymentMethod: customerDetails.paymentMethod || "Cash on Delivery (COD)",
+      paymentMethod: customerDetails.paymentMethod || "الدفع عند الاستلام (COD)",
       date: new Date().toISOString()
     };
 
@@ -241,7 +296,12 @@ export const StoreProvider = ({ children }) => {
 
   const updateOrderStatus = (orderId, newStatus) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-    showToast(`Order ${orderId} status changed to ${newStatus}`, "info");
+    showToast(
+      language === 'ar' 
+        ? `تم تحديث حالة الطلب #${orderId} إلى: ${newStatus}` 
+        : `Order #${orderId} status changed to: ${newStatus}`, 
+      "info"
+    );
   };
 
   // Wishlist
@@ -249,10 +309,10 @@ export const StoreProvider = ({ children }) => {
     setWishlist(prev => {
       const exists = prev.includes(productId);
       if (exists) {
-        showToast("Removed from favorites", "info");
+        showToast(language === 'ar' ? "تمت الإزالة من المفضلة" : "Removed from favorites", "info");
         return prev.filter(id => id !== productId);
       } else {
-        showToast("Added to favorites!", "success");
+        showToast(language === 'ar' ? "تمت الإضافة إلى المفضلة!" : "Added to favorites!", "success");
         return [...prev, productId];
       }
     });
@@ -260,12 +320,12 @@ export const StoreProvider = ({ children }) => {
 
   // Reset & Backup
   const resetToDefaultData = () => {
-    if (window.confirm("Are you sure you want to reset all site content, products, and orders to original defaults?")) {
+    if (window.confirm(language === 'ar' ? "هل أنت متأكد من رغبتك في إعادة ضبط كافة محتويات الموقع والمنتجات والطلبات للوضع الافتراضي؟" : "Are you sure you want to reset all site content, products, and orders to default?")) {
       setSiteContent(initialSiteContent);
       setProducts(initialProducts);
       setOrders(initialOrders);
       localStorage.clear();
-      showToast("Store reset to original default state!", "info");
+      showToast(language === 'ar' ? "تمت إعادة ضبط المتجر بنجاح!" : "Store reset to default state!", "info");
     }
   };
 
@@ -283,7 +343,7 @@ export const StoreProvider = ({ children }) => {
     a.download = `keswa-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast("Backup file downloaded!", "success");
+    showToast(language === 'ar' ? "تم تحميل ملف النسخة الاحتياطية!" : "Backup file downloaded!", "success");
   };
 
   const importData = (jsonData) => {
@@ -292,9 +352,9 @@ export const StoreProvider = ({ children }) => {
       if (parsed.siteContent) setSiteContent(parsed.siteContent);
       if (parsed.products) setProducts(parsed.products);
       if (parsed.orders) setOrders(parsed.orders);
-      showToast("Data imported successfully!", "success");
+      showToast(language === 'ar' ? "تم استيراد البيانات بنجاح!" : "Data imported successfully!", "success");
     } catch (e) {
-      alert("Invalid JSON format");
+      alert(language === 'ar' ? "صيغة الملف غير صالحة" : "Invalid JSON format");
     }
   };
 
@@ -307,6 +367,11 @@ export const StoreProvider = ({ children }) => {
 
   return (
     <StoreContext.Provider value={{
+      language,
+      setLanguage,
+      toggleLanguage,
+      t,
+      getLocalized,
       siteContent,
       updateContent,
       updateBanner,

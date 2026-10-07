@@ -23,27 +23,29 @@ export default function App() {
     activeCategory, 
     setActiveCategory, 
     notification, 
-    setIsAdminOpen 
+    setIsAdminOpen,
+    getLocalized,
+    language 
   } = useStore();
 
   const { sectionHeaders } = siteContent;
 
   return (
-    <div id="top" className="min-h-screen bg-[#0a0a0c] text-white flex flex-col relative selection:bg-white selection:text-black">
+    <div id="top" className="min-h-screen bg-[#0a0a0c] text-white flex flex-col relative selection:bg-white selection:text-black font-sans">
       
       {/* 1. Header / Navbar */}
       <Navbar />
 
       {/* Floating Admin Trigger Button for Quick Live Editing */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-6 start-6 z-40">
         <button
           onClick={() => setIsAdminOpen(true)}
           className="group flex items-center gap-2 bg-neutral-900/90 hover:bg-white hover:text-black text-gray-200 border border-white/20 px-4 py-3 rounded-full shadow-2xl backdrop-blur-md transition-all duration-300 transform hover:scale-105"
           title="Open Admin CMS"
         >
-          <Sliders size={18} className="text-amber-400 group-hover:text-black animate-spin-slow" />
-          <span className="text-xs font-black uppercase tracking-wider font-mono">
-            تحكم بالواجهة (CMS)
+          <Sliders size={18} className="text-amber-400 group-hover:text-black" />
+          <span className="text-xs font-black uppercase tracking-wider font-sans">
+            {language === 'ar' ? 'لوحة التحكم (CMS)' : 'Admin CMS'}
           </span>
         </button>
       </div>
@@ -51,21 +53,25 @@ export default function App() {
       {/* 2. Main Storefront Content */}
       <main className="flex-1">
         
-        {/* If user filtered specifically to a single category from navbar or shop */}
+        {/* If user filtered specifically to a single category from navbar */}
         {activeCategory !== 'all' ? (
           <div className="pt-8 pb-16">
             <div className="max-w-7xl mx-auto px-4 mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-gray-400 uppercase">CATEGORY:</span>
+                <span className="text-xs font-sans text-gray-400 uppercase">
+                  {language === 'ar' ? 'القسم الحالي:' : 'CATEGORY:'}
+                </span>
                 <span className="text-xl font-black font-display uppercase text-white bg-neutral-900 px-3 py-1 border border-white/10">
-                  {activeCategory}
+                  {activeCategory === 'hoodies' ? (language === 'ar' ? 'هوديز' : 'Hoodies') :
+                   activeCategory === 'tshirts' ? (language === 'ar' ? 'تيشرتات' : 'T-Shirts') :
+                   activeCategory === 'sweatpants' ? (language === 'ar' ? 'سويت بانتس' : 'Sweatpants') : activeCategory}
                 </span>
               </div>
               <button 
                 onClick={() => setActiveCategory('all')}
-                className="text-xs font-bold font-mono text-gray-400 hover:text-white underline uppercase"
+                className="text-xs font-bold font-sans text-gray-400 hover:text-white underline uppercase"
               >
-                ← View All Categories
+                {language === 'ar' ? '← عرض كافة الأقسام والصفحة الرئيسية' : '← View All Categories'}
               </button>
             </div>
 
@@ -73,9 +79,9 @@ export default function App() {
               <ProductSection
                 id="hoodies"
                 category="hoodies"
-                title={sectionHeaders?.hoodies?.title || "HOODIES"}
-                subtitle={sectionHeaders?.hoodies?.subtitle}
-                viewAllText={sectionHeaders?.hoodies?.viewAllText}
+                title={getLocalized(sectionHeaders?.hoodies, 'title') || "HOODIES"}
+                subtitle={getLocalized(sectionHeaders?.hoodies, 'subtitle')}
+                viewAllText={getLocalized(sectionHeaders?.hoodies, 'viewAllText')}
                 limit={12}
               />
             )}
@@ -84,9 +90,9 @@ export default function App() {
               <ProductSection
                 id="tshirts"
                 category="tshirts"
-                title={sectionHeaders?.tshirts?.title || "T-SHIRTS"}
-                subtitle={sectionHeaders?.tshirts?.subtitle}
-                viewAllText={sectionHeaders?.tshirts?.viewAllText}
+                title={getLocalized(sectionHeaders?.tshirts, 'title') || "T-SHIRTS"}
+                subtitle={getLocalized(sectionHeaders?.tshirts, 'subtitle')}
+                viewAllText={getLocalized(sectionHeaders?.tshirts, 'viewAllText')}
                 limit={12}
               />
             )}
@@ -95,9 +101,9 @@ export default function App() {
               <ProductSection
                 id="sweatpants"
                 category="sweatpants"
-                title={sectionHeaders?.sweatpants?.title || "SWEATPANTS"}
-                subtitle={sectionHeaders?.sweatpants?.subtitle}
-                viewAllText={sectionHeaders?.sweatpants?.viewAllText}
+                title={getLocalized(sectionHeaders?.sweatpants, 'title') || "SWEATPANTS"}
+                subtitle={getLocalized(sectionHeaders?.sweatpants, 'subtitle')}
+                viewAllText={getLocalized(sectionHeaders?.sweatpants, 'viewAllText')}
                 limit={12}
               />
             )}
@@ -115,9 +121,9 @@ export default function App() {
             <ProductSection
               id="hoodies"
               category="hoodies"
-              title={sectionHeaders?.hoodies?.title || "HOODIES"}
-              subtitle={sectionHeaders?.hoodies?.subtitle}
-              viewAllText={sectionHeaders?.hoodies?.viewAllText}
+              title={getLocalized(sectionHeaders?.hoodies, 'title') || "HOODIES"}
+              subtitle={getLocalized(sectionHeaders?.hoodies, 'subtitle')}
+              viewAllText={getLocalized(sectionHeaders?.hoodies, 'viewAllText')}
               limit={8}
             />
 
@@ -128,9 +134,9 @@ export default function App() {
             <ProductSection
               id="tshirts"
               category="tshirts"
-              title={sectionHeaders?.tshirts?.title || "T-SHIRTS"}
-              subtitle={sectionHeaders?.tshirts?.subtitle}
-              viewAllText={sectionHeaders?.tshirts?.viewAllText}
+              title={getLocalized(sectionHeaders?.tshirts, 'title') || "T-SHIRTS"}
+              subtitle={getLocalized(sectionHeaders?.tshirts, 'subtitle')}
+              viewAllText={getLocalized(sectionHeaders?.tshirts, 'viewAllText')}
               limit={4}
             />
 
@@ -141,9 +147,9 @@ export default function App() {
             <ProductSection
               id="sweatpants"
               category="sweatpants"
-              title={sectionHeaders?.sweatpants?.title || "SWEATPANTS"}
-              subtitle={sectionHeaders?.sweatpants?.subtitle}
-              viewAllText={sectionHeaders?.sweatpants?.viewAllText}
+              title={getLocalized(sectionHeaders?.sweatpants, 'title') || "SWEATPANTS"}
+              subtitle={getLocalized(sectionHeaders?.sweatpants, 'subtitle')}
+              viewAllText={getLocalized(sectionHeaders?.sweatpants, 'viewAllText')}
               limit={8}
             />
 
@@ -169,7 +175,7 @@ export default function App() {
       {/* 5. Toast Notification Banner */}
       {notification && (
         <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
-          <div className="bg-[#181824] border border-white/20 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-mono backdrop-blur-md">
+          <div className="bg-[#181824] border border-white/20 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-sans backdrop-blur-md">
             {notification.type === 'error' ? (
               <AlertCircle size={16} className="text-rose-500 shrink-0" />
             ) : (

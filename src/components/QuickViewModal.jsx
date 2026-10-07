@@ -9,7 +9,9 @@ export const QuickViewModal = () => {
     addToCart, 
     wishlist, 
     toggleWishlist,
-    siteContent 
+    language,
+    t,
+    getLocalized 
   } = useStore();
 
   const [selectedImage, setSelectedImage] = useState(0);
@@ -29,10 +31,14 @@ export const QuickViewModal = () => {
   if (!quickViewProduct) return null;
 
   const isFavorite = wishlist.includes(quickViewProduct.id);
-  const currency = siteContent.general?.currency || 'EGP';
+  const currency = t('actions.egp');
+  const productName = getLocalized(quickViewProduct, 'name');
+  const productDesc = getLocalized(quickViewProduct, 'description');
+  const productBadge = getLocalized(quickViewProduct, 'badge');
 
   const handleAddToCart = () => {
-    addToCart(quickViewProduct, selectedSize, selectedColor?.name, quantity);
+    const colorName = selectedColor ? getLocalized(selectedColor, 'name') : null;
+    addToCart(quickViewProduct, selectedSize, colorName, quantity);
     setQuickViewProduct(null);
   };
 
@@ -43,7 +49,7 @@ export const QuickViewModal = () => {
         {/* Close Button */}
         <button 
           onClick={() => setQuickViewProduct(null)}
-          className="absolute top-4 right-4 z-20 p-2 bg-black/60 hover:bg-black text-gray-300 hover:text-white rounded-full transition-colors"
+          className="absolute top-4 end-4 z-20 p-2 bg-black/60 hover:bg-black text-gray-300 hover:text-white rounded-full transition-colors"
           aria-label="Close modal"
         >
           <X size={20} />
@@ -56,12 +62,12 @@ export const QuickViewModal = () => {
             <div className="relative aspect-[3/4] w-full bg-black overflow-hidden rounded-sm border border-white/5">
               <img 
                 src={quickViewProduct.images?.[selectedImage] || quickViewProduct.images?.[0]} 
-                alt={quickViewProduct.name}
+                alt={productName}
                 className="w-full h-full object-cover object-top" 
               />
-              {quickViewProduct.badge && (
-                <span className="absolute top-3 left-3 bg-red-600 text-white font-mono text-[10px] font-black uppercase tracking-wider px-2.5 py-1">
-                  {quickViewProduct.badge}
+              {productBadge && (
+                <span className="absolute top-3 start-3 bg-red-600 text-white font-sans text-[10px] font-black uppercase tracking-wider px-2.5 py-1">
+                  {productBadge}
                 </span>
               )}
             </div>
@@ -93,7 +99,7 @@ export const QuickViewModal = () => {
                   KESWA WEAR • {quickViewProduct.category}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black uppercase font-display text-white">
-                  {quickViewProduct.name}
+                  {productName}
                 </h2>
               </div>
 
@@ -107,36 +113,39 @@ export const QuickViewModal = () => {
                     {quickViewProduct.oldPrice} {currency}
                   </span>
                 )}
-                <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20">
-                  IN STOCK • متوفر
+                <span className="text-[11px] font-sans text-emerald-400 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20">
+                  {t('actions.inStock')}
                 </span>
               </div>
 
               {/* Description */}
               <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
-                {quickViewProduct.description}
+                {productDesc}
               </p>
 
               {/* Colors */}
               {quickViewProduct.colors && (
                 <div>
-                  <span className="text-[11px] font-mono uppercase text-gray-400 block mb-2">
-                    Color: <strong className="text-white">{selectedColor?.name}</strong>
+                  <span className="text-[11px] font-sans text-gray-400 block mb-2">
+                    {t('quickView.selectColor')} <strong className="text-white">{selectedColor ? getLocalized(selectedColor, 'name') : ''}</strong>
                   </span>
                   <div className="flex gap-2">
-                    {quickViewProduct.colors.map((c, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setSelectedColor(c)}
-                        className={`w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center ${
-                          selectedColor?.name === c.name ? 'border-white scale-110' : 'border-neutral-700'
-                        }`}
-                        style={{ backgroundColor: c.hex }}
-                        title={c.name}
-                      >
-                        {selectedColor?.name === c.name && <Check size={12} className="text-white drop-shadow" />}
-                      </button>
-                    ))}
+                    {quickViewProduct.colors.map((c, i) => {
+                      const colorTitle = getLocalized(c, 'name');
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => setSelectedColor(c)}
+                          className={`w-7 h-7 rounded-full border-2 transition-all flex items-center justify-center ${
+                            selectedColor?.hex === c.hex ? 'border-white scale-110' : 'border-neutral-700'
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                          title={colorTitle}
+                        >
+                          {selectedColor?.hex === c.hex && <Check size={12} className="text-white drop-shadow" />}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -144,8 +153,8 @@ export const QuickViewModal = () => {
               {/* Sizes */}
               {quickViewProduct.sizes && (
                 <div>
-                  <span className="text-[11px] font-mono uppercase text-gray-400 block mb-2">
-                    Select Size:
+                  <span className="text-[11px] font-sans text-gray-400 block mb-2">
+                    {t('quickView.selectSize')}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {quickViewProduct.sizes.map(size => (
@@ -167,8 +176,8 @@ export const QuickViewModal = () => {
 
               {/* Quantity */}
               <div>
-                <span className="text-[11px] font-mono uppercase text-gray-400 block mb-2">
-                  Quantity:
+                <span className="text-[11px] font-sans text-gray-400 block mb-2">
+                  {t('quickView.quantity')}
                 </span>
                 <div className="inline-flex items-center border border-white/20 bg-neutral-900">
                   <button 
@@ -195,10 +204,10 @@ export const QuickViewModal = () => {
               <div className="flex gap-2">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-[0.2em] uppercase py-4 flex items-center justify-center gap-2 transition-all shadow-xl"
+                  className="flex-1 bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-wider uppercase py-4 flex items-center justify-center gap-2 transition-all shadow-xl font-sans"
                 >
                   <ShoppingBag size={15} />
-                  <span>ADD TO CART • {quickViewProduct.price * quantity} {currency}</span>
+                  <span>{t('actions.addToCart')} • {quickViewProduct.price * quantity} {currency}</span>
                 </button>
 
                 <button
@@ -215,12 +224,12 @@ export const QuickViewModal = () => {
               </div>
 
               {/* Assurance badges */}
-              <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 pt-2">
+              <div className="flex items-center justify-between text-[10px] font-sans text-gray-400 pt-2">
                 <span className="flex items-center gap-1">
-                  <ShieldCheck size={12} className="text-emerald-400" /> 100% Egyptian Cotton
+                  <ShieldCheck size={12} className="text-emerald-400" /> {t('quickView.cottonBadge')}
                 </span>
                 <span className="flex items-center gap-1">
-                  <RefreshCw size={12} className="text-blue-400" /> Easy 14-Day Returns
+                  <RefreshCw size={12} className="text-blue-400" /> {t('quickView.returnBadge')}
                 </span>
               </div>
             </div>

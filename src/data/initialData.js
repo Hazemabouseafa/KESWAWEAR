@@ -1,528 +1,633 @@
 export const initialSiteContent = {
   announcement: {
     enabled: true,
-    text: "🔥 FREE SHIPPING ON ORDERS OVER 1500 EGP | USE CODE: KESWA10 FOR 10% OFF",
+    text_ar: "🔥 شحن مجاني للطلبات فوق 1500 ج.م | كود الخصم: KESWA10 لخصم 10%",
+    text_en: "🔥 FREE SHIPPING ON ORDERS OVER 1500 EGP | USE CODE: KESWA10 FOR 10% OFF",
     link: "#sale"
   },
   brand: {
     name: "KESWA",
-    tagline: "CLOTHES • STYLE • YOU",
-    logoStyle: "metallic", // 'metallic' | 'image' | 'minimal'
+    tagline_ar: "ملابس • أناقة • أنت",
+    tagline_en: "CLOTHES • STYLE • YOU",
+    logoStyle: "metallic", // 'metallic' | 'badge'
   },
   navigation: [
-    { id: "shop", label: "SHOP ALL", link: "#shop" },
-    { id: "hoodies", label: "HOODIES", link: "#hoodies" },
-    { id: "tshirts", label: "T-SHIRTS", link: "#tshirts" },
-    { id: "sweatpants", label: "SWEATPANTS", link: "#sweatpants" },
-    { id: "sale", label: "SALE", link: "#sale" }
+    { id: "shop", label_ar: "تسوق الكل", label_en: "SHOP ALL", link: "#shop" },
+    { id: "hoodies", label_ar: "هوديز", label_en: "HOODIES", link: "#hoodies" },
+    { id: "tshirts", label_ar: "تيشرتات", label_en: "T-SHIRTS", link: "#tshirts" },
+    { id: "sweatpants", label_ar: "سويت بانتس", label_en: "SWEATPANTS", link: "#sweatpants" },
+    { id: "sale", label_ar: "العروض", label_en: "SALE", link: "#sale" }
   ],
   banners: {
     heroHoodies: {
       enabled: true,
-      title: "HOODIES",
-      subtitle: "HEAVYWEIGHT 450 GSM COTTON • OVERSIZED BOXY FIT",
-      badge: "NEW DROP 2026",
-      buttonText: "SHOP COLLECTION",
+      title_ar: "هوديز",
+      title_en: "HOODIES",
+      subtitle_ar: "قطن مصري 450 جرام • قصة أوفرسايز بوكسي عصرية",
+      subtitle_en: "HEAVYWEIGHT 450 GSM COTTON • OVERSIZED BOXY FIT",
+      badge_ar: "تشكيلة 2026 الجديدة",
+      badge_en: "NEW DROP 2026",
+      buttonText_ar: "تسوق التشكيلة",
+      buttonText_en: "SHOP COLLECTION",
       buttonLink: "#hoodies",
       image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2070&auto=format&fit=crop"
     },
     categoryGrid: {
       enabled: true,
       card1: {
-        title: "OVERSIZED HOODIES",
-        subtitle: "DROP SHOULDER SILHOUETTE",
-        buttonText: "SHOP HOODIES",
+        title_ar: "هوديز أوفرسايز",
+        title_en: "OVERSIZED HOODIES",
+        subtitle_ar: "أكتاف ساقطة وقماش ثقيل",
+        subtitle_en: "DROP SHOULDER SILHOUETTE",
+        buttonText_ar: "تسوق الهوديز",
+        buttonText_en: "SHOP HOODIES",
         link: "#hoodies",
         image: "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?q=80&w=1200&auto=format&fit=crop"
       },
       card2: {
-        title: "RETRO POLO TEES",
-        subtitle: "KNIT COLLAR ESSENTIALS",
-        buttonText: "SHOP TEES",
+        title_ar: "تيشرتات بولو ريترو",
+        title_en: "RETRO POLO TEES",
+        subtitle_ar: "ياقة تريكو إصدار محدود",
+        subtitle_en: "KNIT COLLAR ESSENTIALS",
+        buttonText_ar: "تسوق التيشرتات",
+        buttonText_en: "SHOP TEES",
         link: "#tshirts",
         image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=1000&auto=format&fit=crop"
       },
       card3: {
-        title: "BAGGY SWEATPANTS",
-        subtitle: "MAXIMUM FLEECE COMFORT",
-        buttonText: "SHOP SWEATS",
+        title_ar: "سويت بانتس باجي",
+        title_en: "BAGGY SWEATPANTS",
+        subtitle_ar: "راحة قصوى وفليس ناعم",
+        subtitle_en: "MAXIMUM FLEECE COMFORT",
+        buttonText_ar: "تسوق البنطلونات",
+        buttonText_en: "SHOP SWEATS",
         link: "#sweatpants",
         image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=1000&auto=format&fit=crop"
       }
     },
     heroTshirts: {
       enabled: true,
-      title: "T-SHIRTS",
-      subtitle: "SUMMER ESSENTIALS & OVERSIZED VINTAGE CUTS",
-      badge: "STREETWEAR BASICS",
-      buttonText: "EXPLORE NOW",
+      title_ar: "تيشرتات",
+      title_en: "T-SHIRTS",
+      subtitle_ar: "أساسيات الصيف وقصات أوفرسايز فينتاج",
+      subtitle_en: "SUMMER ESSENTIALS & OVERSIZED VINTAGE CUTS",
+      badge_ar: "الأكثر مبيعاً",
+      badge_en: "BEST SELLERS",
+      buttonText_ar: "اكتشف الآن",
+      buttonText_en: "EXPLORE NOW",
       buttonLink: "#tshirts",
       image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=2000&auto=format&fit=crop"
     },
     heroSweatpants: {
       enabled: true,
-      title: "SWEATPANTS",
-      subtitle: "RELAXED FIT & DRAWSTRING WAIST • STREET READY",
-      badge: "ALL DAY COMFORT",
-      buttonText: "SHOP SWEATS",
+      title_ar: "سويت بانتس",
+      title_en: "SWEATPANTS",
+      subtitle_ar: "قصة مريحة ورباط خصر عريض • ستريت وير أصلي",
+      subtitle_en: "RELAXED FIT & DRAWSTRING WAIST • STREET READY",
+      badge_ar: "راحة طوال اليوم",
+      badge_en: "ALL DAY COMFORT",
+      buttonText_ar: "تسوق السويت بانتس",
+      buttonText_en: "SHOP SWEATS",
       buttonLink: "#sweatpants",
       image: "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=2000&auto=format&fit=crop"
     },
     superSale: {
       enabled: true,
-      title: "SUPER SALE UP TO 40% OFF",
-      subtitle: "BIGGEST SEASONAL PRICE DROP • LIMITED STOCK AVAILABLE",
-      badge: "FLASH DEAL",
-      buttonText: "SHOP SALE",
+      title_ar: "تخفيضات كبرى تصل إلى 40%",
+      title_en: "SUPER SALE UP TO 40% OFF",
+      subtitle_ar: "أكبر خصم موسمي على ملابس الستريت وير • الكمية محدودة",
+      subtitle_en: "BIGGEST SEASONAL PRICE DROP • LIMITED STOCK AVAILABLE",
+      badge_ar: "عرض حصري لفترة محدودة",
+      badge_en: "FLASH DEAL",
+      buttonText_ar: "تسوق العرض الآن",
+      buttonText_en: "SHOP SALE",
       buttonLink: "#sale",
       image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2000&auto=format&fit=crop",
-      // Target countdown date: 5 days from now
       targetDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000 + 7 * 60 * 60 * 1000).toISOString()
     },
     newsletter: {
       enabled: true,
-      title: "NEWSLETTER",
-      subtitle: "JOIN THE KESWA SQUAD & GET 10% OFF YOUR FIRST ORDER",
-      placeholder: "Enter your email address...",
-      buttonText: "SUBSCRIBE",
-      badgeText: "STREET CLUB"
+      title_ar: "النشرة البريدية ونادي كسوة",
+      title_en: "NEWSLETTER",
+      subtitle_ar: "انضم إلى عائلة KESWA واحصل على خصم 10% على أول طلب لك",
+      subtitle_en: "JOIN THE KESWA SQUAD & GET 10% OFF YOUR FIRST ORDER",
+      placeholder_ar: "أدخل بريدك الإلكتروني هنا...",
+      placeholder_en: "Enter your email address...",
+      buttonText_ar: "اشترك الآن",
+      buttonText_en: "SUBSCRIBE",
+      badgeText_ar: "نادي الستريت وير",
+      badgeText_en: "STREET CLUB"
     }
   },
   sectionHeaders: {
     hoodies: {
-      title: "HOODIES",
-      subtitle: "Signature heavyweight oversized fits crafted for ultimate street comfort",
-      viewAllText: "VIEW ALL"
+      title_ar: "هوديز (HOODIES)",
+      title_en: "HOODIES",
+      subtitle_ar: "هوديز شتوية ثقيلة من أرقى أنواع القطن المصري للأناقة اليومية",
+      subtitle_en: "Signature heavyweight oversized fits crafted for ultimate street comfort",
+      viewAllText_ar: "عرض الكل",
+      viewAllText_en: "VIEW ALL"
     },
     tshirts: {
-      title: "T-SHIRTS",
-      subtitle: "Breathable pure Egyptian cotton and boxy drop-shoulder graphics",
-      viewAllText: "VIEW ALL"
+      title_ar: "تيشرتات (T-SHIRTS)",
+      title_en: "T-SHIRTS",
+      subtitle_ar: "قطن مصري نقي وقصات أوفرسايز مريحة وطباعات متميزة",
+      subtitle_en: "Breathable pure Egyptian cotton and boxy drop-shoulder graphics",
+      viewAllText_ar: "عرض الكل",
+      viewAllText_en: "VIEW ALL"
     },
     sweatpants: {
-      title: "SWEATPANTS",
-      subtitle: "Ultra-comfortable fleece joggers, cargos and wide-leg silhouettes",
-      viewAllText: "VIEW ALL"
+      title_ar: "سويت بانتس وكارجو (SWEATPANTS)",
+      title_en: "SWEATPANTS",
+      subtitle_ar: "بناطيل فليس وجوجرز وكارجو واسعة مصممة للراحة والحركة",
+      subtitle_en: "Ultra-comfortable fleece joggers, cargos and wide-leg silhouettes",
+      viewAllText_ar: "عرض الكل",
+      viewAllText_en: "VIEW ALL"
     }
   },
   footer: {
-    about: "KESWA WEAR is a premier Egyptian streetwear label born from the underground youth culture. We craft premium oversized garments made from heavy-gauge fabrics engineered for daily expression.",
-    tagline: "CLOTHES • STYLE • YOU",
+    about_ar: "براند KESWA WEAR هو علامة تجارية مصرية رائدة للملابس الستريت وير الفاخرة. نبتكر تصاميم عصرية واسعة مصنوعة من أجود أنواع القطن المصري لتلائم ثقافة الشباب المعاصر.",
+    about_en: "KESWA WEAR is a premier Egyptian streetwear label born from the underground youth culture. We craft premium oversized garments made from heavy-gauge fabrics engineered for daily expression.",
+    tagline_ar: "ملابس • أناقة • أنت",
+    tagline_en: "CLOTHES • STYLE • YOU",
     phone: "+20 102 345 6789",
     whatsapp: "+20 102 345 6789",
     email: "contact@keswawear.com",
-    address: "Alexandria & Cairo, Egypt",
+    address_ar: "الإسكندرية والقاهرة، مصر",
+    address_en: "Alexandria & Cairo, Egypt",
     social: {
       instagram: "https://instagram.com/keswawear",
       tiktok: "https://tiktok.com/@keswawear",
       facebook: "https://facebook.com/keswawear"
     },
-    copyright: "© 2026 KESWA WEAR. ALL RIGHTS RESERVED."
+    copyright_ar: "© 2026 KESWA WEAR. جميع الحقوق محفوظة.",
+    copyright_en: "© 2026 KESWA WEAR. ALL RIGHTS RESERVED."
   },
   general: {
-    currency: "EGP",
+    currency_ar: "ج.م",
+    currency_en: "EGP",
     shippingCost: 50,
     freeShippingThreshold: 1500
   }
 };
 
 export const initialProducts = [
-  // HOODIES (8 products matching image 1)
+  // HOODIES (8 products)
   {
     id: "h-01",
-    name: "Washed Black Boxy Heavyweight Hoodie",
+    name_ar: "هودي أسود مغسول بوكسي ثقيل 450 جرام",
+    name_en: "Washed Black Boxy Heavyweight Hoodie",
     category: "hoodies",
     price: 950,
     oldPrice: 1200,
-    badge: "SALE -20%",
+    badge_ar: "خصم -20%",
+    badge_en: "SALE -20%",
     inStock: true,
     featured: true,
-    description: "450 GSM french terry cotton hoodie featuring a boxy drop-shoulder cut, double-layered hood without drawstrings, and subtle tonal chest embroidery.",
+    description_ar: "هودي قطن فرينش تيري مصري 450 جرام بقصة أكتاف ساقطة بوكسي وغطاء رأس مزدوج بدون أربطة مع تطريز ناعم.",
+    description_en: "450 GSM french terry cotton hoodie featuring a boxy drop-shoulder cut, double-layered hood without drawstrings, and subtle tonal chest embroidery.",
     images: [
       "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: [
-      { name: "Washed Black", hex: "#1c1c1f" },
-      { name: "Burgundy", hex: "#5b1d28" },
-      { name: "Mocha", hex: "#543e34" }
+      { name_ar: "أسود مغسول", name_en: "Washed Black", hex: "#1c1c1f" },
+      { name_ar: "نبيتي", name_en: "Burgundy", hex: "#5b1d28" },
+      { name_ar: "موكا", name_en: "Mocha", hex: "#543e34" }
     ]
   },
   {
     id: "h-02",
-    name: "Burgundy Heavy Fleece Oversized Hoodie",
+    name_ar: "هودي نبيتي فليس أوفرسايز فخم",
+    name_en: "Burgundy Heavy Fleece Oversized Hoodie",
     category: "hoodies",
     price: 920,
     oldPrice: 1150,
-    badge: "BEST SELLER",
+    badge_ar: "الأكثر مبيعاً",
+    badge_en: "BEST SELLER",
     inStock: true,
     featured: true,
-    description: "Deep wine burgundy fleece hoodie designed with ribbed cuffs and kangaroo pouch. Pre-shrunk Egyptian combed cotton.",
+    description_ar: "هودي فليس نبيتي داكن مع جيب كنغر أمامي وأساور مضلعة متينة، معالج ضد الانكماش.",
+    description_en: "Deep wine burgundy fleece hoodie designed with ribbed cuffs and kangaroo pouch. Pre-shrunk Egyptian combed cotton.",
     images: [
       "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL", "XXL"],
     colors: [
-      { name: "Burgundy", hex: "#5b1d28" },
-      { name: "Onyx Black", hex: "#111111" }
+      { name_ar: "نبيتي", name_en: "Burgundy", hex: "#5b1d28" },
+      { name_ar: "أسود داكن", name_en: "Onyx Black", hex: "#111111" }
     ]
   },
   {
     id: "h-03",
-    name: "Maroon Zip-Up Streetwear Hoodie",
+    name_ar: "هودي مارون سوستة ستريت وير كاملة",
+    name_en: "Maroon Zip-Up Streetwear Hoodie",
     category: "hoodies",
     price: 980,
     oldPrice: 1250,
-    badge: "SALE -22%",
+    badge_ar: "خصم -22%",
+    badge_en: "SALE -22%",
     inStock: true,
     featured: true,
-    description: "Heavy metal YKK two-way zipper hoodie with clean minimal chest logo and reinforced stitching throughout.",
+    description_ar: "هودي بسحاب معدني YKK باتجاهين مع لوجو كسوة مصغر وخياطة مزدوجة معززة.",
+    description_en: "Heavy metal YKK two-way zipper hoodie with clean minimal chest logo and reinforced stitching throughout.",
     images: [
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Maroon", hex: "#631c2c" },
-      { name: "Navy", hex: "#1a243b" },
-      { name: "Charcoal", hex: "#2b2b30" }
+      { name_ar: "مارون", name_en: "Maroon", hex: "#631c2c" },
+      { name_ar: "كحلي", name_en: "Navy", hex: "#1a243b" },
+      { name_ar: "شاركوول", name_en: "Charcoal", hex: "#2b2b30" }
     ]
   },
   {
     id: "h-04",
-    name: "Stealth Utility Arm Patch Hoodie",
+    name_ar: "هودي أسود تكتيكال بجيب على الذراع",
+    name_en: "Stealth Utility Arm Patch Hoodie",
     category: "hoodies",
     price: 1050,
     oldPrice: 1300,
-    badge: "LIMITED",
+    badge_ar: "إصدار حصري",
+    badge_en: "LIMITED",
     inStock: true,
     featured: false,
-    description: "Tactical streetwear hybrid hoodie with zippered arm pocket and rubberized KESWA emblem.",
+    description_ar: "تصميم ستريت وير تكتيكي هجين مع جيب سوستة على الذراع وشارة كسوة مطاطية حصرية.",
+    description_en: "Tactical streetwear hybrid hoodie with zippered arm pocket and rubberized KESWA emblem.",
     images: [
       "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL"],
     colors: [
-      { name: "Tactical Black", hex: "#151515" }
+      { name_ar: "أسود تكتيكال", name_en: "Tactical Black", hex: "#151515" }
     ]
   },
   {
     id: "h-05",
-    name: "Oatmeal Heather Embroidered Hoodie",
+    name_ar: "هودي بيج شوفان مطرز بتاج كسوة",
+    name_en: "Oatmeal Heather Embroidered Hoodie",
     category: "hoodies",
     price: 890,
     oldPrice: 1100,
-    badge: "NEW",
+    badge_ar: "جديد",
+    badge_en: "NEW",
     inStock: true,
     featured: true,
-    description: "Warm neutral heather oatmeal palette with high-density KESWA crown embroidery across the chest.",
+    description_ar: "لون بيج شوفان طبيعي هادئ مع تطريز كثيف عالي الجودة لتاج KESWA في المنتصف.",
+    description_en: "Warm neutral heather oatmeal palette with high-density KESWA crown embroidery across the chest.",
     images: [
       "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: [
-      { name: "Oatmeal", hex: "#dcd6cd" },
-      { name: "Bone White", hex: "#f1eee9" }
+      { name_ar: "شوفان بيج", name_en: "Oatmeal", hex: "#dcd6cd" },
+      { name_ar: "أوف وايت", name_en: "Bone White", hex: "#f1eee9" }
     ]
   },
   {
     id: "h-06",
-    name: "Charcoal Washed Minimal Pullover",
+    name_ar: "هودي رمادي شاركوول أسيد مغسول فينتاج",
+    name_en: "Charcoal Washed Minimal Pullover",
     category: "hoodies",
     price: 940,
     oldPrice: 1200,
-    badge: "SALE -21%",
+    badge_ar: "خصم -21%",
+    badge_en: "SALE -21%",
     inStock: true,
     featured: false,
-    description: "Sun-faded stone wash finish providing that sought-after vintage grunge streetwear vibe.",
+    description_ar: "غسيل حجري مميز يمنح الهودي طابع الجرونج العتيق المحبب لعشاق الستريت وير.",
+    description_en: "Sun-faded stone wash finish providing that sought-after vintage grunge streetwear vibe.",
     images: [
       "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Acid Charcoal", hex: "#2f3136" }
+      { name_ar: "شاركوول مغسول", name_en: "Acid Charcoal", hex: "#2f3136" }
     ]
   },
   {
     id: "h-07",
-    name: "Earth Mocha Tan Relaxed Hoodie",
+    name_ar: "هودي بني موكا تان ثقيل وناعم",
+    name_en: "Earth Mocha Tan Relaxed Hoodie",
     category: "hoodies",
     price: 950,
     oldPrice: 1250,
-    badge: "HOT",
+    badge_ar: "مميز",
+    badge_en: "HOT",
     inStock: true,
     featured: false,
-    description: "Earthy mocha brown shade crafted in ultra-soft brushed fleece interior with thick elasticated hem.",
+    description_ar: "درجة بني موكا دافئة مصنوعة من فليس داخلي مفرش فائق النعومة لراحة تدوم طوال اليوم.",
+    description_en: "Earthy mocha brown shade crafted in ultra-soft brushed fleece interior with thick elasticated hem.",
     images: [
       "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL", "XXL"],
     colors: [
-      { name: "Mocha Tan", hex: "#6e5445" },
-      { name: "Desert Sand", hex: "#c4a482" }
+      { name_ar: "موكا تان", name_en: "Mocha Tan", hex: "#6e5445" },
+      { name_ar: "رملي", name_en: "Desert Sand", hex: "#c4a482" }
     ]
   },
   {
     id: "h-08",
-    name: "Deep Midnight Navy Zip Hoodie",
+    name_ar: "هودي كحلي داكن بسوستة خفيفة ودافئة",
+    name_en: "Deep Midnight Navy Zip Hoodie",
     category: "hoodies",
     price: 920,
     oldPrice: 1180,
-    badge: "SALE -22%",
+    badge_ar: "خصم -22%",
+    badge_en: "SALE -22%",
     inStock: true,
     featured: false,
-    description: "Clean dark navy blue hue with matte metallic zipper pull and reinforced side panel ribbing.",
+    description_ar: "درجة كحلي داكنة أنيقة مع سحاب مطفي وتصميم جانبي مضلع معزز.",
+    description_en: "Clean dark navy blue hue with matte metallic zipper pull and reinforced side panel ribbing.",
     images: [
       "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Deep Navy", hex: "#162035" },
-      { name: "Steel Grey", hex: "#4b5563" }
+      { name_ar: "كحلي داكن", name_en: "Deep Navy", hex: "#162035" },
+      { name_ar: "رمادي معدني", name_en: "Steel Grey", hex: "#4b5563" }
     ]
   },
 
-  // T-SHIRTS (4 products matching image 1)
+  // T-SHIRTS (4 products)
   {
     id: "t-01",
-    name: "Vintage Cream Retro Knit Collar Polo",
+    name_ar: "تيشيرت بولو بيج بياقة تريكو ريترو",
+    name_en: "Vintage Cream Retro Knit Collar Polo",
     category: "tshirts",
     price: 580,
     oldPrice: 720,
-    badge: "SALE -20%",
+    badge_ar: "خصم -20%",
+    badge_en: "SALE -20%",
     inStock: true,
     featured: true,
-    description: "Retro streetwear collared polo tee featuring contrast jacquard knit piping and relaxed drop sleeves.",
+    description_ar: "تيشيرت بولو كلاسيكي ستريت وير بياقة تريكو جاكار مخططة وأكمام ساقطة واسعة.",
+    description_en: "Retro streetwear collared polo tee featuring contrast jacquard knit piping and relaxed drop sleeves.",
     images: [
       "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Beige Cream", hex: "#eee8dd" },
-      { name: "Sage", hex: "#8a9a86" }
+      { name_ar: "بيج كريمي", name_en: "Beige Cream", hex: "#eee8dd" },
+      { name_ar: "زيتي فاتح", name_en: "Sage", hex: "#8a9a86" }
     ]
   },
   {
     id: "t-02",
-    name: "Urban Camo Street Oversized Tee",
+    name_ar: "تيشيرت مموه أوربان كامو أوفرسايز",
+    name_en: "Urban Camo Street Oversized Tee",
     category: "tshirts",
     price: 520,
     oldPrice: 650,
-    badge: "POPULAR",
+    badge_ar: "شائع",
+    badge_en: "POPULAR",
     inStock: true,
     featured: true,
-    description: "Custom military camo screenprint on 260 GSM heavy cotton jersey. Wide neckline and raw look hem.",
+    description_ar: "طباعة تمويه عسكري مخصصة على قماش قطن مصري متين 260 جرام مع ياقة واسعة.",
+    description_en: "Custom military camo screenprint on 260 GSM heavy cotton jersey. Wide neckline and raw look hem.",
     images: [
       "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL", "XXL"],
     colors: [
-      { name: "Woodland Camo", hex: "#4a533c" }
+      { name_ar: "كامو غابات", name_en: "Woodland Camo", hex: "#4a533c" }
     ]
   },
   {
     id: "t-03",
-    name: "Crisp Off-White Textured Boxy Polo",
+    name_ar: "تيشيرت بولو أوف وايت وافل بوكسي",
+    name_en: "Crisp Off-White Textured Boxy Polo",
     category: "tshirts",
     price: 590,
     oldPrice: 750,
-    badge: "NEW DROP",
+    badge_ar: "إصدار جديد",
+    badge_en: "NEW DROP",
     inStock: true,
     featured: true,
-    description: "Clean minimalist waffle knit texture with mother-of-pearl buttons and embroidered K crown logo.",
+    description_ar: "ملمس نسيج الوافل الفاخر مع أزرار صدفية وتطريز مصغر لتاج كسوة الملكي.",
+    description_en: "Clean minimalist waffle knit texture with mother-of-pearl buttons and embroidered K crown logo.",
     images: [
       "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Off White", hex: "#f7f7f5" },
-      { name: "Pure Black", hex: "#000000" }
+      { name_ar: "أوف وايت", name_en: "Off White", hex: "#f7f7f5" },
+      { name_ar: "أسود نقي", name_en: "Pure Black", hex: "#000000" }
     ]
   },
   {
     id: "t-04",
-    name: "Olive Graphic Gold Print Street Tee",
+    name_ar: "تيشيرت زيتي ستريت بطباعة ذهبية خلفية",
+    name_en: "Olive Graphic Gold Print Street Tee",
     category: "tshirts",
     price: 490,
     oldPrice: 620,
-    badge: "SALE -21%",
+    badge_ar: "خصم -21%",
+    badge_en: "SALE -21%",
     inStock: true,
     featured: true,
-    description: "Military olive green washed tee stamped with metallic golden calligraphy street graphic on the back.",
+    description_ar: "تيشيرت قطن زيتي مغسول مدموج بطباعة خط عربي ستريت ذهبية على الظهر.",
+    description_en: "Military olive green washed tee stamped with metallic golden calligraphy street graphic on the back.",
     images: [
       "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL"],
     colors: [
-      { name: "Olive Green", hex: "#434b36" }
+      { name_ar: "زيتي عسكري", name_en: "Olive Green", hex: "#434b36" }
     ]
   },
 
-  // SWEATPANTS (8 products matching image 1)
+  // SWEATPANTS (8 products)
   {
     id: "p-01",
-    name: "Heather Grey Baggy Drawstring Sweatpants",
+    name_ar: "سويت بانتس رمادي باجي برباط أبيض سميك",
+    name_en: "Heather Grey Baggy Drawstring Sweatpants",
     category: "sweatpants",
     price: 750,
     oldPrice: 950,
-    badge: "ICONIC",
+    badge_ar: "أيقوني",
+    badge_en: "ICONIC",
     inStock: true,
     featured: true,
-    description: "Heavy 400 GSM brushed fleece sweatpants with oversized wide-leg cut, thick chunky white drawstring cord, and deep welt pockets.",
+    description_ar: "فليس ثقيل 400 جرام بقصة رجل عريضة مريحة ورباط خصر أبيض سميك وجيوب عميقة.",
+    description_en: "Heavy 400 GSM brushed fleece sweatpants with oversized wide-leg cut, thick chunky white drawstring cord, and deep welt pockets.",
     images: [
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: [
-      { name: "Heather Grey", hex: "#b5b7b9" },
-      { name: "Charcoal", hex: "#3e4146" },
-      { name: "Onyx", hex: "#141416" }
+      { name_ar: "رمادي ميلانج", name_en: "Heather Grey", hex: "#b5b7b9" },
+      { name_ar: "شاركوول", name_en: "Charcoal", hex: "#3e4146" },
+      { name_ar: "أسود أونيكس", name_en: "Onyx", hex: "#141416" }
     ]
   },
   {
     id: "p-02",
-    name: "Midnight Navy Relaxed Fit Track Pants",
+    name_ar: "بنطلون كحلي مريح قصة مستقيمة",
+    name_en: "Midnight Navy Relaxed Fit Track Pants",
     category: "sweatpants",
     price: 720,
     oldPrice: 900,
-    badge: "BEST SELLER",
+    badge_ar: "الأكثر طلباً",
+    badge_en: "BEST SELLER",
     inStock: true,
     featured: true,
-    description: "Straight leg navy sweatpants designed for effortless stacking over your favorite sneakers.",
+    description_ar: "بنطلون سويت بانتس كحلي مستقيم ينزل بنسيابية فوق السنيكرز.",
+    description_en: "Straight leg navy sweatpants designed for effortless stacking over your favorite sneakers.",
     images: [
       "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL"],
     colors: [
-      { name: "Navy Blue", hex: "#162035" }
+      { name_ar: "كحلي داكن", name_en: "Navy Blue", hex: "#162035" }
     ]
   },
   {
     id: "p-03",
-    name: "Ecru Off-White Baggy Fleece Pants",
+    name_ar: "سويت بانتس إيكرو أوف وايت فليس باجي",
+    name_en: "Ecru Off-White Baggy Fleece Pants",
     category: "sweatpants",
     price: 780,
     oldPrice: 980,
-    badge: "LIMITED",
+    badge_ar: "إصدار محدود",
+    badge_en: "LIMITED",
     inStock: true,
     featured: true,
-    description: "Minimalist cream ecru tone with custom brushed texture interior and tonal metallic eyelets.",
+    description_ar: "درجة إيكرو كريمية فخمة مع فليس ناعم للغاية وحلقات أربطة معدنية مطفية.",
+    description_en: "Minimalist cream ecru tone with custom brushed texture interior and tonal metallic eyelets.",
     images: [
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Ecru Bone", hex: "#ece7de" }
+      { name_ar: "إيكرو كريمي", name_en: "Ecru Bone", hex: "#ece7de" }
     ]
   },
   {
     id: "p-04",
-    name: "Vintage Charcoal Heavy Jogger Pants",
+    name_ar: "جوجر شاركوول ثقيل مغسول باستك سفلي",
+    name_en: "Vintage Charcoal Heavy Jogger Pants",
     category: "sweatpants",
     price: 760,
     oldPrice: 950,
-    badge: "SALE -20%",
+    badge_ar: "خصم -20%",
+    badge_en: "SALE -20%",
     inStock: true,
     featured: false,
-    description: "Tapered ankle elastic jogger with vintage washed finish for high-energy casual styling.",
+    description_ar: "بنطلون جوجر رمادي شاركوول بأسورة كاحل مطاطية ولمسة غسيل كلاسيكية.",
+    description_en: "Tapered ankle elastic jogger with vintage washed finish for high-energy casual styling.",
     images: [
       "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL", "XXL"],
     colors: [
-      { name: "Washed Charcoal", hex: "#32353b" }
+      { name_ar: "شاركوول مغسول", name_en: "Washed Charcoal", hex: "#32353b" }
     ]
   },
   {
     id: "p-05",
-    name: "Classic Deep Navy Athletic Joggers",
+    name_ar: "جوجر رياضي كحلي كلاسيكي مريح",
+    name_en: "Classic Deep Navy Athletic Joggers",
     category: "sweatpants",
     price: 690,
     oldPrice: 880,
-    badge: "SALE -21%",
+    badge_ar: "خصم -21%",
+    badge_en: "SALE -21%",
     inStock: true,
     featured: false,
-    description: "Classic streetwear sweatpants with snug ribbed ankles and durable cotton-poly fleece mix.",
+    description_ar: "سويت بانتس عملي يومي متين مع بطانة ناعمة ومقاومة للوبر.",
+    description_en: "Classic streetwear sweatpants with snug ribbed ankles and durable cotton-poly fleece mix.",
     images: [
       "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Navy Blue", hex: "#162035" }
+      { name_ar: "كحلي داكن", name_en: "Navy Blue", hex: "#162035" }
     ]
   },
   {
     id: "p-06",
-    name: "Dune Sand Relaxed Cargo Sweats",
+    name_ar: "بنطلون كارجو رملي بجيوب جانبية كبس",
+    name_en: "Dune Sand Relaxed Cargo Sweats",
     category: "sweatpants",
     price: 820,
     oldPrice: 1050,
-    badge: "NEW DROP",
+    badge_ar: "جديد وحصري",
+    badge_en: "NEW DROP",
     inStock: true,
     featured: true,
-    description: "Dual utility cargo flap pockets on the thighs with snap buttons. Urban explorer streetwear staple.",
+    description_ar: "جيوب كارجو مزدوجة على الفخذين مع أزرار كبس مخفية لأناقة الستريت وير المعاصرة.",
+    description_en: "Dual utility cargo flap pockets on the thighs with snap buttons. Urban explorer streetwear staple.",
     images: [
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL"],
     colors: [
-      { name: "Dune Sand", hex: "#c2ab95" },
-      { name: "Black", hex: "#111111" }
+      { name_ar: "رملي بيج", name_en: "Dune Sand", hex: "#c2ab95" },
+      { name_ar: "أسود نقي", name_en: "Black", hex: "#111111" }
     ]
   },
   {
     id: "p-07",
-    name: "Jet Black Wide Leg Stacking Sweats",
+    name_ar: "سويت بانتس أسود نفاث واسع الأرجل",
+    name_en: "Jet Black Wide Leg Stacking Sweats",
     category: "sweatpants",
     price: 750,
     oldPrice: 950,
-    badge: "HOT",
+    badge_ar: "مميز",
+    badge_en: "HOT",
     inStock: true,
     featured: false,
-    description: "All-black heavyweight wide-leg silhouette that stacks cleanly over sneakers and boots.",
+    description_ar: "قصة رجل واسعة متدلية باللون الأسود الكامل تنسدل بشكل استثنائي فوق الأحذية.",
+    description_en: "All-black heavyweight wide-leg silhouette that stacks cleanly over sneakers and boots.",
     images: [
       "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["S", "M", "L", "XL", "XXL"],
     colors: [
-      { name: "Jet Black", hex: "#0e0e10" }
+      { name_ar: "أسود داكن", name_en: "Jet Black", hex: "#0e0e10" }
     ]
   },
   {
     id: "p-08",
-    name: "Slate Grey Vintage Cuffed Joggers",
+    name_ar: "جوجر رمادي أردوازي فينتاج بسوست مخفية",
+    name_en: "Slate Grey Vintage Cuffed Joggers",
     category: "sweatpants",
     price: 740,
     oldPrice: 920,
-    badge: "SALE -20%",
+    badge_ar: "خصم -20%",
+    badge_en: "SALE -20%",
     inStock: true,
     featured: false,
-    description: "Dark mineral slate shade with mineral wash detailing and concealed zippered side pockets.",
+    description_ar: "درجة رمادي حجري مميزة مع جيوب جانبية بسحابات مخفية لراحة وحماية متعلقاتك.",
+    description_en: "Dark mineral slate shade with mineral wash detailing and concealed zippered side pockets.",
     images: [
       "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=900&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=900&auto=format&fit=crop"
     ],
     sizes: ["M", "L", "XL"],
     colors: [
-      { name: "Slate Grey", hex: "#5a616d" }
+      { name_ar: "رمادي حجري", name_en: "Slate Grey", hex: "#5a616d" }
     ]
   }
 ];
@@ -531,26 +636,26 @@ export const initialOrders = [
   {
     id: "ORD-9481",
     customer: {
-      name: "Ahmed Hassan",
+      name: "أحمد حسن",
       phone: "01091234567",
-      address: "15 El-Gomhoureya St, Smoha",
+      address: "15 شارع الجمهورية، سموحة",
       city: "Alexandria"
     },
     items: [
       {
         id: "h-01",
-        name: "Washed Black Boxy Heavyweight Hoodie",
+        name: "هودي أسود مغسول بوكسي ثقيل 450 جرام",
         size: "L",
-        color: "Washed Black",
+        color: "أسود مغسول",
         price: 950,
         quantity: 1,
         image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=300&auto=format&fit=crop"
       },
       {
         id: "p-01",
-        name: "Heather Grey Baggy Drawstring Sweatpants",
+        name: "سويت بانتس رمادي باجي برباط أبيض سميك",
         size: "L",
-        color: "Heather Grey",
+        color: "رمادي ميلانج",
         price: 750,
         quantity: 1,
         image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=300&auto=format&fit=crop"
@@ -560,23 +665,23 @@ export const initialOrders = [
     shipping: 0,
     total: 1700,
     status: "Delivered",
-    paymentMethod: "Cash on Delivery (COD)",
+    paymentMethod: "الدفع عند الاستلام (COD)",
     date: "2026-10-05T14:30:00.000Z"
   },
   {
     id: "ORD-9482",
     customer: {
-      name: "Omar Tarek",
+      name: "عمر طارق",
       phone: "01123456789",
-      address: "Bldg 42, Degla, Maadi",
+      address: "عمارة 42، دجلة المعادي",
       city: "Cairo"
     },
     items: [
       {
         id: "h-02",
-        name: "Burgundy Heavy Fleece Oversized Hoodie",
+        name: "هودي نبيتي فليس أوفرسايز فخم",
         size: "XL",
-        color: "Burgundy",
+        color: "نبيتي",
         price: 920,
         quantity: 1,
         image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=300&auto=format&fit=crop"
@@ -586,7 +691,7 @@ export const initialOrders = [
     shipping: 50,
     total: 970,
     status: "Processing",
-    paymentMethod: "Cash on Delivery (COD)",
+    paymentMethod: "الدفع عند الاستلام (COD)",
     date: "2026-10-06T10:15:00.000Z"
   }
 ];

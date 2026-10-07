@@ -8,7 +8,9 @@ export const ProductCard = ({ product }) => {
     setQuickViewProduct, 
     wishlist, 
     toggleWishlist, 
-    siteContent 
+    getLocalized,
+    t,
+    language 
   } = useStore();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -16,11 +18,15 @@ export const ProductCard = ({ product }) => {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'L');
 
   const isFavorite = wishlist.includes(product.id);
-  const currency = siteContent.general?.currency || 'EGP';
+  const currency = t('actions.egp');
+
+  const productName = getLocalized(product, 'name');
+  const badge = getLocalized(product, 'badge');
 
   const handleQuickAdd = (e) => {
     e.stopPropagation();
-    addToCart(product, selectedSize, selectedColor?.name, 1);
+    const colorName = selectedColor ? getLocalized(selectedColor, 'name') : null;
+    addToCart(product, selectedSize, colorName, 1);
   };
 
   return (
@@ -36,15 +42,15 @@ export const ProductCard = ({ product }) => {
       >
         <img 
           src={product.images?.[currentImageIndex] || product.images?.[0]} 
-          alt={product.name}
+          alt={productName}
           className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105" 
           loading="lazy"
         />
 
         {/* Badge (Sale / New / Limited) */}
-        {product.badge && (
-          <span className="absolute top-2.5 left-2.5 bg-red-600 text-white font-mono text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-none shadow-md z-10">
-            {product.badge}
+        {badge && (
+          <span className="absolute top-2.5 start-2.5 bg-red-600 text-white font-sans text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-none shadow-md z-10">
+            {badge}
           </span>
         )}
 
@@ -54,10 +60,10 @@ export const ProductCard = ({ product }) => {
             e.stopPropagation();
             toggleWishlist(product.id);
           }}
-          className={`absolute top-2.5 right-2.5 p-2 rounded-full backdrop-blur-md transition-all duration-200 z-10 ${
+          className={`absolute top-2.5 end-2.5 p-2 rounded-full backdrop-blur-md transition-all duration-200 z-10 ${
             isFavorite ? 'bg-red-500 text-white' : 'bg-black/50 text-gray-300 hover:text-white hover:bg-black/80'
           }`}
-          aria-label={isFavorite ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+          aria-label={isFavorite ? `Remove from wishlist` : `Add to wishlist`}
         >
           <Heart size={14} fill={isFavorite ? 'currentColor' : 'none'} />
         </button>
@@ -66,10 +72,10 @@ export const ProductCard = ({ product }) => {
         <div className="absolute inset-x-2 bottom-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
           <button 
             onClick={handleQuickAdd}
-            className="flex-1 bg-white hover:bg-neutral-200 text-black font-extrabold text-[11px] tracking-wider uppercase py-2.5 px-3 flex items-center justify-center gap-1.5 shadow-lg transition-transform active:scale-95"
+            className="flex-1 bg-white hover:bg-neutral-200 text-black font-extrabold text-[11px] tracking-wider uppercase py-2.5 px-3 flex items-center justify-center gap-1.5 shadow-lg transition-transform active:scale-95 font-sans"
           >
             <ShoppingBag size={13} />
-            <span>ADD TO CART</span>
+            <span>{t('actions.addToCart')}</span>
           </button>
           
           <button 
@@ -78,8 +84,8 @@ export const ProductCard = ({ product }) => {
               setQuickViewProduct(product);
             }}
             className="bg-black/80 hover:bg-black text-white p-2.5 backdrop-blur-md transition-colors"
-            title="Quick View"
-            aria-label={`Quick view ${product.name}`}
+            title={t('actions.quickView')}
+            aria-label={`Quick view ${productName}`}
           >
             <Eye size={14} />
           </button>
@@ -93,29 +99,32 @@ export const ProductCard = ({ product }) => {
           {/* Color Dots */}
           {product.colors && product.colors.length > 0 && (
             <div className="flex items-center gap-1.5 mb-2">
-              {product.colors.map((c, i) => (
-                <button
-                  key={i}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedColor(c);
-                  }}
-                  className={`w-3.5 h-3.5 rounded-full border transition-all ${
-                    selectedColor?.name === c.name ? 'border-white scale-110 shadow-[0_0_5px_rgba(255,255,255,0.6)]' : 'border-neutral-600 opacity-70'
-                  }`}
-                  style={{ backgroundColor: c.hex }}
-                  title={c.name}
-                />
-              ))}
-              <span className="text-[10px] text-gray-400 font-mono ml-1">
-                {selectedColor?.name}
+              {product.colors.map((c, i) => {
+                const colorTitle = getLocalized(c, 'name');
+                return (
+                  <button
+                    key={i}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedColor(c);
+                    }}
+                    className={`w-3.5 h-3.5 rounded-full border transition-all ${
+                      selectedColor?.hex === c.hex ? 'border-white scale-110 shadow-[0_0_5px_rgba(255,255,255,0.6)]' : 'border-neutral-600 opacity-70'
+                    }`}
+                    style={{ backgroundColor: c.hex }}
+                    title={colorTitle}
+                  />
+                );
+              })}
+              <span className="text-[10px] text-gray-400 font-sans mx-1">
+                {selectedColor ? getLocalized(selectedColor, 'name') : ''}
               </span>
             </div>
           )}
 
           {/* Product Name */}
-          <h3 className="text-xs sm:text-sm font-bold uppercase tracking-tight text-gray-200 group-hover:text-white transition-colors line-clamp-1 mb-1.5">
-            {product.name}
+          <h3 className="text-xs sm:text-sm font-bold text-gray-200 group-hover:text-white transition-colors line-clamp-1 mb-1.5 font-sans">
+            {productName}
           </h3>
         </div>
 

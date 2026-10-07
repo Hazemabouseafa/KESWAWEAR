@@ -18,12 +18,16 @@ const FacebookIcon = () => (
 );
 
 export const Footer = () => {
-  const { siteContent, setActiveCategory, setIsAdminOpen } = useStore();
+  const { siteContent, setActiveCategory, setIsAdminOpen, getLocalized, t } = useStore();
   const { footer, brand } = siteContent;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const aboutText = getLocalized(footer, 'about');
+  const copyrightText = getLocalized(footer, 'copyright');
+  const addressText = getLocalized(footer, 'address');
 
   return (
     <footer className="bg-[#070709] border-t border-white/10 pt-16 pb-12 text-gray-400">
@@ -35,17 +39,17 @@ export const Footer = () => {
             <KeswaLogo variant="full" size="lg" />
           </div>
           <p className="max-w-xl text-xs sm:text-sm font-sans text-gray-400 mt-2 leading-relaxed">
-            {footer?.about}
+            {aboutText}
           </p>
         </div>
 
         {/* 4 Columns Links */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-12 border-b border-white/10 text-xs font-mono">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-12 border-b border-white/10 text-xs font-sans">
           
           {/* Col 1: Shop */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs font-display">
-              COLLECTIONS
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs font-display">
+              {t('footer.collections')}
             </h4>
             <ul className="space-y-2">
               <li>
@@ -54,7 +58,7 @@ export const Footer = () => {
                   onClick={() => setActiveCategory('hoodies')}
                   className="hover:text-white transition-colors"
                 >
-                  Heavyweight Hoodies
+                  {t('nav.hoodies')}
                 </a>
               </li>
               <li>
@@ -63,7 +67,7 @@ export const Footer = () => {
                   onClick={() => setActiveCategory('tshirts')}
                   className="hover:text-white transition-colors"
                 >
-                  Oversized T-Shirts
+                  {t('nav.tshirts')}
                 </a>
               </li>
               <li>
@@ -72,7 +76,7 @@ export const Footer = () => {
                   onClick={() => setActiveCategory('sweatpants')}
                   className="hover:text-white transition-colors"
                 >
-                  Baggy Sweatpants & Cargos
+                  {t('nav.sweatpants')}
                 </a>
               </li>
               <li>
@@ -81,7 +85,7 @@ export const Footer = () => {
                   onClick={() => setActiveCategory('all')}
                   className="hover:text-rose-400 transition-colors text-rose-500 font-bold"
                 >
-                  Super Flash Sale (-40%)
+                  {t('nav.sale')} (-40%)
                 </a>
               </li>
             </ul>
@@ -89,42 +93,42 @@ export const Footer = () => {
 
           {/* Col 2: Customer Care */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs font-display">
-              CUSTOMER CARE
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs font-display">
+              {t('footer.customerCare')}
             </h4>
             <ul className="space-y-2">
-              <li className="hover:text-white transition-colors cursor-pointer">Shipping & Delivery Policy</li>
-              <li className="hover:text-white transition-colors cursor-pointer">14-Day Free Exchange</li>
-              <li className="hover:text-white transition-colors cursor-pointer">Streetwear Size Guide</li>
-              <li className="hover:text-white transition-colors cursor-pointer">Track Your Package</li>
+              <li className="hover:text-white transition-colors cursor-pointer">{t('footer.shippingPolicy')}</li>
+              <li className="hover:text-white transition-colors cursor-pointer">{t('footer.returnPolicy')}</li>
+              <li className="hover:text-white transition-colors cursor-pointer">{t('footer.sizeGuide')}</li>
+              <li className="hover:text-white transition-colors cursor-pointer">{t('footer.trackOrder')}</li>
             </ul>
           </div>
 
           {/* Col 3: Contact */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs font-display">
-              GET IN TOUCH
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs font-display">
+              {t('footer.getInTouch')}
             </h4>
-            <ul className="space-y-2 text-[11px]">
+            <ul className="space-y-2 text-[11px] font-sans">
               <li className="flex items-center gap-2">
-                <Phone size={13} className="text-gray-300" />
-                <span>{footer?.phone}</span>
+                <Phone size={13} className="text-gray-300 shrink-0" />
+                <span className="font-mono">{footer?.phone}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Mail size={13} className="text-gray-300" />
-                <span>{footer?.email}</span>
+                <Mail size={13} className="text-gray-300 shrink-0" />
+                <span className="font-mono">{footer?.email}</span>
               </li>
               <li className="flex items-center gap-2">
-                <MapPin size={13} className="text-gray-300" />
-                <span>{footer?.address}</span>
+                <MapPin size={13} className="text-gray-300 shrink-0" />
+                <span>{addressText}</span>
               </li>
             </ul>
           </div>
 
           {/* Col 4: Control & Social */}
           <div className="space-y-3">
-            <h4 className="text-white font-bold uppercase tracking-widest text-xs font-display">
-              ADMIN & CONNECT
+            <h4 className="text-white font-bold uppercase tracking-wider text-xs font-display">
+              {t('footer.adminPortal')}
             </h4>
             <div className="flex gap-3 text-white">
               <a href={footer?.social?.instagram || "#"} target="_blank" rel="noreferrer" className="p-2 bg-neutral-900 border border-white/10 hover:border-white transition-colors" aria-label="Instagram">
@@ -138,10 +142,10 @@ export const Footer = () => {
             <div className="pt-2">
               <button 
                 onClick={() => setIsAdminOpen(true)}
-                className="w-full text-left bg-neutral-900 border border-white/10 hover:border-amber-400 p-2.5 text-[11px] text-gray-300 hover:text-white flex items-center justify-between transition-colors"
+                className="w-full text-left rtl:text-right bg-neutral-900 border border-white/10 hover:border-amber-400 p-2.5 text-[11px] text-gray-300 hover:text-white flex items-center justify-between transition-colors font-sans"
               >
-                <span>⚙️ لوحة تحكم المتجر</span>
-                <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5">CMS</span>
+                <span>⚙️ لوحة تحكم المتجر الكاملة</span>
+                <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 font-mono">CMS</span>
               </button>
             </div>
           </div>
@@ -149,13 +153,13 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] font-mono text-gray-500 gap-4">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] font-sans text-gray-500 gap-4">
           <div>
-            {footer?.copyright}
+            {copyrightText}
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-gray-400">Cash on Delivery • Visa • InstaPay</span>
+            <span className="text-gray-400">الدفع عند الاستلام • Visa • InstaPay</span>
             <button 
               onClick={scrollToTop}
               className="p-2 bg-neutral-900 text-gray-300 hover:text-white border border-white/10 transition-colors"
