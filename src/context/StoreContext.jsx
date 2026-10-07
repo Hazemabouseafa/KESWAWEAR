@@ -263,33 +263,87 @@ export const StoreProvider = ({ children }) => {
             setNeonDetails(statusData);
           }
 
-          // 1. Fetch content from Neon
+          // 1. Fetch content from Neon / Backend
           const contentRes = await fetch('/api/content').catch(() => null);
           if (contentRes && contentRes.ok) {
             const contentJson = await contentRes.json();
             if (contentJson.data && isMounted) {
-              setSiteContent(prev => ({
-                ...initialSiteContent,
-                ...contentJson.data,
-                categories: (contentJson.data.categories && contentJson.data.categories.length > 0) ? contentJson.data.categories : initialSiteContent.categories,
-                sectionsVisibility: {
+              setSiteContent(prev => {
+                const neonCats = contentJson.data.categories || [];
+                const localCats = prev.categories || [];
+
+                // Smart Merge: Preserve both Neon and local custom categories
+                const catMap = new Map();
+                neonCats.forEach(c => catMap.set(c.id, c));
+                localCats.forEach(c => {
+                  if (!catMap.has(c.id)) {
+                    catMap.set(c.id, c);
+                  }
+                });
+                const mergedCategories = Array.from(catMap.values());
+
+                // Smart Merge navigation
+                const neonNav = contentJson.data.navigation || [];
+                const localNav = prev.navigation || [];
+                const navMap = new Map();
+                neonNav.forEach(n => navMap.set(n.id, n));
+                localNav.forEach(n => {
+                  if (!navMap.has(n.id)) {
+                    navMap.set(n.id, n);
+                  }
+                });
+                const mergedNav = Array.from(navMap.values());
+
+                const mergedVisibility = {
                   ...initialSiteContent.sectionsVisibility,
-                  ...(contentJson.data.sectionsVisibility || {})
+                  ...(prev.sectionsVisibility || {}),
+                  ...(contentJson.data.sectionsVisibility || {}),
+                  superSale: false
+                };
+
+                const mergedContent = {
+                  ...initialSiteContent,
+                  ...prev,
+                  ...contentJson.data,
+                  categories: mergedCategories.length > 0 ? mergedCategories : initialSiteContent.categories,
+                  navigation: mergedNav.length > 0 ? mergedNav : initialSiteContent.navigation,
+                  sectionsVisibility: mergedVisibility
+                };
+
+                // If local had custom categories that Neon was missing, push merged to Neon!
+                const hasLocalNewCats = localCats.some(lc => !neonCats.some(nc => nc.id === lc.id));
+                if (hasLocalNewCats) {
+                  fetch('/api/content', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(mergedContent)
+                  }).catch(() => {});
                 }
-              }));
+
+                return mergedContent;
+              });
             }
           }
 
-          // 2. Fetch products from Neon
+          // 2. Fetch products from Neon / Backend
           const prodRes = await fetch('/api/products').catch(() => null);
           if (prodRes && prodRes.ok) {
             const prodJson = await prodRes.json();
-            if (prodJson.products && prodJson.products.length > 0 && isMounted) {
-              setProducts(sanitizeProducts(prodJson.products));
+            if (prodJson.products && Array.isArray(prodJson.products) && prodJson.products.length > 0 && isMounted) {
+              setProducts(prev => {
+                const neonProds = sanitizeProducts(prodJson.products);
+                const localProds = prev || [];
+                const prodMap = new Map();
+                neonProds.forEach(p => prodMap.set(p.id, p));
+                localProds.forEach(p => {
+                  if (!prodMap.has(p.id)) prodMap.set(p.id, p);
+                });
+                return Array.from(prodMap.values());
+              });
             }
           }
 
-          // 3. Fetch orders from Neon
+          // 3. Fetch orders from Neon / Backend
           const orderRes = await fetch('/api/orders').catch(() => null);
           if (orderRes && orderRes.ok) {
             const orderJson = await orderRes.json();
@@ -351,6 +405,33 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
+  // Centralized async persistence to Backend / Neon / Serverless cache on Vercel
+  const persistSiteContent = async (contentToSave) => {
+    try {
+      await fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contentToSave)
+      });
+    } catch (e) {
+      console.warn('Backend sync failed, saved in local storage:', e);
+    }
+  };
+
+  const persistProduct = async (productData, method = 'POST') => {
+    try {
+      if (method === 'DELETE') {
+        await fetch(`/api/products?id=${productData.id}`, { method: 'DELETE' });
+      } else {
+        await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product: productData })
+        });
+      }
+    } catch (e) {}
+  };
+
   // Row / Section Visibility Toggle
   const toggleSectionVisibility = (sectionKey) => {
     setSiteContent(prev => {
@@ -362,6 +443,7 @@ export const StoreProvider = ({ children }) => {
           [sectionKey]: !currentVal
         }
       };
+      persistSiteContent(updated);
       return updated;
     });
     showToast(language === 'ar' ? "تم تحديث ظهور القسم في الواجهة!" : "Row visibility updated!", "info");
@@ -396,67 +478,35 @@ export const StoreProvider = ({ children }) => {
           card3: updatedFields.card3 ? { ...existing.card3, ...updatedFields.card3 } : existing.card3,
         };
       }
-      return {
+      const updated = {
         ...prev,
         banners: {
           ...prev.banners,
           [bannerKey]: merged
         }
       };
+      persistSiteContent(updated);
+      return updated;
     });
     showToast(language === 'ar' ? "تم تحديث البنر بنجاح!" : "Banner updated successfully!", "success");
-    if (neonStatus === 'connected') {
-      fetch('/api/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...siteContent,
-          banners: {
-            ...siteContent.banners,
-            [bannerKey]: bannerKey === 'categoryGrid' && updatedFields ? {
-              ...siteContent.banners?.[bannerKey],
-              ...updatedFields,
-              card1: updatedFields.card1 ? { ...siteContent.banners?.[bannerKey]?.card1, ...updatedFields.card1 } : siteContent.banners?.[bannerKey]?.card1,
-              card2: updatedFields.card2 ? { ...siteContent.banners?.[bannerKey]?.card2, ...updatedFields.card2 } : siteContent.banners?.[bannerKey]?.card2,
-              card3: updatedFields.card3 ? { ...siteContent.banners?.[bannerKey]?.card3, ...updatedFields.card3 } : siteContent.banners?.[bannerKey]?.card3,
-            } : {
-              ...siteContent.banners?.[bannerKey],
-              ...updatedFields
-            }
-          }
-        })
-      }).catch(() => {});
-    }
   };
 
   const updateSectionHeader = (sectionKey, updatedFields) => {
-    setSiteContent(prev => ({
-      ...prev,
-      sectionHeaders: {
-        ...prev.sectionHeaders,
-        [sectionKey]: {
-          ...prev.sectionHeaders?.[sectionKey],
-          ...updatedFields
-        }
-      }
-    }));
-    showToast(language === 'ar' ? "تم تحديث عنوان القسم!" : "Section header updated!", "success");
-    if (neonStatus === 'connected') {
-      fetch('/api/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...siteContent,
-          sectionHeaders: {
-            ...siteContent.sectionHeaders,
-            [sectionKey]: {
-              ...siteContent.sectionHeaders?.[sectionKey],
-              ...updatedFields
-            }
+    setSiteContent(prev => {
+      const updated = {
+        ...prev,
+        sectionHeaders: {
+          ...prev.sectionHeaders,
+          [sectionKey]: {
+            ...prev.sectionHeaders?.[sectionKey],
+            ...updatedFields
           }
-        })
-      }).catch(() => {});
-    }
+        }
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
+    showToast(language === 'ar' ? "تم تحديث عنوان القسم!" : "Section header updated!", "success");
   };
 
   // Update Image URL directly
@@ -467,56 +517,48 @@ export const StoreProvider = ({ children }) => {
 
   // Explicit Save Handlers for Admin Panel with Immediate Toast & Persistence
   const saveGeneralSettings = (settings) => {
-    setSiteContent(prev => ({
-      ...prev,
-      general: {
-        ...prev.general,
-        ...settings
-      }
-    }));
+    setSiteContent(prev => {
+      const updated = {
+        ...prev,
+        general: {
+          ...prev.general,
+          ...settings
+        }
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
     showToast(language === 'ar' ? "تم حفظ وتثبيت إعدادات الشحن والعملة بنجاح! 💾" : "Shipping and currency settings saved! 💾", "success");
-    if (neonStatus === 'connected') {
-      fetch('/api/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...siteContent,
-          general: { ...siteContent.general, ...settings }
-        })
-      }).catch(() => {});
-    }
   };
 
   const saveSectionsVisibility = (visibilityMap) => {
-    setSiteContent(prev => ({
-      ...prev,
-      sectionsVisibility: {
-        ...prev.sectionsVisibility,
-        ...visibilityMap
-      }
-    }));
+    setSiteContent(prev => {
+      const updated = {
+        ...prev,
+        sectionsVisibility: {
+          ...prev.sectionsVisibility,
+          ...visibilityMap
+        }
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
     showToast(language === 'ar' ? "تم حفظ وتثبيت حالة ظهور صفوف وأقسام المتجر! 💾" : "Rows visibility settings saved! 💾", "success");
   };
 
   const saveTexts = (sectionKey, textData) => {
-    setSiteContent(prev => ({
-      ...prev,
-      [sectionKey]: {
-        ...prev[sectionKey],
-        ...textData
-      }
-    }));
+    setSiteContent(prev => {
+      const updated = {
+        ...prev,
+        [sectionKey]: {
+          ...prev[sectionKey],
+          ...textData
+        }
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
     showToast(language === 'ar' ? "تم حفظ نصوص الواجهة وتثبيتها بنجاح! 💾" : "Text changes saved successfully! 💾", "success");
-    if (neonStatus === 'connected') {
-      fetch('/api/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...siteContent,
-          [sectionKey]: { ...siteContent[sectionKey], ...textData }
-        })
-      }).catch(() => {});
-    }
   };
 
   // Categories & Custom Blocks Management
@@ -566,18 +608,24 @@ export const StoreProvider = ({ children }) => {
         }
       ];
 
-      return {
+      const updatedVisibility = {
+        ...prev.sectionsVisibility,
+        [`hero_${cleanId}`]: true,
+        [`products_${cleanId}`]: true,
+        [`${cleanId}Banner`]: true,
+        [`${cleanId}Products`]: true
+      };
+
+      const updatedContent = {
         ...prev,
         categories: updatedList,
         navigation: updatedNav,
-        sectionsVisibility: {
-          ...prev.sectionsVisibility,
-          [`hero_${cleanId}`]: true,
-          [`products_${cleanId}`]: true,
-          [`${cleanId}Banner`]: true,
-          [`${cleanId}Products`]: true
-        }
+        sectionsVisibility: updatedVisibility
       };
+
+      persistSiteContent(updatedContent);
+
+      return updatedContent;
     });
 
     showToast(language === 'ar' ? `تمت إضافة قسم "${newCategory.name_ar}" بنجاح للواجهة الرئيسية!` : `Category "${newCategory.name_en}" added to storefront!`, "success");
@@ -601,11 +649,15 @@ export const StoreProvider = ({ children }) => {
         return item;
       });
 
-      return {
+      const updatedContent = {
         ...prev,
         categories: updatedList,
         navigation: updatedNav
       };
+
+      persistSiteContent(updatedContent);
+
+      return updatedContent;
     });
 
     showToast(language === 'ar' ? "تم تحديث بيانات القسم بنجاح!" : "Category updated!", "success");
@@ -618,11 +670,15 @@ export const StoreProvider = ({ children }) => {
       const currentNav = prev.navigation || [];
       const updatedNav = currentNav.filter(item => item.id !== categoryId);
       
-      return {
+      const updatedContent = {
         ...prev,
         categories: updatedList,
         navigation: updatedNav
       };
+
+      persistSiteContent(updatedContent);
+
+      return updatedContent;
     });
 
     showToast(language === 'ar' ? "تم حذف القسم بنجاح" : "Category deleted", "info");
@@ -635,17 +691,24 @@ export const StoreProvider = ({ children }) => {
       id: newProduct.id || `keswa-${Date.now()}`
     };
     setProducts(prev => [productWithId, ...prev]);
+    persistProduct(productWithId, 'POST');
     showToast(language === 'ar' ? "تمت إضافة المنتج بنجاح!" : "Product added!", "success");
     return productWithId;
   };
 
   const updateProduct = (id, updatedFields) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updatedFields } : p));
+    setProducts(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, ...updatedFields } : p);
+      const found = next.find(p => p.id === id);
+      if (found) persistProduct(found, 'POST');
+      return next;
+    });
     showToast(language === 'ar' ? "تم تحديث بيانات المنتج بنجاح!" : "Product updated successfully!", "success");
   };
 
   const deleteProduct = (id) => {
     setProducts(prev => prev.filter(p => p.id !== id));
+    persistProduct({ id }, 'DELETE');
     showToast(language === 'ar' ? "تم حذف المنتج من المتجر." : "Product deleted from store.", "info");
   };
 

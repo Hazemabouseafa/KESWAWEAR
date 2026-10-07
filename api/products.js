@@ -1,5 +1,8 @@
 import { getSql, ensureTables, getConnectionString } from './db.js';
 
+// In-memory fallback cache for when DATABASE_URL is not configured
+let memoryProductsCache = null;
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -9,8 +12,47 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      body = {};
+    }
+  }
+
   const connStr = getConnectionString();
   if (!connStr) {
+    if (req.method === 'GET') {
+      return res.status(200).json({
+        success: true,
+        connected: false,
+        products: memoryProductsCache || []
+      });
+    }
+
+    if (req.method === 'POST' || req.method === 'PUT') {
+      const prod = body?.product || body;
+      if (Array.isArray(body)) {
+        memoryProductsCache = body;
+      } else if (prod && prod.id) {
+        memoryProductsCache = [prod, ...(memoryProductsCache || []).filter(p => p.id !== prod.id)];
+      }
+      return res.status(200).json({
+        success: true,
+        connected: false,
+        message: 'Product cached in server memory (DATABASE_URL not configured)'
+      });
+    }
+
+    if (req.method === 'DELETE') {
+      const id = req.query?.id || body?.id;
+      if (id && memoryProductsCache) {
+        memoryProductsCache = memoryProductsCache.filter(p => p.id !== id);
+      }
+      return res.status(200).json({ success: true, connected: false });
+    }
+
     return res.status(200).json({
       success: false,
       connected: false,
@@ -28,16 +70,16 @@ export default async function handler(req, res) {
         SELECT data FROM products ORDER BY updated_at DESC;
       `;
       const products = rows.map(r => r.data);
+      memoryProductsCache = products;
       return res.status(200).json({
         success: true,
+        connected: true,
         products
       });
     }
 
     // POST / PUT: Upsert product or batch
     if (req.method === 'POST' || req.method === 'PUT') {
-      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      
       // Batch sync
       if (Array.isArray(body)) {
         for (const item of body) {
@@ -46,11 +88,12 @@ export default async function handler(req, res) {
               INSERT INTO products (id, data, updated_at)
               VALUES (${item.id}, ${JSON.stringify(item)}::jsonb, CURRENT_TIMESTAMP)
               ON CONFLICT (id)
-              DO UPDATE SET data = ${JSON.stringify(item)}::jsonb, updated_at = CURRENT_TIMESTAMP;
+              DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP;
             `;
           }
         }
-        return res.status(200).json({ success: true, message: 'Products batch saved to Neon' });
+        memoryProductsCache = body;
+        return res.status(200).json({ success: true, connected: true, message: 'Products batch saved to Neon' });
       }
 
       // Single product
@@ -63,11 +106,16 @@ export default async function handler(req, res) {
         INSERT INTO products (id, data, updated_at)
         VALUES (${product.id}, ${JSON.stringify(product)}::jsonb, CURRENT_TIMESTAMP)
         ON CONFLICT (id)
-        DO UPDATE SET data = ${JSON.stringify(product)}::jsonb, updated_at = CURRENT_TIMESTAMP;
+        DO UPDATE SET data = EXCLUDED.data, updated_at = CURRENT_TIMESTAMP;
       `;
+
+      if (memoryProductsCache) {
+        memoryProductsCache = [product, ...memoryProductsCache.filter(p => p.id !== product.id)];
+      }
 
       return res.status(200).json({
         success: true,
+        connected: true,
         product
       });
     }
