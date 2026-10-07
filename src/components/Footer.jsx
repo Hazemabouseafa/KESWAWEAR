@@ -17,6 +17,12 @@ const FacebookIcon = () => (
   </svg>
 );
 
+const TikTokIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+  </svg>
+);
+
 export const Footer = () => {
   const { siteContent, setActiveCategory, setIsTrackOrderOpen, getLocalized, language, t } = useStore();
   const { footer, brand } = siteContent;
@@ -125,12 +131,42 @@ export const Footer = () => {
               {language === 'ar' ? 'تابعنا على منصاتنا' : 'FOLLOW US'}
             </h4>
             <div className="flex gap-3 text-white">
-              <a href={footer?.social?.instagram || "#"} target="_blank" rel="noreferrer" className="p-2 bg-neutral-900 border border-white/10 hover:border-white transition-colors" aria-label="Instagram">
-                <InstagramIcon />
-              </a>
-              <a href={footer?.social?.facebook || "#"} target="_blank" rel="noreferrer" className="p-2 bg-neutral-900 border border-white/10 hover:border-white transition-colors" aria-label="Facebook">
-                <FacebookIcon />
-              </a>
+              {footer?.social?.instagram && (
+                <a 
+                  href={footer.social.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="p-2 bg-neutral-900 border border-white/10 hover:border-white transition-colors" 
+                  aria-label="Instagram"
+                  title="Instagram"
+                >
+                  <InstagramIcon />
+                </a>
+              )}
+              {footer?.social?.facebook && (
+                <a 
+                  href={footer.social.facebook} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="p-2 bg-neutral-900 border border-white/10 hover:border-white transition-colors" 
+                  aria-label="Facebook"
+                  title="Facebook"
+                >
+                  <FacebookIcon />
+                </a>
+              )}
+              {footer?.social?.tiktok && (
+                <a 
+                  href={footer.social.tiktok} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="p-2 bg-neutral-900 border border-white/10 hover:border-white transition-colors" 
+                  aria-label="TikTok"
+                  title="TikTok"
+                >
+                  <TikTokIcon />
+                </a>
+              )}
             </div>
             <p className="text-[11px] text-gray-400 font-sans leading-relaxed pt-1">
               {language === 'ar' ? 'أحدث صيحات الستريت وير المصري بجودة عالمية.' : 'Premium Egyptian streetwear designed for daily expression.'}

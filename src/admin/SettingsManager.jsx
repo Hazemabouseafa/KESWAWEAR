@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { 
   Settings, Save, CheckCircle2, Download, Upload, 
-  RotateCcw, RefreshCw, Database
+  RotateCcw, RefreshCw, Database, Share2, ExternalLink
 } from 'lucide-react';
+
+const FacebookIcon = ({ className = "text-blue-500", size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+  </svg>
+);
+
+const InstagramIcon = ({ className = "text-pink-500", size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+const TikTokIcon = ({ className = "text-white", size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+  </svg>
+);
 
 export const SettingsManager = () => {
   const { 
     siteContent, 
     saveGeneralSettings, 
+    saveSocialLinks,
     neonStatus, 
     neonDetails, 
     checkNeonConnection, 
@@ -24,8 +45,31 @@ export const SettingsManager = () => {
   const [freeShippingThreshold, setFreeShippingThreshold] = useState(siteContent.general?.freeShippingThreshold ?? 1500);
   const [currencyAr, setCurrencyAr] = useState(siteContent.general?.currency_ar || 'ج.م');
   const [currencyEn, setCurrencyEn] = useState(siteContent.general?.currency_en || 'EGP');
-
   const [isSaved, setIsSaved] = useState(false);
+
+  // Social Links State
+  const [facebookUrl, setFacebookUrl] = useState(siteContent.footer?.social?.facebook || '');
+  const [instagramUrl, setInstagramUrl] = useState(siteContent.footer?.social?.instagram || '');
+  const [tiktokUrl, setTiktokUrl] = useState(siteContent.footer?.social?.tiktok || '');
+  const [isSocialSaved, setIsSocialSaved] = useState(false);
+
+  // Keep state synchronized if siteContent updates from Neon database or API
+  useEffect(() => {
+    if (siteContent.general) {
+      setShippingCost(siteContent.general.shippingCost ?? 50);
+      setFreeShippingThreshold(siteContent.general.freeShippingThreshold ?? 1500);
+      setCurrencyAr(siteContent.general.currency_ar || 'ج.م');
+      setCurrencyEn(siteContent.general.currency_en || 'EGP');
+    }
+  }, [siteContent.general]);
+
+  useEffect(() => {
+    if (siteContent.footer?.social) {
+      setFacebookUrl(siteContent.footer.social.facebook || '');
+      setInstagramUrl(siteContent.footer.social.instagram || '');
+      setTiktokUrl(siteContent.footer.social.tiktok || '');
+    }
+  }, [siteContent.footer?.social]);
 
   const handleSaveShipping = (e) => {
     e.preventDefault();
@@ -37,6 +81,17 @@ export const SettingsManager = () => {
     });
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2500);
+  };
+
+  const handleSaveSocial = (e) => {
+    e.preventDefault();
+    saveSocialLinks({
+      facebook: facebookUrl,
+      instagram: instagramUrl,
+      tiktok: tiktokUrl
+    });
+    setIsSocialSaved(true);
+    setTimeout(() => setIsSocialSaved(false), 2500);
   };
 
   const handleFileImport = (e) => {
@@ -137,6 +192,133 @@ export const SettingsManager = () => {
                 setIsSaved(false);
               }}
               className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded font-mono outline-none focus:border-white"
+            />
+          </div>
+        </div>
+      </form>
+
+      {/* Social Media Links Card with Dedicated Save Button */}
+      <form onSubmit={handleSaveSocial} className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
+          <div>
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Share2 size={16} className="text-blue-400 shrink-0" />
+              <span>روابط التواصل الاجتماعي (صفحات فيسبوك وإنستجرام)</span>
+            </h3>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              تعديل روابط صفحات الفيسبوك وحساب الإنستجرام وتيك توك التي تظهر للزوار في أسفل الموقع (الفوتر).
+            </p>
+          </div>
+          <button
+            type="submit"
+            className={`w-full sm:w-auto text-xs px-4 py-2.5 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
+              isSocialSaved 
+                ? 'bg-emerald-500 text-black font-black' 
+                : 'bg-white hover:bg-neutral-200 text-black font-black'
+            }`}
+          >
+            {isSocialSaved ? <CheckCircle2 size={14} /> : <Save size={14} />}
+            <span>{isSocialSaved ? '✓ تم الحفظ والتثبيت!' : '💾 حفظ وتثبيت روابط السوشيال ميديا'}</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs">
+          {/* Facebook */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-gray-300 font-bold flex items-center gap-1.5">
+                <FacebookIcon className="text-blue-400" size={15} />
+                <span>رابط صفحة الفيسبوك (Facebook Page):</span>
+              </label>
+              {facebookUrl && (
+                <a 
+                  href={facebookUrl.startsWith('http') ? facebookUrl : `https://${facebookUrl}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-blue-400 hover:underline flex items-center gap-1 font-sans"
+                >
+                  <span>معاينة الرابط</span>
+                  <ExternalLink size={10} />
+                </a>
+              )}
+            </div>
+            <input 
+              type="text" 
+              placeholder="https://facebook.com/keswawear أو اسم الصفحة"
+              value={facebookUrl}
+              onChange={(e) => {
+                setFacebookUrl(e.target.value);
+                setIsSocialSaved(false);
+              }}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded font-mono text-xs outline-none focus:border-blue-400"
+            />
+            <p className="text-[10px] text-gray-500">
+              يمكنك كتابة الرابط كاملاً أو اسم الصفحة مباشرة
+            </p>
+          </div>
+
+          {/* Instagram */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-gray-300 font-bold flex items-center gap-1.5">
+                <InstagramIcon className="text-pink-400" size={15} />
+                <span>رابط حساب الإنستجرام (Instagram Profile):</span>
+              </label>
+              {instagramUrl && (
+                <a 
+                  href={instagramUrl.startsWith('http') ? instagramUrl : `https://${instagramUrl}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-pink-400 hover:underline flex items-center gap-1 font-sans"
+                >
+                  <span>معاينة الرابط</span>
+                  <ExternalLink size={10} />
+                </a>
+              )}
+            </div>
+            <input 
+              type="text" 
+              placeholder="https://instagram.com/keswawear أو @keswawear"
+              value={instagramUrl}
+              onChange={(e) => {
+                setInstagramUrl(e.target.value);
+                setIsSocialSaved(false);
+              }}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded font-mono text-xs outline-none focus:border-pink-400"
+            />
+            <p className="text-[10px] text-gray-500">
+              يمكنك كتابة رابط الإنستجرام أو المعرّف مع @
+            </p>
+          </div>
+
+          {/* TikTok */}
+          <div className="sm:col-span-2 space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-gray-300 font-bold flex items-center gap-1.5">
+                <TikTokIcon className="text-neutral-300" size={15} />
+                <span>رابط حساب تيك توك (TikTok - اختياري):</span>
+              </label>
+              {tiktokUrl && (
+                <a 
+                  href={tiktokUrl.startsWith('http') ? tiktokUrl : `https://${tiktokUrl}`}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-gray-300 hover:underline flex items-center gap-1 font-sans"
+                >
+                  <span>معاينة الرابط</span>
+                  <ExternalLink size={10} />
+                </a>
+              )}
+            </div>
+            <input 
+              type="text" 
+              placeholder="https://tiktok.com/@keswawear أو @keswawear"
+              value={tiktokUrl}
+              onChange={(e) => {
+                setTiktokUrl(e.target.value);
+                setIsSocialSaved(false);
+              }}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded font-mono text-xs outline-none focus:border-white"
             />
           </div>
         </div>

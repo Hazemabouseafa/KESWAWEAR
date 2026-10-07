@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Layout, Save, CheckCircle2, Grid, Bookmark } from 'lucide-react';
+import { Layout, Save, CheckCircle2, Grid, Bookmark, Share2 } from 'lucide-react';
 
 export const TextContentManager = () => {
   const { 
     siteContent, 
     saveTexts, 
+    saveSocialLinks,
     updateBanner, 
     updateSectionHeader, 
     showToast, 
@@ -142,6 +143,17 @@ export const TextContentManager = () => {
   const [footerAddress, setFooterAddress] = useState(
     textLangTab === 'ar' ? (siteContent.footer?.address_ar || '') : (siteContent.footer?.address_en || '')
   );
+  const [footerFacebook, setFooterFacebook] = useState(siteContent.footer?.social?.facebook || '');
+  const [footerInstagram, setFooterInstagram] = useState(siteContent.footer?.social?.instagram || '');
+  const [footerTiktok, setFooterTiktok] = useState(siteContent.footer?.social?.tiktok || '');
+
+  useEffect(() => {
+    if (siteContent.footer?.social) {
+      setFooterFacebook(siteContent.footer.social.facebook || '');
+      setFooterInstagram(siteContent.footer.social.instagram || '');
+      setFooterTiktok(siteContent.footer.social.tiktok || '');
+    }
+  }, [siteContent.footer?.social]);
 
   // Switch Language subtab
   const handleSwitchTab = (tab) => {
@@ -355,7 +367,17 @@ export const TextContentManager = () => {
       [textLangTab === 'ar' ? 'about_ar' : 'about_en']: footerAbout,
       phone: footerPhone,
       email: footerEmail,
-      [textLangTab === 'ar' ? 'address_ar' : 'address_en']: footerAddress
+      [textLangTab === 'ar' ? 'address_ar' : 'address_en']: footerAddress,
+      social: {
+        facebook: footerFacebook,
+        instagram: footerInstagram,
+        tiktok: footerTiktok
+      }
+    });
+    saveSocialLinks({
+      facebook: footerFacebook,
+      instagram: footerInstagram,
+      tiktok: footerTiktok
     });
     notifySaved('footer');
   };
@@ -971,6 +993,46 @@ export const TextContentManager = () => {
               onChange={(e) => setFooterAddress(e.target.value)}
               className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded outline-none focus:border-white"
             />
+          </div>
+
+          {/* Social Media Links inside Footer Section */}
+          <div className="sm:col-span-2 pt-3 border-t border-white/5 space-y-3">
+            <h4 className="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+              <Share2 size={13} className="text-blue-400" />
+              <span>روابط صفحات التواصل الاجتماعي (فيسبوك، إنستجرام، تيك توك):</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">رابط صفحة الفيسبوك (Facebook):</label>
+                <input 
+                  type="text" 
+                  placeholder="https://facebook.com/keswawear"
+                  value={footerFacebook}
+                  onChange={(e) => setFooterFacebook(e.target.value)}
+                  className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded font-mono outline-none focus:border-blue-400"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">رابط حساب الإنستجرام (Instagram):</label>
+                <input 
+                  type="text" 
+                  placeholder="https://instagram.com/keswawear"
+                  value={footerInstagram}
+                  onChange={(e) => setFooterInstagram(e.target.value)}
+                  className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded font-mono outline-none focus:border-pink-400"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs text-gray-400 mb-1">رابط حساب تيك توك (TikTok - اختياري):</label>
+                <input 
+                  type="text" 
+                  placeholder="https://tiktok.com/@keswawear"
+                  value={footerTiktok}
+                  onChange={(e) => setFooterTiktok(e.target.value)}
+                  className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded font-mono outline-none focus:border-white"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

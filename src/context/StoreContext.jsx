@@ -546,14 +546,66 @@ export const StoreProvider = ({ children }) => {
     showToast(language === 'ar' ? "تم حفظ وتثبيت حالة ظهور صفوف وأقسام المتجر! 💾" : "Rows visibility settings saved! 💾", "success");
   };
 
-  const saveTexts = (sectionKey, textData) => {
+  const formatSocialUrl = (url, platform) => {
+    if (!url) return '';
+    let trimmed = url.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    if (trimmed.startsWith('@')) {
+      trimmed = trimmed.substring(1);
+    }
+    if (platform === 'facebook') {
+      return trimmed.includes('facebook.com') ? `https://${trimmed}` : `https://facebook.com/${trimmed}`;
+    }
+    if (platform === 'instagram') {
+      return trimmed.includes('instagram.com') ? `https://${trimmed}` : `https://instagram.com/${trimmed}`;
+    }
+    if (platform === 'tiktok') {
+      return trimmed.includes('tiktok.com') ? `https://${trimmed}` : `https://tiktok.com/@${trimmed}`;
+    }
+    return `https://${trimmed}`;
+  };
+
+  const saveSocialLinks = (socialMap) => {
     setSiteContent(prev => {
+      const currentSocial = prev.footer?.social || {};
+      const updatedSocial = {
+        ...currentSocial,
+        ...(socialMap.instagram !== undefined ? { instagram: formatSocialUrl(socialMap.instagram, 'instagram') } : {}),
+        ...(socialMap.facebook !== undefined ? { facebook: formatSocialUrl(socialMap.facebook, 'facebook') } : {}),
+        ...(socialMap.tiktok !== undefined ? { tiktok: formatSocialUrl(socialMap.tiktok, 'tiktok') } : {})
+      };
+
       const updated = {
         ...prev,
-        [sectionKey]: {
-          ...prev[sectionKey],
-          ...textData
+        footer: {
+          ...prev.footer,
+          social: updatedSocial
         }
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
+    showToast(language === 'ar' ? "تم حفظ وتثبيت روابط السوشيال ميديا بنجاح! 💾" : "Social media links saved! 💾", "success");
+  };
+
+  const saveTexts = (sectionKey, textData) => {
+    setSiteContent(prev => {
+      const mergedSection = {
+        ...prev[sectionKey],
+        ...textData
+      };
+      if (sectionKey === 'footer' && textData.social) {
+        mergedSection.social = {
+          ...prev.footer?.social,
+          ...textData.social
+        };
+      }
+      const updated = {
+        ...prev,
+        [sectionKey]: mergedSection
       };
       persistSiteContent(updated);
       return updated;
@@ -1043,6 +1095,8 @@ export const StoreProvider = ({ children }) => {
       saveGeneralSettings,
       saveSectionsVisibility,
       saveTexts,
+      saveSocialLinks,
+      formatSocialUrl,
       isCheckoutOpen,
       setIsCheckoutOpen,
       quickViewProduct,

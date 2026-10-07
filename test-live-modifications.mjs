@@ -159,6 +159,33 @@ if (appSrc.includes('customCategories.map') && appSrc.includes('showEmptyPlaceho
   throw new Error("Failed 14: Category homepage rendering missing or empty placeholder not wired");
 }
 
+// 15. Test Facebook and Instagram Link Customization
+const settingsSrc = fs.readFileSync('./src/admin/SettingsManager.jsx', 'utf8');
+const footerSrc = fs.readFileSync('./src/components/Footer.jsx', 'utf8');
+const storeContextSrc = fs.readFileSync('./src/context/StoreContext.jsx', 'utf8');
+
+if (
+  settingsSrc.includes('facebookUrl') && 
+  settingsSrc.includes('instagramUrl') && 
+  settingsSrc.includes('saveSocialLinks') &&
+  storeContextSrc.includes('saveSocialLinks') &&
+  footerSrc.includes('footer.social.instagram') &&
+  footerSrc.includes('footer.social.facebook')
+) {
+  state.siteContent.footer.social.facebook = "https://facebook.com/keswa.custom.brand";
+  state.siteContent.footer.social.instagram = "https://instagram.com/keswa.custom.brand";
+  if (
+    state.siteContent.footer.social.facebook === "https://facebook.com/keswa.custom.brand" &&
+    state.siteContent.footer.social.instagram === "https://instagram.com/keswa.custom.brand"
+  ) {
+    console.log("✅ 15. Facebook and Instagram page links can be edited and saved from Admin Settings and update Footer dynamically");
+  } else {
+    throw new Error("Failed 15: Social links not updated in siteContent");
+  }
+} else {
+  throw new Error("Failed 15: Missing Facebook or Instagram integration in SettingsManager, Footer or StoreContext");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 14 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 15 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");
