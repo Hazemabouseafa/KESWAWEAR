@@ -95,11 +95,18 @@ export const StoreProvider = ({ children }) => {
   // UI States
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [adminTab, setAdminTab] = useState('orders'); // Defaults straight to orders management
+  const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [notification, setNotification] = useState(null);
+
+  const openAdminTab = (tab = 'orders') => {
+    setAdminTab(tab);
+    setIsAdminOpen(true);
+  };
 
   // Neon PostgreSQL Database State ('checking' | 'connected' | 'local' | 'error')
   const [neonStatus, setNeonStatus] = useState('checking');
@@ -337,7 +344,61 @@ export const StoreProvider = ({ children }) => {
   // Update Image URL directly
   const updateImage = (path, url) => {
     updateContent(path, url);
-    showToast(language === 'ar' ? "تم تحديث الصورة بنجاح!" : "Image updated successfully!", "success");
+    showToast(language === 'ar' ? "تم تحديث الصورة بنجاح! 💾" : "Image updated successfully! 💾", "success");
+  };
+
+  // Explicit Save Handlers for Admin Panel with Immediate Toast & Persistence
+  const saveGeneralSettings = (settings) => {
+    setSiteContent(prev => ({
+      ...prev,
+      general: {
+        ...prev.general,
+        ...settings
+      }
+    }));
+    showToast(language === 'ar' ? "تم حفظ وتثبيت إعدادات الشحن والعملة بنجاح! 💾" : "Shipping and currency settings saved! 💾", "success");
+    if (neonStatus === 'connected') {
+      fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...siteContent,
+          general: { ...siteContent.general, ...settings }
+        })
+      }).catch(() => {});
+    }
+  };
+
+  const saveSectionsVisibility = (visibilityMap) => {
+    setSiteContent(prev => ({
+      ...prev,
+      sectionsVisibility: {
+        ...prev.sectionsVisibility,
+        ...visibilityMap
+      }
+    }));
+    showToast(language === 'ar' ? "تم حفظ وتثبيت حالة ظهور صفوف وأقسام المتجر! 💾" : "Rows visibility settings saved! 💾", "success");
+  };
+
+  const saveTexts = (sectionKey, textData) => {
+    setSiteContent(prev => ({
+      ...prev,
+      [sectionKey]: {
+        ...prev[sectionKey],
+        ...textData
+      }
+    }));
+    showToast(language === 'ar' ? "تم حفظ نصوص الواجهة وتثبيتها بنجاح! 💾" : "Text changes saved successfully! 💾", "success");
+    if (neonStatus === 'connected') {
+      fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...siteContent,
+          [sectionKey]: { ...siteContent[sectionKey], ...textData }
+        })
+      }).catch(() => {});
+    }
   };
 
   // Categories & Custom Blocks Management
@@ -780,6 +841,14 @@ export const StoreProvider = ({ children }) => {
       setIsCartOpen,
       isAdminOpen,
       setIsAdminOpen,
+      adminTab,
+      setAdminTab,
+      openAdminTab,
+      isTrackOrderOpen,
+      setIsTrackOrderOpen,
+      saveGeneralSettings,
+      saveSectionsVisibility,
+      saveTexts,
       isCheckoutOpen,
       setIsCheckoutOpen,
       quickViewProduct,

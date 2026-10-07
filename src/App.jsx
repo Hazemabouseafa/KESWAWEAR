@@ -15,7 +15,8 @@ import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { QuickViewModal } from './components/QuickViewModal';
-import { AdminPanel } from './components/AdminPanel';
+import { AdminPanel } from './components/admin/AdminPanel';
+import { TrackOrderModal } from './components/TrackOrderModal';
 import { Sliders, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
@@ -232,6 +233,7 @@ export default function App() {
       <CartDrawer />
       <CheckoutModal />
       <QuickViewModal />
+      <TrackOrderModal />
       <AdminPanel />
 
       {/* 5. Toast Notification Banner */}

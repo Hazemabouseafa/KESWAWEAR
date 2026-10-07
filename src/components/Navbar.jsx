@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { KeswaLogo } from './KeswaLogo';
-import { ShoppingBag, Search, Heart, Sliders, Menu, X, Globe } from 'lucide-react';
+import { ShoppingBag, Search, Heart, Sliders, Menu, X, Globe, PackageCheck } from 'lucide-react';
 
 export const Navbar = () => {
   const { 
@@ -9,6 +9,7 @@ export const Navbar = () => {
     cartItemsCount, 
     setIsCartOpen, 
     setIsAdminOpen, 
+    setIsTrackOrderOpen,
     wishlist,
     setActiveCategory,
     searchQuery,
@@ -174,6 +175,18 @@ export const Navbar = () => {
                 )}
               </button>
 
+              {/* Track Orders Button */}
+              <button 
+                onClick={() => setIsTrackOrderOpen(true)}
+                className="flex items-center gap-1.5 text-neutral-800 hover:text-black bg-white hover:bg-neutral-100 border border-[#dedcd4] px-2.5 py-1.5 rounded text-xs font-bold transition-all shadow-sm"
+                title={language === 'ar' ? "تتبع طلباتي ومتابعة الشحنات" : "Track Orders"}
+              >
+                <PackageCheck size={14} className="text-amber-500" />
+                <span className="text-[11px] font-sans">
+                  {language === 'ar' ? 'الطلبات' : 'Orders'}
+                </span>
+              </button>
+
               {/* Admin Panel Toggle Button */}
               <button 
                 onClick={() => setIsAdminOpen(true)}
@@ -201,7 +214,7 @@ export const Navbar = () => {
                 {getLocalized(item, 'label')}
               </button>
             ))}
-            <div className="pt-2 flex justify-between items-center text-xs text-neutral-600">
+            <div className="pt-2 flex flex-wrap justify-between items-center gap-2 text-xs text-neutral-600">
               <button 
                 onClick={toggleLanguage}
                 className="flex items-center gap-1.5 text-neutral-800 bg-white border border-[#dedcd4] px-3 py-1.5 rounded shadow-sm"
@@ -209,6 +222,15 @@ export const Navbar = () => {
                 <Globe size={13} />
                 <span>{language === 'ar' ? 'English Language' : 'اللغة العربية'}</span>
               </button>
+
+              <button 
+                onClick={() => { setMobileMenuOpen(false); setIsTrackOrderOpen(true); }}
+                className="flex items-center gap-1 text-neutral-800 bg-white border border-[#dedcd4] px-3 py-1.5 rounded shadow-sm font-bold"
+              >
+                <PackageCheck size={13} className="text-amber-500" />
+                <span>{language === 'ar' ? 'تتبع الطلبات' : 'Track Orders'}</span>
+              </button>
+
               <button 
                 onClick={() => { setMobileMenuOpen(false); setIsAdminOpen(true); }}
                 className="text-white bg-black px-3 py-1.5 rounded font-bold"

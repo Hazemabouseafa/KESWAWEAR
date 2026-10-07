@@ -18,7 +18,7 @@ const FacebookIcon = () => (
 );
 
 export const Footer = () => {
-  const { siteContent, setActiveCategory, setIsAdminOpen, getLocalized, t } = useStore();
+  const { siteContent, setActiveCategory, setIsAdminOpen, setIsTrackOrderOpen, getLocalized, t } = useStore();
   const { footer, brand } = siteContent;
 
   const scrollToTop = () => {
@@ -100,7 +100,10 @@ export const Footer = () => {
               <li className="hover:text-white transition-colors cursor-pointer">{t('footer.shippingPolicy')}</li>
               <li className="hover:text-white transition-colors cursor-pointer">{t('footer.returnPolicy')}</li>
               <li className="hover:text-white transition-colors cursor-pointer">{t('footer.sizeGuide')}</li>
-              <li className="hover:text-white transition-colors cursor-pointer">{t('footer.trackOrder')}</li>
+              <li onClick={() => setIsTrackOrderOpen(true)} className="hover:text-amber-300 text-amber-400 font-bold transition-colors cursor-pointer flex items-center gap-1.5">
+                <span>📦</span>
+                <span>{t('footer.trackOrder')}</span>
+              </li>
             </ul>
           </div>
 
