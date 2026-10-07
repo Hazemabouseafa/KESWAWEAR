@@ -35,9 +35,22 @@ export const StoreProvider = ({ children }) => {
         const cleanAnnText = (ann.text_ar && (ann.text_ar.includes('خصم') || ann.text_ar.includes('SALE'))) 
           ? initialSiteContent.announcement.text_ar 
           : ann.text_ar;
+        const banners = {
+          ...initialSiteContent.banners,
+          ...(parsed.banners || {}),
+          heroHoodies: {
+            ...initialSiteContent.banners.heroHoodies,
+            ...(parsed.banners?.heroHoodies || {}),
+            image: (parsed.banners?.heroHoodies?.image && !parsed.banners?.heroHoodies?.image.includes('photo-1556905055-8f358a7a47b2')) 
+              ? parsed.banners.heroHoodies.image 
+              : '/assets/hero_knit_banner.jpg'
+          }
+        };
+
         return {
           ...initialSiteContent,
           ...parsed,
+          banners,
           navigation: nav,
           announcement: {
             ...ann,
