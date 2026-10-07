@@ -286,3 +286,38 @@ export default function App() {
     </div>
   );
 }
+
+export class GlobalErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("Storefront Error caught:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#070709] text-white flex flex-col items-center justify-center p-6 text-center select-none font-sans">
+          <div className="max-w-md bg-[#121218] border border-white/10 p-8 rounded-lg space-y-4 shadow-2xl">
+            <h2 className="text-xl font-black font-display tracking-wider text-white">KESWA WEAR</h2>
+            <p className="text-xs text-gray-300 leading-relaxed">
+              حدث خطأ غير متوقع أثناء تحميل الصفحة. تم تفعيل استرداد النظام التلقائي.
+            </p>
+            <button 
+              onClick={() => { localStorage.clear(); window.location.href = '/'; }}
+              className="px-6 py-2.5 bg-white text-black font-black text-xs rounded hover:bg-neutral-200 transition-all shadow-lg"
+            >
+              إعادة تهيئة وتحميل الصفحة (Reload Store)
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+

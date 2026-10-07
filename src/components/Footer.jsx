@@ -18,7 +18,7 @@ const FacebookIcon = () => (
 );
 
 export const Footer = () => {
-  const { siteContent, setActiveCategory, setIsAdminOpen, setIsTrackOrderOpen, getLocalized, t } = useStore();
+  const { siteContent, setActiveCategory, setIsAdminOpen, setIsTrackOrderOpen, getLocalized, language, t } = useStore();
   const { footer, brand } = siteContent;
 
   const scrollToTop = () => {
@@ -77,15 +77,6 @@ export const Footer = () => {
                   className="hover:text-white transition-colors"
                 >
                   {t('nav.sweatpants')}
-                </a>
-              </li>
-              <li>
-                <a 
-                  href="#sale" 
-                  onClick={() => setActiveCategory('all')}
-                  className="hover:text-rose-400 transition-colors text-rose-500 font-bold"
-                >
-                  {t('nav.sale')} (-40%)
                 </a>
               </li>
             </ul>
