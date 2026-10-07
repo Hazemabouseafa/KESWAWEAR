@@ -241,7 +241,7 @@ export const initialSiteContent = {
 };
 
 export const initialProducts = [
-  // HOODIES (8 products)
+  // HOODIES (6 products)
   {
     id: "h-01",
     name_ar: "هودي أسود مغسول بوكسي ثقيل 450 جرام",
@@ -378,52 +378,6 @@ export const initialProducts = [
     sizes: ["S", "M", "L", "XL"],
     colors: [
       { name_ar: "شاركوول مغسول", name_en: "Acid Charcoal", hex: "#2f3136" }
-    ]
-  },
-  {
-    id: "h-07",
-    name_ar: "هودي بني موكا تان ثقيل وناعم",
-    name_en: "Earth Mocha Tan Relaxed Hoodie",
-    category: "hoodies",
-    price: 950,
-    oldPrice: 1250,
-    badge_ar: "مميز",
-    badge_en: "HOT",
-    inStock: true,
-    featured: false,
-    description_ar: "درجة بني موكا دافئة مصنوعة من فليس داخلي مفرش فائق النعومة لراحة تدوم طوال اليوم.",
-    description_en: "Earthy mocha brown shade crafted in ultra-soft brushed fleece interior with thick elasticated hem.",
-    images: [
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop"
-    ],
-    sizes: ["M", "L", "XL", "XXL"],
-    colors: [
-      { name_ar: "موكا تان", name_en: "Mocha Tan", hex: "#6e5445" },
-      { name_ar: "رملي", name_en: "Desert Sand", hex: "#c4a482" }
-    ]
-  },
-  {
-    id: "h-08",
-    name_ar: "هودي كحلي داكن بسوستة خفيفة ودافئة",
-    name_en: "Deep Midnight Navy Zip Hoodie",
-    category: "hoodies",
-    price: 920,
-    oldPrice: 1180,
-    badge_ar: "خصم -22%",
-    badge_en: "SALE -22%",
-    inStock: true,
-    featured: false,
-    description_ar: "درجة كحلي داكنة أنيقة مع سحاب مطفي وتصميم جانبي مضلع معزز.",
-    description_en: "Clean dark navy blue hue with matte metallic zipper pull and reinforced side panel ribbing.",
-    images: [
-      "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=900&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=900&auto=format&fit=crop"
-    ],
-    sizes: ["S", "M", "L", "XL"],
-    colors: [
-      { name_ar: "كحلي داكن", name_en: "Deep Navy", hex: "#162035" },
-      { name_ar: "رمادي معدني", name_en: "Steel Grey", hex: "#4b5563" }
     ]
   },
 

@@ -50,7 +50,13 @@ export const StoreProvider = ({ children }) => {
   const [products, setProducts] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-      return saved ? JSON.parse(saved) : initialProducts;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(p => p.id !== 'h-07' && p.id !== 'h-08');
+        }
+      }
+      return initialProducts;
     } catch (e) {
       return initialProducts;
     }
@@ -202,7 +208,7 @@ export const StoreProvider = ({ children }) => {
           if (prodRes && prodRes.ok) {
             const prodJson = await prodRes.json();
             if (prodJson.products && prodJson.products.length > 0 && isMounted) {
-              setProducts(prodJson.products);
+              setProducts(prodJson.products.filter(p => p.id !== 'h-07' && p.id !== 'h-08'));
             }
           }
 

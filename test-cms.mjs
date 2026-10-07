@@ -20,7 +20,7 @@ function assert(condition, message) {
 }
 
 // 1. Test Initial Data Integrity
-assert(initialProducts.length >= 20, `Products loaded with count: ${initialProducts.length}`);
+assert(initialProducts.length >= 18, `Products loaded with count: ${initialProducts.length}`);
 assert(initialSiteContent.announcement.text_ar.includes("شحن مجاني"), "Arabic announcement text loaded");
 assert(initialSiteContent.announcement.text_en.includes("FREE SHIPPING"), "English announcement text loaded");
 assert(initialSiteContent.banners.heroHoodies.title_ar === "هوديز", "Arabic hero title loaded");
