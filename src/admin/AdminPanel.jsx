@@ -8,16 +8,14 @@ import { ImageLibraryManager } from './ImageLibraryManager';
 import { TextContentManager } from './TextContentManager';
 import { SettingsManager } from './SettingsManager';
 import { 
-  X, Eye, Sliders, ChevronRight, ShoppingBag, 
+  Eye, Sliders, ChevronRight, ShoppingBag, 
   Package, Layers, ToggleRight, Image as ImageIcon, 
-  Layout, Settings, FileSpreadsheet, Download, RotateCcw
+  Layout, Settings, FileSpreadsheet, Download, RotateCcw,
+  ArrowRight
 } from 'lucide-react';
 
-export const AdminPanel = () => {
+export const AdminPanel = ({ onBackToStore }) => {
   const { 
-    isAdminOpen, 
-    setIsAdminOpen, 
-    closeAdmin,
     adminTab, 
     setAdminTab,
     orders, 
@@ -29,12 +27,13 @@ export const AdminPanel = () => {
     resetToDefaultData
   } = useStore();
 
-  const handleClose = () => {
-    if (closeAdmin) closeAdmin();
-    else setIsAdminOpen(false);
+  const handleBack = () => {
+    if (onBackToStore) {
+      onBackToStore();
+    } else {
+      window.location.href = '/';
+    }
   };
-
-  if (!isAdminOpen) return null;
 
   const { categories = [] } = siteContent;
 
@@ -49,10 +48,10 @@ export const AdminPanel = () => {
   ];
 
   return (
-    <div dir="rtl" className="fixed inset-0 z-50 overflow-hidden bg-black/95 backdrop-blur-md flex flex-col font-sans select-none animate-fadeIn">
+    <div dir="rtl" className="min-h-screen bg-[#0d0d12] text-[#e5e5e5] flex flex-col font-sans select-none">
       
       {/* Top Header */}
-      <header className="bg-[#121218] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0">
+      <header className="bg-[#121218] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0 sticky top-0 z-30 shadow-xl">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-white text-black font-black text-xs uppercase tracking-wider flex items-center gap-2 rounded shadow-md">
             <Sliders size={16} />
@@ -61,7 +60,7 @@ export const AdminPanel = () => {
 
           <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 border border-emerald-500/20 rounded-full hidden sm:flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>تعديل وحفظ فوري نشط (Active)</span>
+            <span>بوابة الإدارة المستقلة نشطة</span>
           </span>
 
           {/* Neon DB Indicator */}
@@ -80,22 +79,16 @@ export const AdminPanel = () => {
           </div>
         </div>
 
-        {/* Top Actions */}
+        {/* Top Actions: Go Back to Store */}
         <div className="flex items-center gap-3">
           <button 
-            onClick={handleClose}
-            className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200 text-xs font-black px-4 py-2 rounded transition-all shadow-md"
+            onClick={handleBack}
+            className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200 text-xs font-black px-4 py-2.5 rounded transition-all shadow-md group"
+            title="الانتقال لواجهة المتجر"
           >
             <Eye size={15} />
-            <span>معاينة المتجر في الواجهة</span>
-          </button>
-          
-          <button 
-            onClick={handleClose}
-            className="p-2 text-gray-400 hover:text-white transition-colors"
-            title="إغلاق لوحة التحكم"
-          >
-            <X size={22} />
+            <span>الذهاب لواجهة المتجر (View Store)</span>
+            <ArrowRight size={14} className="group-hover:-translate-x-1 transition-transform" />
           </button>
         </div>
       </header>
@@ -104,9 +97,9 @@ export const AdminPanel = () => {
       <div className="flex-1 flex overflow-hidden">
         
         {/* Desktop Sidebar Tabs */}
-        <aside className="w-64 bg-[#0a0a0d] border-l border-white/10 p-4 space-y-1.5 hidden md:block overflow-y-auto shrink-0">
+        <aside className="w-64 bg-[#0a0a0d] border-l border-white/10 p-4 space-y-1.5 hidden md:block overflow-y-auto shrink-0 min-h-[calc(100vh-65px)]">
           <div className="text-[11px] font-mono text-gray-500 px-3 py-1 uppercase tracking-wider mb-2">
-            الأقسام والتحكم
+            أقسام لوحة التحكم
           </div>
 
           {tabs.map(tab => {
@@ -175,7 +168,7 @@ export const AdminPanel = () => {
         </div>
 
         {/* Content Body */}
-        <main className="flex-1 bg-[#101015] p-6 lg:p-10 overflow-y-auto">
+        <main className="flex-1 bg-[#101015] p-6 lg:p-10 overflow-y-auto min-h-[calc(100vh-65px)]">
           {adminTab === 'orders' && <OrdersManager />}
           {adminTab === 'products' && <ProductsManager />}
           {adminTab === 'categories' && <CategoriesManager />}

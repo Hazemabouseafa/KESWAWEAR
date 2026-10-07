@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from './context/StoreContext';
 import { Navbar } from './components/Navbar';
 import { 
@@ -17,7 +17,7 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { QuickViewModal } from './components/QuickViewModal';
 import { AdminPanel } from './admin/AdminPanel';
 import { TrackOrderModal } from './components/TrackOrderModal';
-import { Sliders, Sparkles, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
   const { 
@@ -25,13 +25,61 @@ export default function App() {
     activeCategory, 
     setActiveCategory, 
     notification, 
-    setIsAdminOpen,
     getLocalized,
     language 
   } = useStore();
 
-  const { sectionHeaders, sectionsVisibility, categories = [] } = siteContent;
+  // Robust URL Route State
+  const [currentPath, setCurrentPath] = useState(() => {
+    if (typeof window === 'undefined') return '/';
+    return window.location.pathname;
+  });
 
+  const [currentHash, setCurrentHash] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return window.location.hash;
+  });
+
+  useEffect(() => {
+    const handleUrlChange = () => {
+      setCurrentPath(window.location.pathname);
+      setCurrentHash(window.location.hash);
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
+  }, []);
+
+  const navigateTo = (path) => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', path);
+      setCurrentPath(path);
+      setCurrentHash('');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  };
+
+  const isAdminRoute = 
+    currentPath === '/admin' || 
+    currentPath.startsWith('/admin/') || 
+    currentPath === '/admin.html' || 
+    currentHash === '#admin' || 
+    currentHash === '#/admin' || 
+    currentHash.startsWith('#/admin/');
+
+  // IF ADMIN ROUTE: RENDER STANDALONE ADMIN PORTAL ONLY (No Storefront, No Overlays)
+  if (isAdminRoute) {
+    return (
+      <AdminPanel onBackToStore={() => navigateTo('/')} />
+    );
+  }
+
+  // OTHERWISE: RENDER PURE CUSTOMER STOREFRONT (Zero Admin buttons on homepage)
+  const { sectionHeaders, sectionsVisibility, categories = [] } = siteContent;
   const isVisible = (rowKey) => sectionsVisibility?.[rowKey] !== false;
 
   const hoodiesCat = categories.find(c => c.id === 'hoodies');
@@ -53,20 +101,6 @@ export default function App() {
       
       {/* 1. Header / Navbar */}
       <Navbar />
-
-      {/* Floating Admin Trigger Button for Quick Live Editing */}
-      <div className="fixed bottom-6 start-6 z-40">
-        <button
-          onClick={() => setIsAdminOpen(true)}
-          className="group flex items-center gap-2 bg-black hover:bg-neutral-800 text-white border border-white/20 px-4 py-3 rounded-full shadow-2xl backdrop-blur-md transition-all duration-300 transform hover:scale-105"
-          title="فتح لوحة التحكم"
-        >
-          <Sliders size={18} className="text-amber-400 group-hover:rotate-45 transition-transform" />
-          <span className="text-xs font-black uppercase tracking-wider font-sans">
-            {language === 'ar' ? 'تحكم بالواجهة (CMS)' : 'Admin CMS'}
-          </span>
-        </button>
-      </div>
 
       {/* 2. Main Storefront Content */}
       <main className="flex-1">
@@ -153,7 +187,7 @@ export default function App() {
             {/* ROW 2: 3-Card Category Feature Grid */}
             {isVisible('categoryGrid') && <CategoryFeatureGrid />}
 
-            {/* ROW 3: Hoodies Products Section (8 Products) */}
+            {/* ROW 3: Hoodies Products Section */}
             {isVisible('hoodiesProducts') && (
               <ProductSection
                 id="hoodies"
@@ -168,7 +202,7 @@ export default function App() {
             {/* ROW 4: T-Shirts Cinematic Banner */}
             {isVisible('heroTshirts') && <HeroTshirts />}
 
-            {/* ROW 5: T-Shirts Products Section (4 Products) */}
+            {/* ROW 5: T-Shirts Products Section */}
             {isVisible('tshirtsProducts') && (
               <ProductSection
                 id="tshirts"
@@ -183,7 +217,7 @@ export default function App() {
             {/* ROW 6: Sweatpants Urban Banner */}
             {isVisible('heroSweatpants') && <HeroSweatpants />}
 
-            {/* ROW 7: Sweatpants Products Section (8 Products) */}
+            {/* ROW 7: Sweatpants Products Section */}
             {isVisible('sweatpantsProducts') && (
               <ProductSection
                 id="sweatpants"
@@ -195,7 +229,7 @@ export default function App() {
               />
             )}
 
-            {/* DYNAMIC CUSTOM CATEGORY BLOCKS (User-Added Rows & Categories) */}
+            {/* DYNAMIC CUSTOM CATEGORY BLOCKS */}
             {customCategories.map(cat => {
               const showBanner = isVisible(`hero_${cat.id}`) && isVisible(`${cat.id}Banner`) && cat.showBanner !== false;
               const showProducts = isVisible(`products_${cat.id}`) && isVisible(`${cat.id}Products`) && cat.showProducts !== false;
@@ -216,7 +250,7 @@ export default function App() {
               );
             })}
 
-            {/* ROW 8: Super Sale with Interactive Live Countdown */}
+            {/* ROW 8: Super Sale */}
             {isVisible('superSale') && <SuperSaleSection />}
 
             {/* ROW 9: Newsletter Section */}
@@ -226,15 +260,14 @@ export default function App() {
 
       </main>
 
-      {/* 3. Footer (ROW 10) */}
-      {isVisible('footer') && <Footer />}
+      {/* 3. Footer with Admin Portal Link */}
+      {isVisible('footer') && <Footer onNavigateAdmin={() => navigateTo('/admin')} />}
 
       {/* 4. Drawers & Modals */}
       <CartDrawer />
       <CheckoutModal />
       <QuickViewModal />
       <TrackOrderModal />
-      <AdminPanel />
 
       {/* 5. Toast Notification Banner */}
       {notification && (
