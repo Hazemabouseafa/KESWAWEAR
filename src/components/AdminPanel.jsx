@@ -39,7 +39,11 @@ export const AdminPanel = () => {
     exportData,
     importData,
     showToast,
-    language
+    language,
+    neonStatus,
+    neonDetails,
+    syncAllToNeon,
+    checkNeonConnection
   } = useStore();
 
   const [activeTab, setActiveTab] = useState('categories'); // 'categories' | 'rows' | 'images' | 'orders' | 'products' | 'texts' | 'settings'
@@ -268,6 +272,21 @@ export const AdminPanel = () => {
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>وضع التعديل اللحظي نشط (Live Edit)</span>
           </span>
+
+          {/* Neon Database Indicator */}
+          <div className="hidden lg:flex items-center">
+            {neonStatus === 'connected' ? (
+              <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 border border-emerald-500/30 rounded-full flex items-center gap-1.5 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Neon DB: متصلة (keswawear)</span>
+              </span>
+            ) : (
+              <span className="text-xs font-mono text-cyan-400 bg-cyan-500/10 px-3 py-1 border border-cyan-500/30 rounded-full flex items-center gap-1.5 shadow-sm" title="مجهزة للربط التلقائي على Vercel">
+                <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                <span>Neon PostgreSQL: جاهزة للربط (Vercel)</span>
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Top Actions */}
@@ -1385,6 +1404,73 @@ export const AdminPanel = () => {
                       className="hidden" 
                     />
                   </label>
+                </div>
+              </div>
+
+              {/* Neon PostgreSQL Serverless Database on Vercel */}
+              <div className="bg-[#181824] border border-cyan-500/30 p-5 rounded space-y-4 shadow-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2">
+                  <div>
+                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                      <span>قاعدة بيانات Neon PostgreSQL السحابية (قاعدة: keswawear)</span>
+                    </h3>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      قاعدة بيانات سحابية Serverless عالية السرعة تعمل مع دوال Vercel Serverless Functions.
+                    </p>
+                  </div>
+
+                  <span className={`text-xs font-mono px-3 py-1 rounded border self-start sm:self-auto ${
+                    neonStatus === 'connected' 
+                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' 
+                      : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+                  }`}>
+                    {neonStatus === 'connected' ? '🟢 متصلة بنجاح (Live)' : '🔵 مجهزة للربط في Vercel'}
+                  </span>
+                </div>
+
+                <div className="bg-neutral-900/80 p-3.5 rounded border border-white/5 space-y-2 text-xs">
+                  <div className="flex justify-between items-center text-gray-300">
+                    <span>اسم قاعدة البيانات (Neon Database):</span>
+                    <strong className="text-white font-mono bg-neutral-800 px-2 py-0.5 rounded">keswawear</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-gray-300">
+                    <span>المزود وخطة التشغيل:</span>
+                    <span className="text-cyan-300 font-mono">Neon Serverless PostgreSQL (Vercel Node Runtime)</span>
+                  </div>
+                  {neonDetails?.counts && (
+                    <div className="flex justify-between items-center text-gray-300 border-t border-white/5 pt-2">
+                      <span>السجلات المحفوظة في Neon:</span>
+                      <span className="text-emerald-400 font-mono">
+                        {neonDetails.counts.products ?? 0} منتجات • {neonDetails.counts.orders ?? 0} طلبات
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2.5 pt-1">
+                  <button
+                    onClick={checkNeonConnection}
+                    className="bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs px-4 py-2.5 rounded flex items-center gap-2 transition-colors border border-white/10"
+                  >
+                    <RefreshCw size={14} className="text-cyan-400" />
+                    <span>فحص الاتصال بـ Neon</span>
+                  </button>
+
+                  <button
+                    onClick={syncAllToNeon}
+                    className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs px-4 py-2.5 rounded flex items-center gap-2 transition-colors shadow"
+                  >
+                    <Upload size={14} />
+                    <span>مزامنة وتهيئة البيانات في Neon (Sync & Init DB)</span>
+                  </button>
+                </div>
+
+                <div className="bg-neutral-900/60 p-3 rounded text-[11px] text-gray-400 space-y-1">
+                  <strong className="text-gray-300 block">خطوات ربط قاعدة keswawear على Vercel:</strong>
+                  <p>1. قم بعمل Import لمستودع GitHub (<span className="text-white font-mono">Hazemabouseafa/KESWAWEAR</span>) داخل Vercel.</p>
+                  <p>2. اذهب إلى <span className="text-white font-mono">Project Settings ➔ Environment Variables</span> وأضف متغير <span className="text-cyan-300 font-mono">DATABASE_URL</span> برابط الاتصال الخاص بقاعدة <span className="text-white font-mono">keswawear</span> من Neon.</p>
+                  <p>3. أو من تبويب <span className="text-white font-mono">Storage</span> في Vercel اضغط Connect Neon مباشرة ليتم ملء المتغيرات تلقائياً!</p>
                 </div>
               </div>
 

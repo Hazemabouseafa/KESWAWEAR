@@ -95,6 +95,10 @@ export const StoreProvider = ({ children }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [notification, setNotification] = useState(null);
 
+  // Neon PostgreSQL Database State ('checking' | 'connected' | 'local' | 'error')
+  const [neonStatus, setNeonStatus] = useState('checking');
+  const [neonDetails, setNeonDetails] = useState({ connected: false, database: 'keswawear', counts: {} });
+
   // Sync Language and Direction
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.LANG, language);
@@ -129,7 +133,7 @@ export const StoreProvider = ({ children }) => {
     return obj[`${field}_en`] || obj[`${field}`] || obj[`${field}_ar`] || '';
   };
 
-  // Sync to LocalStorage
+  // Sync to LocalStorage (Immediate offline cache)
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.CONTENT, JSON.stringify(siteContent));
   }, [siteContent]);
@@ -156,6 +160,112 @@ export const StoreProvider = ({ children }) => {
     setTimeout(() => {
       setNotification(prev => (prev?.message === message ? null : prev));
     }, 3500);
+  };
+
+  // Neon Database Sync on Mount
+  useEffect(() => {
+    let isMounted = true;
+    const checkAndSyncNeon = async () => {
+      try {
+        const statusRes = await fetch('/api/status').catch(() => null);
+        if (!statusRes || !statusRes.ok) {
+          if (isMounted) setNeonStatus('local');
+          return;
+        }
+
+        const statusData = await statusRes.json();
+        if (statusData.connected) {
+          if (isMounted) {
+            setNeonStatus('connected');
+            setNeonDetails(statusData);
+          }
+
+          // 1. Fetch content from Neon
+          const contentRes = await fetch('/api/content').catch(() => null);
+          if (contentRes && contentRes.ok) {
+            const contentJson = await contentRes.json();
+            if (contentJson.data && isMounted) {
+              setSiteContent(prev => ({
+                ...initialSiteContent,
+                ...contentJson.data,
+                categories: (contentJson.data.categories && contentJson.data.categories.length > 0) ? contentJson.data.categories : initialSiteContent.categories,
+                sectionsVisibility: {
+                  ...initialSiteContent.sectionsVisibility,
+                  ...(contentJson.data.sectionsVisibility || {})
+                }
+              }));
+            }
+          }
+
+          // 2. Fetch products from Neon
+          const prodRes = await fetch('/api/products').catch(() => null);
+          if (prodRes && prodRes.ok) {
+            const prodJson = await prodRes.json();
+            if (prodJson.products && prodJson.products.length > 0 && isMounted) {
+              setProducts(prodJson.products);
+            }
+          }
+
+          // 3. Fetch orders from Neon
+          const orderRes = await fetch('/api/orders').catch(() => null);
+          if (orderRes && orderRes.ok) {
+            const orderJson = await orderRes.json();
+            if (orderJson.orders && orderJson.orders.length > 0 && isMounted) {
+              setOrders(orderJson.orders);
+            }
+          }
+        } else {
+          if (isMounted) setNeonStatus('local');
+        }
+      } catch (err) {
+        if (isMounted) setNeonStatus('local');
+      }
+    };
+
+    checkAndSyncNeon();
+    return () => { isMounted = false; };
+  }, []);
+
+  const syncAllToNeon = async () => {
+    try {
+      showToast(language === 'ar' ? "جاري مزامنة وتهيئة البيانات في Neon (قاعدة keswawear)..." : "Syncing data to Neon PostgreSQL...", "info");
+      const res = await fetch('/api/init-db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          siteContent,
+          products,
+          orders
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNeonStatus('connected');
+        showToast(language === 'ar' ? "تمت المزامنة بنجاح في قاعدة بيانات Neon (keswawear)!" : "Successfully synced to Neon PostgreSQL!", "success");
+        checkNeonConnection();
+      } else {
+        showToast(language === 'ar' ? `تنبيه: ${data.message || 'يرجى ربط DATABASE_URL في Vercel'}` : (data.message || 'Failed'), "error");
+      }
+    } catch (e) {
+      showToast(language === 'ar' ? "فشل الاتصال بـ API Neon - يرجى التأكد من نشر المتجر على Vercel وربط DATABASE_URL" : "Failed to connect to Neon API", "error");
+    }
+  };
+
+  const checkNeonConnection = async () => {
+    try {
+      const res = await fetch('/api/status');
+      if (res.ok) {
+        const data = await res.json();
+        setNeonDetails(data);
+        setNeonStatus(data.connected ? 'connected' : 'local');
+        return data;
+      }
+      setNeonStatus('local');
+      return { connected: false };
+    } catch (e) {
+      setNeonStatus('local');
+      return { connected: false };
+    }
   };
 
   // Row / Section Visibility Toggle
@@ -676,7 +786,11 @@ export const StoreProvider = ({ children }) => {
       showToast,
       resetToDefaultData,
       exportData,
-      importData
+      importData,
+      neonStatus,
+      neonDetails,
+      syncAllToNeon,
+      checkNeonConnection
     }}>
       {children}
     </StoreContext.Provider>
