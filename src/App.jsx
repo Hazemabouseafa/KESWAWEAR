@@ -163,7 +163,7 @@ export default function App() {
               const currentCat = customCategories.find(c => c.id === activeCategory);
               return (
                 <div>
-                  {currentCat.bannerImage && currentCat.showBanner !== false && (
+                  {currentCat.showBanner !== false && (
                     <DynamicCategoryBanner category={currentCat} />
                   )}
                   <ProductSection
@@ -173,6 +173,7 @@ export default function App() {
                     subtitle={getLocalized(currentCat, 'subtitle')}
                     viewAllText={getLocalized(currentCat, 'viewAllText')}
                     limit={16}
+                    showEmptyPlaceholder={true}
                   />
                 </div>
               );
@@ -231,8 +232,12 @@ export default function App() {
 
             {/* DYNAMIC CUSTOM CATEGORY BLOCKS */}
             {customCategories.map(cat => {
-              const showBanner = isVisible(`hero_${cat.id}`) && isVisible(`${cat.id}Banner`) && cat.showBanner !== false;
-              const showProducts = isVisible(`products_${cat.id}`) && isVisible(`${cat.id}Products`) && cat.showProducts !== false;
+              const showBanner = (sectionsVisibility?.[`hero_${cat.id}`] !== false) && 
+                                 (sectionsVisibility?.[`${cat.id}Banner`] !== false) && 
+                                 cat.showBanner !== false;
+              const showProducts = (sectionsVisibility?.[`products_${cat.id}`] !== false) && 
+                                   (sectionsVisibility?.[`${cat.id}Products`] !== false) && 
+                                   cat.showProducts !== false;
               return (
                 <React.Fragment key={cat.id}>
                   {showBanner && <DynamicCategoryBanner category={cat} />}
@@ -244,6 +249,7 @@ export default function App() {
                       subtitle={getLocalized(cat, 'subtitle')}
                       viewAllText={getLocalized(cat, 'viewAllText')}
                       limit={8}
+                      showEmptyPlaceholder={true}
                     />
                   )}
                 </React.Fragment>

@@ -9,7 +9,8 @@ export const ProductSection = ({
   title, 
   subtitle, 
   viewAllText,
-  limit = 8 
+  limit = 8,
+  showEmptyPlaceholder = false
 }) => {
   const { products, setActiveCategory, searchQuery, language, t } = useStore();
 
@@ -32,7 +33,7 @@ export const ProductSection = ({
     filtered = filtered.slice(0, limit);
   }
 
-  if (filtered.length === 0) return null;
+  if (filtered.length === 0 && !showEmptyPlaceholder) return null;
 
   const displayViewAll = viewAllText || t('actions.viewAll');
 
@@ -51,29 +52,47 @@ export const ProductSection = ({
           )}
         </div>
 
-        <button
-          onClick={() => {
-            setActiveCategory(category || 'all');
-            const shopTarget = document.querySelector('#shop');
-            if (shopTarget) shopTarget.scrollIntoView({ behavior: 'smooth' });
-          }}
-          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors group self-start sm:self-auto font-sans"
-        >
-          <span>{displayViewAll}</span>
-          {language === 'ar' ? (
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-          ) : (
-            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-          )}
-        </button>
+        {filtered.length > 0 && (
+          <button
+            onClick={() => {
+              setActiveCategory(category || 'all');
+              const shopTarget = document.querySelector('#shop');
+              if (shopTarget) shopTarget.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors group self-start sm:self-auto font-sans"
+          >
+            <span>{displayViewAll}</span>
+            {language === 'ar' ? (
+              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+            ) : (
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            )}
+          </button>
+        )}
       </div>
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {filtered.map(product => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {/* Product Grid or Empty State */}
+      {filtered.length > 0 ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {filtered.map(product => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-12 px-6 text-center border border-dashed border-[#d8d6ce] bg-white/70 rounded-sm">
+          <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-2 text-base">
+            ✨
+          </div>
+          <h4 className="text-sm font-bold text-neutral-800">
+            {language === 'ar' ? 'تشكيلة هذا القسم قادمة قريباً!' : 'Products for this category coming soon!'}
+          </h4>
+          <p className="text-xs text-neutral-500 mt-1 max-w-sm mx-auto">
+            {language === 'ar' 
+              ? 'تمت إضافة هذا القسم وتفعيله بالواجهة الرئيسية. يمكنك إضافة وتعيين منتجات له من لوحة التحكم.' 
+              : 'Category is live on the storefront. You can assign products to this category from the Admin Panel.'}
+          </p>
+        </div>
+      )}
     </section>
   );
 };

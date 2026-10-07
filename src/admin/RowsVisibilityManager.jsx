@@ -42,10 +42,18 @@ export const RowsVisibilityManager = () => {
   const allRows = [...coreRowsList, ...dynamicRowsList];
 
   const handleToggle = (key) => {
-    setVisibility(prev => ({
-      ...prev,
-      [key]: prev[key] === false ? true : false
-    }));
+    setVisibility(prev => {
+      const nextVal = prev[key] === false ? true : false;
+      const updated = { ...prev, [key]: nextVal };
+      if (key.startsWith('hero_')) {
+        const catId = key.replace('hero_', '');
+        updated[`${catId}Banner`] = nextVal;
+      } else if (key.startsWith('products_')) {
+        const catId = key.replace('products_', '');
+        updated[`${catId}Products`] = nextVal;
+      }
+      return updated;
+    });
     setIsSaved(false);
   };
 

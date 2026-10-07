@@ -12,7 +12,6 @@ export const ProductCard = ({ product }) => {
     t 
   } = useStore();
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || null);
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'L');
 
@@ -34,15 +33,11 @@ export const ProductCard = ({ product }) => {
       className="group relative flex flex-col bg-white border border-[#e6e4dc] hover:border-black/30 rounded-sm cursor-pointer select-none transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-xl"
     >
       {/* Product Image Container */}
-      <div 
-        className="relative w-full aspect-[3/4] bg-[#f1efe9] overflow-hidden"
-        onMouseEnter={() => product.images?.length > 1 && setCurrentImageIndex(1)}
-        onMouseLeave={() => setCurrentImageIndex(0)}
-      >
+      <div className="relative w-full aspect-[3/4] bg-[#f1efe9] overflow-hidden">
         <img 
-          src={product.images?.[currentImageIndex] || product.images?.[0]} 
+          src={product.images?.[0] || ''} 
           alt={productName}
-          className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105" 
+          className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105" 
           loading="lazy"
         />
 

@@ -521,8 +521,17 @@ export const StoreProvider = ({ children }) => {
 
   // Categories & Custom Blocks Management
   const addCategory = (categoryData) => {
-    const rawId = categoryData.id || categoryData.name_en || `cat-${Date.now()}`;
-    const cleanId = rawId.toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-');
+    let cleanId = (categoryData.id || categoryData.name_en || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9_-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    if (!cleanId || cleanId.length < 2) {
+      cleanId = `cat-${Date.now().toString(36)}`;
+    }
+
     const newCategory = {
       id: cleanId,
       name_ar: categoryData.name_ar || 'قسم جديد',
@@ -543,7 +552,8 @@ export const StoreProvider = ({ children }) => {
 
     setSiteContent(prev => {
       const existingList = prev.categories || initialSiteContent.categories;
-      const updatedList = [...existingList, newCategory];
+      const filteredExisting = existingList.filter(c => c.id !== cleanId);
+      const updatedList = [...filteredExisting, newCategory];
       
       const currentNav = prev.navigation || [];
       const updatedNav = [
@@ -563,12 +573,14 @@ export const StoreProvider = ({ children }) => {
         sectionsVisibility: {
           ...prev.sectionsVisibility,
           [`hero_${cleanId}`]: true,
-          [`products_${cleanId}`]: true
+          [`products_${cleanId}`]: true,
+          [`${cleanId}Banner`]: true,
+          [`${cleanId}Products`]: true
         }
       };
     });
 
-    showToast(language === 'ar' ? `تمت إضافة قسم "${newCategory.name_ar}" بنجاح!` : `Category "${newCategory.name_en}" added!`, "success");
+    showToast(language === 'ar' ? `تمت إضافة قسم "${newCategory.name_ar}" بنجاح للواجهة الرئيسية!` : `Category "${newCategory.name_en}" added to storefront!`, "success");
     return newCategory;
   };
 

@@ -25,6 +25,19 @@ export const CategoriesManager = () => {
     return map;
   });
 
+  // Keep editingCats updated when categories change
+  React.useEffect(() => {
+    setEditingCats(prev => {
+      const nextMap = { ...prev };
+      categories.forEach(c => {
+        if (!nextMap[c.id]) {
+          nextMap[c.id] = { ...c };
+        }
+      });
+      return nextMap;
+    });
+  }, [categories]);
+
   const [savedCatId, setSavedCatId] = useState(null);
 
   const [newCategoryForm, setNewCategoryForm] = useState({
@@ -69,7 +82,13 @@ export const CategoriesManager = () => {
       return;
     }
 
-    addCategory(newCategoryForm);
+    const created = addCategory(newCategoryForm);
+    if (created && created.id) {
+      setEditingCats(prev => ({
+        ...prev,
+        [created.id]: { ...created }
+      }));
+    }
     setIsAddCategoryOpen(false);
     setNewCategoryForm({
       id: '',

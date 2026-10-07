@@ -450,7 +450,8 @@ export const NewsletterSection = () => {
  */
 export const DynamicCategoryBanner = ({ category }) => {
   const { setActiveCategory, getLocalized, language } = useStore();
-  if (!category || !category.bannerImage) return null;
+  if (!category) return null;
+  const bannerImg = category.bannerImage || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2070&auto=format&fit=crop';
   const title = getLocalized(category, 'name') || category.name_en;
   const subtitle = getLocalized(category, 'subtitle');
   const badge = getLocalized(category, 'badge') || (language === 'ar' ? 'تشكيلة مميزة' : 'EXCLUSIVE DROP');
@@ -460,7 +461,7 @@ export const DynamicCategoryBanner = ({ category }) => {
     <section id={`${category.id}-hero`} className="relative w-full h-[60vh] sm:h-[65vh] min-h-[380px] sm:min-h-[460px] max-h-[750px] bg-black overflow-hidden flex items-center justify-center my-6 sm:my-10">
       <div className="absolute inset-0 z-0">
         <img 
-          src={category.bannerImage} 
+          src={bannerImg} 
           alt={title}
           className="w-full h-full object-cover object-center opacity-80 transform scale-105 transition-transform duration-1000 ease-out hover:scale-100" 
         />
