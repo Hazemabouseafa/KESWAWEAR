@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { ImageUploader } from '../components/ImageUploader';
 import { 
@@ -144,20 +144,20 @@ export const ProductsManager = () => {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
-          <h2 className="text-xl font-black text-white mb-1 flex items-center gap-2">
-            <Package size={22} className="text-white" />
+          <h2 className="text-lg sm:text-xl font-black text-white mb-1 flex items-center gap-2">
+            <Package size={20} className="text-white shrink-0" />
             <span>كتالوج وإدارة المنتجات ({products.length} منتج مسجل)</span>
           </h2>
-          <p className="text-xs text-gray-400">
+          <p className="text-[11px] sm:text-xs text-gray-400">
             إضافة منتجات جديدة أو تعديل المنتجات الحالية، والأسعار، والألوان، والصور، والمقاسات بدون أي خصومات.
           </p>
         </div>
 
         <button
           onClick={handleOpenAddProduct}
-          className="bg-white hover:bg-neutral-200 text-black text-xs font-black px-4 py-2 rounded flex items-center gap-1.5 transition-all shadow-md self-start sm:self-auto"
+          className="w-full sm:w-auto bg-white hover:bg-neutral-200 text-black text-xs font-black px-4 py-2.5 rounded flex items-center justify-center gap-1.5 transition-all shadow-md touch-manipulation"
         >
           <Plus size={15} />
           <span>إضافة منتج جديد</span>
@@ -165,24 +165,24 @@ export const ProductsManager = () => {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-[#16161f] p-3 rounded border border-white/10">
+      <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between bg-[#16161f] p-2.5 sm:p-3 rounded border border-white/10">
         <div className="relative flex-1">
-          <Search size={14} className="absolute top-3 right-3 text-gray-400" />
+          <Search size={14} className="absolute top-2.5 right-3 text-gray-400" />
           <input 
-            type="text"
+            type="text" 
             placeholder="ابحث باسم المنتج أو الكود..."
             value={productSearchQuery}
             onChange={(e) => setProductSearchQuery(e.target.value)}
-            className="w-full bg-neutral-900 border border-white/10 pr-9 pl-3 py-2 text-xs text-white rounded outline-none focus:border-white font-sans"
+            className="w-full bg-neutral-900 border border-white/10 pr-9 pl-3 py-1.5 text-xs text-white rounded outline-none focus:border-white font-sans"
           />
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="flex flex-wrap gap-1.5 shrink-0">
+        {/* Scrollable Category Filter Pills on mobile */}
+        <div className="flex overflow-x-auto pb-1 sm:pb-0 gap-1.5 shrink-0 scrollbar-none touch-manipulation">
           <button
             onClick={() => setProductCategoryFilter('ALL')}
-            className={`px-2.5 py-1 text-xs rounded transition-colors ${
-              productCategoryFilter === 'ALL' ? 'bg-white text-black font-bold' : 'bg-neutral-900 text-gray-400 hover:text-white'
+            className={`px-2.5 py-1 text-xs rounded whitespace-nowrap transition-colors touch-manipulation ${
+              productCategoryFilter === 'ALL' ? 'bg-white text-black font-bold shadow' : 'bg-neutral-900 text-gray-400 hover:text-white'
             }`}
           >
             الكل ({products.length})
@@ -193,8 +193,8 @@ export const ProductsManager = () => {
               <button
                 key={cat.id}
                 onClick={() => setProductCategoryFilter(cat.id)}
-                className={`px-2.5 py-1 text-xs rounded transition-colors ${
-                  productCategoryFilter === cat.id ? 'bg-white text-black font-bold' : 'bg-neutral-900 text-gray-400 hover:text-white'
+                className={`px-2.5 py-1 text-xs rounded whitespace-nowrap transition-colors touch-manipulation ${
+                  productCategoryFilter === cat.id ? 'bg-white text-black font-bold shadow' : 'bg-neutral-900 text-gray-400 hover:text-white'
                 }`}
               >
                 {cat.name_ar} ({count})
@@ -205,9 +205,9 @@ export const ProductsManager = () => {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {filteredProducts.map(prod => (
-          <div key={prod.id} className="bg-[#16161f] border border-white/10 p-4 rounded space-y-3 shadow-lg flex flex-col justify-between">
+          <div key={prod.id} className="bg-[#16161f] border border-white/10 p-3.5 sm:p-4 rounded space-y-3 shadow-lg flex flex-col justify-between">
             <div className="space-y-3">
               <div className="flex gap-3">
                 <img 
@@ -248,10 +248,10 @@ export const ProductsManager = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
+            <div className="flex items-center gap-2 pt-2 border-t border-white/5">
               <button
                 onClick={() => handleOpenEditProduct(prod)}
-                className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-3 py-1.5 rounded flex items-center gap-1 transition-colors border border-white/10"
+                className="flex-1 sm:flex-initial bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-3 py-2 rounded flex items-center justify-center gap-1 transition-colors border border-white/10 touch-manipulation"
               >
                 <Edit2 size={12} className="text-cyan-400" />
                 <span>تعديل</span>
@@ -263,7 +263,7 @@ export const ProductsManager = () => {
                     deleteProduct(prod.id);
                   }
                 }}
-                className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs p-1.5 rounded transition-colors"
+                className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs p-2 rounded transition-colors flex items-center justify-center touch-manipulation"
                 title="حذف المنتج"
               >
                 <Trash2 size={14} />
@@ -275,19 +275,19 @@ export const ProductsManager = () => {
 
       {/* Product Add / Edit Modal */}
       {isProductModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#16161f] border border-white/15 rounded-lg max-w-xl w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto animate-scaleIn">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+          <div className="bg-[#16161f] border border-white/15 rounded-lg max-w-xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto animate-scaleIn">
             <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h3 className="text-base font-black text-white flex items-center gap-2">
-                <Package size={18} className="text-amber-400" />
+              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                <Package size={18} className="text-amber-400 shrink-0" />
                 <span>{editingProductId ? 'تعديل المنتج' : 'إضافة منتج جديد'}</span>
               </h3>
-              <button onClick={() => setIsProductModalOpen(false)} className="text-gray-400 hover:text-white">
+              <button onClick={() => setIsProductModalOpen(false)} className="text-gray-400 hover:text-white p-1">
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
+            <form onSubmit={handleSaveProduct} className="space-y-3.5 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-gray-300 mb-1">الاسم بالعربية *</label>
@@ -349,7 +349,7 @@ export const ProductsManager = () => {
               {/* Sizes Selection */}
               <div>
                 <label className="block text-gray-300 mb-1.5">المقاسات المتاحة:</label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {['S', 'M', 'L', 'XL', 'XXL', 'Oversized'].map(size => {
                     const active = productForm.sizes.includes(size);
                     return (
@@ -357,7 +357,7 @@ export const ProductsManager = () => {
                         type="button"
                         key={size}
                         onClick={() => handleToggleSize(size)}
-                        className={`px-3 py-1.5 rounded font-mono font-bold text-xs transition-colors border ${
+                        className={`px-3 py-1.5 rounded font-mono font-bold text-xs transition-colors border touch-manipulation ${
                           active ? 'bg-white text-black border-white' : 'bg-neutral-900 text-gray-400 border-white/15 hover:border-white/40'
                         }`}
                       >
@@ -380,7 +380,7 @@ export const ProductsManager = () => {
                     });
                   }}
                   label="صورة المنتج الأساسية (رفع من الجهاز أو رابط):"
-                  previewHeight="h-36"
+                  previewHeight="h-32 sm:h-36"
                 />
               </div>
 
@@ -395,29 +395,29 @@ export const ProductsManager = () => {
                 />
               </div>
 
-              <div className="flex items-center gap-4 pt-2">
-                <label className="flex items-center gap-2 cursor-pointer text-gray-300">
+              <div className="flex items-center gap-4 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer text-gray-300 touch-manipulation">
                   <input 
                     type="checkbox"
                     checked={productForm.inStock}
                     onChange={(e) => setProductForm({ ...productForm, inStock: e.target.checked })}
-                    className="rounded bg-neutral-900 border-white/20 text-white"
+                    className="rounded bg-neutral-900 border-white/20 text-white w-4 h-4"
                   />
                   <span>المنتج متوفر في المخزون (In Stock)</span>
                 </label>
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-3 border-t border-white/10">
                 <button
                   type="button"
                   onClick={() => setIsProductModalOpen(false)}
-                  className="px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded transition-colors text-center"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-white hover:bg-neutral-200 text-black font-black rounded transition-all shadow-lg flex items-center gap-1.5"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-white hover:bg-neutral-200 text-black font-black rounded transition-all shadow-lg flex items-center justify-center gap-1.5 touch-manipulation"
                 >
                   <Save size={14} />
                   <span>💾 {editingProductId ? 'حفظ تعديلات المنتج' : 'إضافة المنتج'}</span>

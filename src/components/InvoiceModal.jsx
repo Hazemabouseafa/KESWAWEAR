@@ -1,34 +1,34 @@
 import React from 'react';
 import { X, Printer, CheckCircle, Package, Truck, Phone, MapPin, Calendar, CreditCard } from 'lucide-react';
 
-export const InvoiceModal = ({ order, isOpen, onClose }) => {
-  if (!isOpen || !order) return null;
+export const InvoiceModal = ({ order, isOpen = true, onClose }) => {
+  if (!order || isOpen === false) return null;
 
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="relative w-full max-w-2xl bg-white text-black rounded shadow-2xl overflow-hidden my-8 font-sans animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/85 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4">
+      <div className="relative w-full max-w-2xl max-h-[94vh] overflow-y-auto bg-white text-black rounded shadow-2xl my-auto font-sans animate-fadeIn">
         
         {/* Modal Controls (Not printed) */}
-        <div className="print:hidden bg-neutral-900 text-white px-6 py-3 flex items-center justify-between border-b border-neutral-800">
+        <div className="print:hidden bg-neutral-900 text-white px-3.5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between border-b border-neutral-800 sticky top-0 z-10 shadow">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-xs uppercase tracking-wider text-amber-400">بوليصة شحن وفاتورة ضريبية</span>
+            <span className="font-bold text-xs uppercase tracking-wider text-amber-400">بوليصة شحن وفاتورة</span>
             <span className="font-mono text-xs text-gray-400">#{order.id}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors shadow"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors shadow touch-manipulation"
             >
               <Printer size={14} />
-              <span>طباعة / حفظ PDF</span>
+              <span>طباعة / PDF</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 text-gray-400 hover:text-white rounded"
+              className="p-1.5 text-gray-400 hover:text-white rounded touch-manipulation"
             >
               <X size={18} />
             </button>
@@ -36,24 +36,24 @@ export const InvoiceModal = ({ order, isOpen, onClose }) => {
         </div>
 
         {/* Printable Invoice Area */}
-        <div id="printable-invoice" className="p-8 sm:p-10 space-y-6 text-right" dir="rtl">
+        <div id="printable-invoice" className="p-4 sm:p-8 space-y-4 sm:space-y-6 text-right" dir="rtl">
           
           {/* Header */}
-          <div className="flex items-start justify-between border-b-2 border-black pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b-2 border-black pb-4 sm:pb-6">
             <div>
-              <h1 className="text-3xl font-black font-display tracking-tight text-black uppercase">
+              <h1 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-black uppercase">
                 KESWA WEAR
               </h1>
-              <p className="text-xs text-neutral-600 font-bold uppercase tracking-widest mt-0.5">
+              <p className="text-[11px] sm:text-xs text-neutral-600 font-bold uppercase tracking-widest mt-0.5">
                 CLOTHES • STYLE • YOU • براند الملابس الفاخرة
               </p>
-              <p className="text-xs text-neutral-500 mt-1">
+              <p className="text-[11px] text-neutral-500 mt-1">
                 الإسكندرية والقاهرة • هاتف: 01023456789
               </p>
             </div>
 
-            <div className="text-left font-mono text-xs space-y-1">
-              <div className="bg-neutral-100 px-3 py-1.5 border border-neutral-300 rounded font-bold text-black text-sm">
+            <div className="text-right sm:text-left font-mono text-xs space-y-1">
+              <div className="bg-neutral-100 px-3 py-1.5 border border-neutral-300 rounded font-bold text-black text-sm inline-block sm:block">
                 فاتورة رقم: #{order.id}
               </div>
               <p className="text-neutral-600">
@@ -66,7 +66,7 @@ export const InvoiceModal = ({ order, isOpen, onClose }) => {
           </div>
 
           {/* Customer & Shipping Details */}
-          <div className="grid grid-cols-2 gap-6 bg-neutral-50 p-4 border border-neutral-200 rounded text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6 bg-neutral-50 p-3 sm:p-4 border border-neutral-200 rounded text-xs">
             <div className="space-y-1.5">
               <h3 className="font-bold text-neutral-800 border-b border-neutral-200 pb-1">بيانات العميل المستلم:</h3>
               <p className="font-bold text-black text-sm">{order.customer?.name}</p>
@@ -88,7 +88,7 @@ export const InvoiceModal = ({ order, isOpen, onClose }) => {
           </div>
 
           {/* Products Table */}
-          <div className="border border-neutral-200 rounded overflow-hidden">
+          <div className="border border-neutral-200 rounded overflow-x-auto">
             <table className="w-full text-xs text-right">
               <thead className="bg-neutral-900 text-white font-bold">
                 <tr>

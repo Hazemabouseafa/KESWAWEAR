@@ -41,29 +41,29 @@ export const ImageLibraryManager = () => {
   };
 
   return (
-    <div className="max-w-5xl space-y-8 animate-fadeIn">
+    <div className="max-w-5xl space-y-6 sm:space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="border-b border-white/10 pb-4">
-        <h2 className="text-xl font-black text-white mb-1 flex items-center gap-2">
-          <ImageIcon size={22} className="text-cyan-400" />
+        <h2 className="text-lg sm:text-xl font-black text-white mb-1 flex items-center gap-2">
+          <ImageIcon size={20} className="text-cyan-400 shrink-0" />
           <span>مكتبة ورفع وتبديل صور واجهة المتجر (Images Management)</span>
         </h2>
-        <p className="text-xs text-gray-400">
+        <p className="text-[11px] sm:text-xs text-gray-400">
           يمكنك استبدال أي صورة في الموقع مباشرة من جهازك (كمبيوتر أو هاتف) مع ضغط تلقائي فائق السرعة، ثم الضغط على زر الحفظ لتثبيتها فوراً.
         </p>
       </div>
 
       {/* Main Hero Banners */}
       <div>
-        <h3 className="text-sm font-black text-white mb-4">صور البنرات السينمائية الكبرى:</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <h3 className="text-sm font-black text-white mb-3">صور البنرات السينمائية الكبرى:</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Hoodies Hero Banner */}
-          <div className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
+          <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">بنر الهوديز الرئيسي</h4>
               <button
                 onClick={() => handleSaveHeroBanner('heroHoodies', hoodiesBg)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
                   savedBanner === 'heroHoodies' 
                     ? 'bg-emerald-500 text-black font-black' 
                     : 'bg-white hover:bg-neutral-200 text-black'
@@ -77,17 +77,17 @@ export const ImageLibraryManager = () => {
               value={hoodiesBg}
               onChange={(url) => setHoodiesBg(url)}
               label="رفع صورة بنر الهوديز:"
-              previewHeight="h-36"
+              previewHeight="h-32 sm:h-36"
             />
           </div>
 
           {/* T-Shirts Hero Banner */}
-          <div className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
+          <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">بنر التيشرتات الصيفي</h4>
               <button
                 onClick={() => handleSaveHeroBanner('heroTshirts', tshirtsBg)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
                   savedBanner === 'heroTshirts' 
                     ? 'bg-emerald-500 text-black font-black' 
                     : 'bg-white hover:bg-neutral-200 text-black'
@@ -101,17 +101,17 @@ export const ImageLibraryManager = () => {
               value={tshirtsBg}
               onChange={(url) => setTshirtsBg(url)}
               label="رفع صورة بنر التيشرتات:"
-              previewHeight="h-36"
+              previewHeight="h-32 sm:h-36"
             />
           </div>
 
           {/* Sweatpants Hero Banner */}
-          <div className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
+          <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">بنر السويت بانتس الحضري</h4>
               <button
                 onClick={() => handleSaveHeroBanner('heroSweatpants', sweatpantsBg)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
                   savedBanner === 'heroSweatpants' 
                     ? 'bg-emerald-500 text-black font-black' 
                     : 'bg-white hover:bg-neutral-200 text-black'
@@ -125,7 +125,7 @@ export const ImageLibraryManager = () => {
               value={sweatpantsBg}
               onChange={(url) => setSweatpantsBg(url)}
               label="رفع صورة بنر السويت بانتس:"
-              previewHeight="h-36"
+              previewHeight="h-32 sm:h-36"
             />
           </div>
         </div>
@@ -133,15 +133,15 @@ export const ImageLibraryManager = () => {
 
       {/* 3-Card Grid Category Images */}
       <div>
-        <h3 className="text-sm font-black text-white mb-4">صور شبكة الفئات الثلاثية البارزة (3-Card Feature Grid):</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <h3 className="text-sm font-black text-white mb-3">صور شبكة الفئات الثلاثية البارزة (3-Card Feature Grid):</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Card 1: Oversized Hoodies */}
-          <div className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
+          <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">كارت الهوديز الأوفرسايز</h4>
               <button
                 onClick={() => handleSaveGridCard('card1', card1Img)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
                   savedBanner === 'card1' 
                     ? 'bg-emerald-500 text-black font-black' 
                     : 'bg-white hover:bg-neutral-200 text-black'
@@ -155,17 +155,17 @@ export const ImageLibraryManager = () => {
               value={card1Img}
               onChange={(url) => setCard1Img(url)}
               label="رفع صورة كارت الهوديز:"
-              previewHeight="h-36"
+              previewHeight="h-32 sm:h-36"
             />
           </div>
 
           {/* Card 2: Retro Polo Tees */}
-          <div className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
+          <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">كارت تيشرتات بولو</h4>
               <button
                 onClick={() => handleSaveGridCard('card2', card2Img)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
                   savedBanner === 'card2' 
                     ? 'bg-emerald-500 text-black font-black' 
                     : 'bg-white hover:bg-neutral-200 text-black'
@@ -179,17 +179,17 @@ export const ImageLibraryManager = () => {
               value={card2Img}
               onChange={(url) => setCard2Img(url)}
               label="رفع صورة كارت التيشرتات:"
-              previewHeight="h-36"
+              previewHeight="h-32 sm:h-36"
             />
           </div>
 
           {/* Card 3: Baggy Sweats */}
-          <div className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
+          <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">كارت سويت بانتس باجي</h4>
               <button
                 onClick={() => handleSaveGridCard('card3', card3Img)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
                   savedBanner === 'card3' 
                     ? 'bg-emerald-500 text-black font-black' 
                     : 'bg-white hover:bg-neutral-200 text-black'
@@ -203,7 +203,7 @@ export const ImageLibraryManager = () => {
               value={card3Img}
               onChange={(url) => setCard3Img(url)}
               label="رفع صورة كارت السويت بانتس:"
-              previewHeight="h-36"
+              previewHeight="h-32 sm:h-36"
             />
           </div>
         </div>

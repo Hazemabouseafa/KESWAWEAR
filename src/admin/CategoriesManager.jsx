@@ -89,22 +89,22 @@ export const CategoriesManager = () => {
   };
 
   return (
-    <div className="max-w-5xl space-y-8 animate-fadeIn">
+    <div className="max-w-5xl space-y-6 sm:space-y-8 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
-          <h2 className="text-xl font-black text-white mb-1 flex items-center gap-2">
-            <Layers size={22} className="text-purple-400" />
+          <h2 className="text-lg sm:text-xl font-black text-white mb-1 flex items-center gap-2">
+            <Layers size={20} className="text-purple-400 shrink-0" />
             <span>إدارة وتعديل أقسام وبلوكات المتجر (Categories & Blocks)</span>
           </h2>
-          <p className="text-xs text-gray-400">
+          <p className="text-[11px] sm:text-xs text-gray-400">
             يمكنك تعديل مسميات وعناوين الأقسام وصور البنرات مع زر حفظ مخصص لكل قسم، أو إضافة بلوك جديد بالكامل.
           </p>
         </div>
 
         <button
           onClick={() => setIsAddCategoryOpen(!isAddCategoryOpen)}
-          className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-black px-4 py-2 rounded flex items-center gap-1.5 transition-all shadow-lg self-start sm:self-auto"
+          className="w-full sm:w-auto bg-purple-600 hover:bg-purple-500 text-white text-xs font-black px-4 py-2.5 rounded flex items-center justify-center gap-1.5 transition-all shadow-lg touch-manipulation"
         >
           <Plus size={15} />
           <span>{isAddCategoryOpen ? 'إغلاق النموذج' : 'إضافة بلوك / قسم جديد'}</span>
@@ -113,19 +113,19 @@ export const CategoriesManager = () => {
 
       {/* Add New Category Box */}
       {isAddCategoryOpen && (
-        <div className="bg-[#181824] border border-purple-500/30 p-6 rounded-lg space-y-4 shadow-2xl animate-scaleIn">
+        <div className="bg-[#181824] border border-purple-500/30 p-4 sm:p-6 rounded-lg space-y-4 shadow-2xl animate-scaleIn">
           <div className="flex justify-between items-center border-b border-white/10 pb-3">
             <h3 className="text-sm font-black text-white flex items-center gap-2">
-              <Plus size={16} className="text-purple-400" />
+              <Plus size={16} className="text-purple-400 shrink-0" />
               <span>إضافة بلوك وقسم جديد في الصفحة الرئيسية</span>
             </h3>
-            <button onClick={() => setIsAddCategoryOpen(false)} className="text-gray-400 hover:text-white">
+            <button onClick={() => setIsAddCategoryOpen(false)} className="text-gray-400 hover:text-white p-1">
               <X size={16} />
             </button>
           </div>
 
-          <form onSubmit={handleSaveNewCategory} className="space-y-4 text-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form onSubmit={handleSaveNewCategory} className="space-y-3.5 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-gray-300 mb-1">اسم القسم بالعربية *</label>
                 <input 
@@ -150,7 +150,7 @@ export const CategoriesManager = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-gray-300 mb-1">الوصف الفرعي بالعربية (Subtitle):</label>
                 <input 
@@ -181,11 +181,11 @@ export const CategoriesManager = () => {
                 onChange={(url) => setNewCategoryForm({ ...newCategoryForm, bannerImage: url })}
                 label="صورة بنر القسم الجديد (رفع من جهازك أو رابط):"
                 description="ستظهر في البنر السينمائي العريض المخصص للقسم في الصفحة"
-                previewHeight="h-36"
+                previewHeight="h-32 sm:h-36"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-gray-300 mb-1">نص البادج (العربية):</label>
                 <input 
@@ -207,17 +207,17 @@ export const CategoriesManager = () => {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-3 border-t border-white/10">
               <button
                 type="button"
                 onClick={() => setIsAddCategoryOpen(false)}
-                className="px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded"
+                className="w-full sm:w-auto px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded text-center"
               >
                 إلغاء
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-black rounded transition-colors shadow-lg flex items-center gap-1.5"
+                className="w-full sm:w-auto px-6 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-black rounded transition-colors shadow-lg flex items-center justify-center gap-1.5 touch-manipulation"
               >
                 <Save size={14} />
                 <span>💾 حفظ وإضافة البلوك للواجهة</span>
@@ -228,34 +228,34 @@ export const CategoriesManager = () => {
       )}
 
       {/* List of Existing Categories for In-Place Editing */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <h3 className="text-sm font-bold text-gray-300 flex items-center gap-2">
           <span>الأقسام والبلوكات الحالية في المتجر ({categories.length} أقسام):</span>
         </h3>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {categories.map((cat, idx) => {
             const currentData = editingCats[cat.id] || cat;
             const isSaved = savedCatId === cat.id;
 
             return (
-              <div key={cat.id} className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl hover:border-white/20 transition-all">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 font-mono font-bold text-xs flex items-center justify-center">
+              <div key={cat.id} className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-4 shadow-xl hover:border-white/20 transition-all">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 font-mono font-bold text-xs flex items-center justify-center shrink-0">
                       {idx + 1}
                     </span>
                     <div>
-                      <h4 className="text-base font-black text-white">{currentData.name_ar} ({currentData.name_en})</h4>
+                      <h4 className="text-sm sm:text-base font-black text-white">{currentData.name_ar} ({currentData.name_en})</h4>
                       <span className="text-[10px] font-mono text-gray-400">معرّف القسم: #{cat.id}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto pt-1 sm:pt-0">
                     {/* Explicit Save Button */}
                     <button
                       onClick={() => handleSaveCategory(cat.id)}
-                      className={`text-xs px-4 py-2 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+                      className={`flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
                         isSaved 
                           ? 'bg-emerald-500 text-black font-black' 
                           : 'bg-white hover:bg-neutral-200 text-black'
@@ -272,7 +272,7 @@ export const CategoriesManager = () => {
                             deleteCategory(cat.id);
                           }
                         }}
-                        className="text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 text-xs px-3 py-2 rounded flex items-center gap-1 border border-rose-500/20 transition-colors"
+                        className="text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 text-xs px-3 py-2 rounded flex items-center justify-center gap-1 border border-rose-500/20 transition-colors touch-manipulation"
                       >
                         <Trash2 size={13} />
                         <span>حذف</span>
@@ -341,7 +341,7 @@ export const CategoriesManager = () => {
                     onChange={(url) => handleFieldChange(cat.id, 'bannerImage', url)}
                     label={`صورة بنر قسم ${currentData.name_ar} (رفع من جهازك أو رابط):`}
                     description="الصورة السينمائية المعروضة كخلفية لقسم هذا التصنيف في المتجر"
-                    previewHeight="h-36"
+                    previewHeight="h-32 sm:h-36"
                   />
                 </div>
               </div>

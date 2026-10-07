@@ -361,33 +361,33 @@ export const TextContentManager = () => {
   };
 
   return (
-    <div className="max-w-4xl space-y-8 animate-fadeIn">
+    <div className="max-w-4xl space-y-6 sm:space-y-8 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
-          <h2 className="text-xl font-black text-white mb-1 flex items-center gap-2">
-            <Layout size={22} className="text-blue-400" />
+          <h2 className="text-lg sm:text-xl font-black text-white mb-1 flex items-center gap-2">
+            <Layout size={20} className="text-blue-400 shrink-0" />
             <span>تعديل نصوص وأزرار واجهة المتجر (Text & Labels)</span>
           </h2>
-          <p className="text-xs text-gray-400">
+          <p className="text-[11px] sm:text-xs text-gray-400">
             تعديل كافة نصوص الموقع والعناوين والأزرار باللغتين مع أزرار حفظ مباشرة وتثبيت فوري بالواجهة.
           </p>
         </div>
 
         {/* Sub language tabs */}
-        <div className="flex items-center bg-neutral-900 border border-white/10 p-1 rounded shrink-0">
+        <div className="grid grid-cols-2 sm:flex items-center bg-neutral-900 border border-white/10 p-1 rounded shrink-0 w-full sm:w-auto">
           <button
             onClick={() => handleSwitchTab('ar')}
-            className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
-              textLangTab === 'ar' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+            className={`py-2 px-3 text-xs font-bold rounded transition-colors text-center touch-manipulation ${
+              textLangTab === 'ar' ? 'bg-white text-black font-black shadow' : 'text-gray-400 hover:text-white'
             }`}
           >
             النصوص بالعربية
           </button>
           <button
             onClick={() => handleSwitchTab('en')}
-            className={`px-3 py-1 text-xs font-bold rounded transition-colors ${
-              textLangTab === 'en' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+            className={`py-2 px-3 text-xs font-bold rounded transition-colors text-center touch-manipulation ${
+              textLangTab === 'en' ? 'bg-white text-black font-black shadow' : 'text-gray-400 hover:text-white'
             }`}
           >
             English Texts
@@ -396,14 +396,14 @@ export const TextContentManager = () => {
       </div>
 
       {/* 1. Announcement Bar */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             شريط الإعلانات العلوي ({textLangTab === 'ar' ? 'العربية' : 'English'})
           </h3>
           <button
             onClick={handleSaveAnnouncement}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'announcement' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -425,14 +425,14 @@ export const TextContentManager = () => {
       </div>
 
       {/* 2. Brand Texts */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             اسم البراند والشعار اللفظي (Brand & Taglines)
           </h3>
           <button
             onClick={handleSaveBrand}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'brand' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -442,7 +442,7 @@ export const TextContentManager = () => {
             <span>{savedKey === 'brand' ? '✓ تم الحفظ!' : '💾 حفظ نصوص البراند'}</span>
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <label className="block text-xs text-gray-400 mb-1">اسم البراند:</label>
             <input 
@@ -467,14 +467,14 @@ export const TextContentManager = () => {
       </div>
 
       {/* 3. Hero Hoodies Texts */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             نصوص وأزرار بنر الهوديز الرئيسي ({textLangTab === 'ar' ? 'العربية' : 'English'})
           </h3>
           <button
             onClick={handleSaveHeroHoodies}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'heroHoodies' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -525,15 +525,15 @@ export const TextContentManager = () => {
       </div>
 
       {/* 4. Category Feature Grid (3 Cards) Texts */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Grid size={15} className="text-amber-400" />
+            <Grid size={15} className="text-amber-400 shrink-0" />
             <span>نصوص كروت شبكة الأقسام الثلاثية (3-Cards Feature Grid)</span>
           </h3>
           <button
             onClick={handleSaveCategoryGrid}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'categoryGrid' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -648,15 +648,15 @@ export const TextContentManager = () => {
       </div>
 
       {/* 5. Section Headers for Product Rows */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Bookmark size={15} className="text-indigo-400" />
+            <Bookmark size={15} className="text-indigo-400 shrink-0" />
             <span>عناوين وأوصاف أقسام المنتجات (Product Sections Headers)</span>
           </h3>
           <button
             onClick={handleSaveSectionHeaders}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'sectionHeaders' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -771,14 +771,14 @@ export const TextContentManager = () => {
       </div>
 
       {/* 6. Hero T-Shirts Texts */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             نصوص بنر التيشرتات الصيفي ({textLangTab === 'ar' ? 'العربية' : 'English'})
           </h3>
           <button
             onClick={handleSaveHeroTshirts}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'heroTshirts' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -788,7 +788,7 @@ export const TextContentManager = () => {
             <span>{savedKey === 'heroTshirts' ? '✓ تم الحفظ!' : '💾 حفظ بنر التيشرتات'}</span>
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
           <div>
             <label className="block text-gray-400 mb-1">العنوان:</label>
             <input 
@@ -820,14 +820,14 @@ export const TextContentManager = () => {
       </div>
 
       {/* 5. Hero Sweatpants Texts */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             نصوص بنر السويت بانتس ({textLangTab === 'ar' ? 'العربية' : 'English'})
           </h3>
           <button
             onClick={handleSaveHeroSweats}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'heroSweats' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -837,7 +837,7 @@ export const TextContentManager = () => {
             <span>{savedKey === 'heroSweats' ? '✓ تم الحفظ!' : '💾 حفظ بنر السويت بانتس'}</span>
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
           <div>
             <label className="block text-gray-400 mb-1">العنوان:</label>
             <input 
@@ -869,14 +869,14 @@ export const TextContentManager = () => {
       </div>
 
       {/* 6. Newsletter Texts */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             نصوص النشرة البريدية ونادي كسوة ({textLangTab === 'ar' ? 'العربية' : 'English'})
           </h3>
           <button
             onClick={handleSaveNewsletter}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'newsletter' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -886,7 +886,7 @@ export const TextContentManager = () => {
             <span>{savedKey === 'newsletter' ? '✓ تم الحفظ!' : '💾 حفظ نصوص النشرة'}</span>
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
           <div>
             <label className="block text-gray-400 mb-1">العنوان:</label>
             <input 
@@ -918,14 +918,14 @@ export const TextContentManager = () => {
       </div>
 
       {/* 7. Footer Texts & Contacts */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             نصوص الفوتر وبيانات الاتصال والتواصل
           </h3>
           <button
             onClick={handleSaveFooter}
-            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-3.5 py-2 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               savedKey === 'footer' 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black'
@@ -935,7 +935,7 @@ export const TextContentManager = () => {
             <span>{savedKey === 'footer' ? '✓ تم الحفظ!' : '💾 حفظ بيانات الفوتر'}</span>
           </button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="sm:col-span-2">
             <label className="block text-xs text-gray-400 mb-1">نبذة عن البراند في الفوتر:</label>
             <textarea 

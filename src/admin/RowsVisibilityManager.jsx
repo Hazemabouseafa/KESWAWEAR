@@ -58,20 +58,20 @@ export const RowsVisibilityManager = () => {
   return (
     <div className="max-w-4xl space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
-          <h2 className="text-xl font-black text-white mb-1 flex items-center gap-2">
-            <ToggleRight size={22} className="text-emerald-400" />
+          <h2 className="text-lg sm:text-xl font-black text-white mb-1 flex items-center gap-2">
+            <ToggleRight size={20} className="text-emerald-400 shrink-0" />
             <span>التحكم في ظهور وإخفاء صفوف وأقسام الموقع (Rows Visibility)</span>
           </h2>
-          <p className="text-xs text-gray-400">
+          <p className="text-[11px] sm:text-xs text-gray-400">
             يمكنك تفعيل أو إخفاء أي صف (ROW) في واجهة المتجر بنقرة واحدة ثم حفظ الإعدادات لتثبيتها فوراً.
           </p>
         </div>
 
         <button
           onClick={handleSaveAll}
-          className={`text-xs px-5 py-2.5 rounded flex items-center gap-1.5 font-black transition-all shadow-lg self-start sm:self-auto ${
+          className={`w-full sm:w-auto text-xs px-5 py-2.5 rounded flex items-center justify-center gap-1.5 font-black transition-all shadow-lg touch-manipulation ${
             isSaved 
               ? 'bg-emerald-500 text-black' 
               : 'bg-white hover:bg-neutral-200 text-black'
@@ -83,14 +83,14 @@ export const RowsVisibilityManager = () => {
       </div>
 
       {/* Grid of Rows */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
         {allRows.map(row => {
           const isShown = visibility[row.key] !== false;
           return (
             <div 
               key={row.key}
               onClick={() => handleToggle(row.key)}
-              className={`p-4 rounded border transition-all cursor-pointer flex items-center justify-between select-none shadow-md ${
+              className={`p-3.5 sm:p-4 rounded border transition-all cursor-pointer flex items-center justify-between select-none shadow-md touch-manipulation active:scale-[0.99] ${
                 isShown 
                   ? 'bg-[#181822] border-emerald-500/30 hover:border-emerald-500' 
                   : 'bg-[#121217] border-white/5 opacity-60 hover:opacity-100'

@@ -121,7 +121,7 @@ export const ImageUploader = ({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-white text-black hover:bg-neutral-200 text-[11px] font-bold px-3 py-1.5 rounded flex items-center gap-1.5 shadow-lg"
+                className="bg-white text-black hover:bg-neutral-200 text-[11px] font-bold px-3 py-1.5 rounded flex items-center gap-1.5 shadow-lg touch-manipulation"
               >
                 <Upload size={13} />
                 <span>تبديل من الجهاز</span>
@@ -129,7 +129,7 @@ export const ImageUploader = ({
               <button
                 type="button"
                 onClick={handleClear}
-                className="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded flex items-center gap-1 shadow-lg"
+                className="bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold px-2.5 py-1.5 rounded flex items-center gap-1 shadow-lg touch-manipulation"
                 title="إزالة الصورة"
               >
                 <Trash2 size={13} />
@@ -137,13 +137,16 @@ export const ImageUploader = ({
             </div>
           </>
         ) : (
-          <div className="text-center p-4 text-gray-400 flex flex-col items-center gap-2">
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="text-center p-4 text-gray-400 flex flex-col items-center gap-2 cursor-pointer w-full h-full justify-center touch-manipulation"
+          >
             <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-300">
               <ImageIcon size={20} />
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-200">اسحب وأفلت الصورة هنا، أو اضغط للرفع</p>
-              <p className="text-[10px] text-gray-500 mt-0.5">يدعم JPG, PNG, WebP (يتم الضغط تلقائياً للحفاظ على الأداء)</p>
+              <p className="text-xs font-bold text-gray-200">اضغط هنا أو اسحب الصورة لرفعها من جهازك</p>
+              <p className="text-[10px] text-gray-500 mt-0.5">يدعم JPG, PNG, WebP (ضغط فوري للحفاظ على السرعة)</p>
             </div>
           </div>
         )}
@@ -169,27 +172,27 @@ export const ImageUploader = ({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isProcessing}
-          className="flex-1 bg-white hover:bg-neutral-200 text-black font-black text-xs py-2 px-3 rounded flex items-center justify-center gap-2 transition-colors shadow-md disabled:opacity-50"
+          className="flex-1 bg-white hover:bg-neutral-200 text-black font-black text-xs py-2 px-3 rounded flex items-center justify-center gap-1.5 transition-colors shadow-md disabled:opacity-50 touch-manipulation"
         >
-          <Upload size={14} className="text-black" />
+          <Upload size={14} className="text-black shrink-0" />
           <span>رفع صورة من جهازك</span>
         </button>
 
         <button
           type="button"
           onClick={() => setShowUrlInput(!showUrlInput)}
-          className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs py-2 px-3 rounded flex items-center gap-1.5 transition-colors border border-white/10"
+          className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs py-2 px-3 rounded flex items-center justify-center gap-1.5 transition-colors border border-white/10 touch-manipulation"
           title="أو إدخال رابط خارجي"
         >
           <LinkIcon size={13} />
-          <span>{showUrlInput ? 'إخفاء الرابط' : 'أو إدخال رابط (URL)'}</span>
+          <span>{showUrlInput ? 'إخفاء الرابط' : 'أو رابط (URL)'}</span>
         </button>
 
         {value && (
           <button
             type="button"
             onClick={handleClear}
-            className="p-2 text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20"
+            className="p-2 text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 touch-manipulation"
             title="مسح الصورة"
           >
             <Trash2 size={14} />

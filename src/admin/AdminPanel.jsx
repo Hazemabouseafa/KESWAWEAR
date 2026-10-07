@@ -21,11 +21,13 @@ export const AdminPanel = ({ onBackToStore }) => {
     orders, 
     products, 
     siteContent, 
-    neonStatus,
-    exportOrdersCSV,
-    exportData,
-    resetToDefaultData
+    neonStatus, 
+    exportOrdersCSV, 
+    exportData, 
+    resetToDefaultData 
   } = useStore();
+
+  const [isMobileShortcutsOpen, setIsMobileShortcutsOpen] = React.useState(false);
 
   const handleBack = () => {
     if (onBackToStore) {
@@ -38,29 +40,30 @@ export const AdminPanel = ({ onBackToStore }) => {
   const { categories = [] } = siteContent;
 
   const tabs = [
-    { id: 'orders', label: `طلبات العملاء (${orders.length})`, icon: ShoppingBag, color: 'text-amber-400' },
+    { id: 'orders', label: `الطلبات (${orders.length})`, icon: ShoppingBag, color: 'text-amber-400' },
     { id: 'products', label: `المنتجات (${products.length})`, icon: Package, color: 'text-white' },
-    { id: 'categories', label: `الأقسام والبلوكات (${categories.length})`, icon: Layers, color: 'text-purple-400' },
-    { id: 'rows', label: 'ظهور الصفوف (Rows)', icon: ToggleRight, color: 'text-emerald-400' },
-    { id: 'images', label: 'مكتبة ورفع الصور', icon: ImageIcon, color: 'text-cyan-400' },
-    { id: 'texts', label: 'نصوص وأزرار الواجهة', icon: Layout, color: 'text-blue-400' },
-    { id: 'settings', label: 'الإعدادات وقاعدة البيانات', icon: Settings, color: 'text-neutral-300' }
+    { id: 'categories', label: `الأقسام (${categories.length})`, icon: Layers, color: 'text-purple-400' },
+    { id: 'rows', label: 'ظهور الصفوف', icon: ToggleRight, color: 'text-emerald-400' },
+    { id: 'images', label: 'مكتبة الصور', icon: ImageIcon, color: 'text-cyan-400' },
+    { id: 'texts', label: 'نصوص الواجهة', icon: Layout, color: 'text-blue-400' },
+    { id: 'settings', label: 'الإعدادات', icon: Settings, color: 'text-neutral-300' }
   ];
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#0d0d12] text-[#e5e5e5] flex flex-col font-sans select-none">
       
       {/* Top Header */}
-      <header className="bg-[#121218] border-b border-white/10 px-6 py-4 flex items-center justify-between shrink-0 sticky top-0 z-30 shadow-xl">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-white text-black font-black text-xs uppercase tracking-wider flex items-center gap-2 rounded shadow-md">
-            <Sliders size={16} />
-            <span>لوحة تحكم المتجر • KESWA CMS (/admin)</span>
+      <header className="bg-[#121218] border-b border-white/10 px-3 sm:px-6 py-2.5 sm:py-4 flex items-center justify-between shrink-0 sticky top-0 z-30 shadow-xl">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 bg-white text-black font-black text-xs uppercase tracking-wider flex items-center gap-1.5 sm:gap-2 rounded shadow-md">
+            <Sliders size={15} />
+            <span className="sm:hidden">لوحة التحكم • KESWA</span>
+            <span className="hidden sm:inline">لوحة تحكم المتجر • KESWA CMS (/admin)</span>
           </div>
 
-          <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 border border-emerald-500/20 rounded-full hidden sm:flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>بوابة الإدارة المستقلة نشطة</span>
+          <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 border border-emerald-500/20 rounded-full hidden sm:flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>بوابة الإدارة نشطة</span>
           </span>
 
           {/* Neon DB Indicator */}
@@ -80,21 +83,31 @@ export const AdminPanel = ({ onBackToStore }) => {
         </div>
 
         {/* Top Actions: Go Back to Store */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {/* Mobile shortcuts trigger */}
+          <button
+            onClick={() => setIsMobileShortcutsOpen(!isMobileShortcutsOpen)}
+            className="md:hidden p-2 bg-neutral-900 border border-white/15 text-gray-300 rounded text-xs flex items-center"
+            title="أدوات سريعة"
+          >
+            <Download size={14} />
+          </button>
+
           <button 
             onClick={handleBack}
-            className="flex items-center gap-2 bg-white text-black hover:bg-neutral-200 text-xs font-black px-4 py-2.5 rounded transition-all shadow-md group"
+            className="flex items-center gap-1.5 bg-white text-black hover:bg-neutral-200 text-xs font-black px-3 py-2 sm:px-4 sm:py-2.5 rounded transition-all shadow-md group touch-manipulation"
             title="الانتقال لواجهة المتجر"
           >
-            <Eye size={15} />
-            <span>الذهاب لواجهة المتجر (View Store)</span>
-            <ArrowRight size={14} className="group-hover:-translate-x-1 transition-transform" />
+            <Eye size={14} />
+            <span className="hidden sm:inline">الذهاب لواجهة المتجر (View Store)</span>
+            <span className="sm:hidden">عرض المتجر</span>
+            <ArrowRight size={13} className="group-hover:-translate-x-1 transition-transform" />
           </button>
         </div>
       </header>
 
-      {/* Main Container */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Main Container: Flex-col on mobile, flex-row on desktop */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
         
         {/* Desktop Sidebar Tabs */}
         <aside className="w-64 bg-[#0a0a0d] border-l border-white/10 p-4 space-y-1.5 hidden md:block overflow-y-auto shrink-0 min-h-[calc(100vh-65px)]">
@@ -152,23 +165,62 @@ export const AdminPanel = ({ onBackToStore }) => {
           </div>
         </aside>
 
-        {/* Mobile Horizontal Tabs */}
-        <div className="md:hidden flex overflow-x-auto bg-[#0a0a0d] border-b border-white/10 p-2 gap-2 shrink-0">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setAdminTab(tab.id)}
-              className={`px-3 py-1.5 text-xs font-bold whitespace-nowrap rounded transition-colors ${
-                adminTab === tab.id ? 'bg-white text-black font-black' : 'text-gray-400 bg-neutral-900'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Mobile Horizontal Tabs Bar (Touch-friendly, Scrollable, With Icons) */}
+        <div className="md:hidden flex overflow-x-auto bg-[#0a0a0d] border-b border-white/10 p-2 gap-1.5 shrink-0 scrollbar-none sticky top-0 z-20 shadow-md">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            const isActive = adminTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setAdminTab(tab.id)}
+                className={`px-3 py-2 text-xs font-bold whitespace-nowrap rounded-lg flex items-center gap-1.5 transition-all touch-manipulation active:scale-95 ${
+                  isActive 
+                    ? 'bg-white text-black font-black shadow-md' 
+                    : 'text-gray-300 bg-neutral-900 border border-white/5 hover:text-white'
+                }`}
+              >
+                <Icon size={14} className={isActive ? 'text-black' : tab.color} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Content Body */}
-        <main className="flex-1 bg-[#101015] p-6 lg:p-10 overflow-y-auto min-h-[calc(100vh-65px)]">
+        {/* Mobile Expandable Shortcuts */}
+        {isMobileShortcutsOpen && (
+          <div className="md:hidden bg-[#14141c] border-b border-white/10 p-3 space-y-2 animate-fadeIn shrink-0">
+            <div className="text-[10px] font-mono text-gray-400 uppercase tracking-wider mb-1">
+              إجراءات سريعة:
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-[11px]">
+              <button
+                onClick={() => { exportOrdersCSV(); setIsMobileShortcutsOpen(false); }}
+                className="p-2 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded flex flex-col items-center gap-1 text-center font-bold touch-manipulation"
+              >
+                <FileSpreadsheet size={16} />
+                <span>إكسل الطلبات</span>
+              </button>
+              <button
+                onClick={() => { exportData(); setIsMobileShortcutsOpen(false); }}
+                className="p-2 text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 rounded flex flex-col items-center gap-1 text-center font-bold touch-manipulation"
+              >
+                <Download size={16} />
+                <span>نسخة JSON</span>
+              </button>
+              <button
+                onClick={() => { resetToDefaultData(); setIsMobileShortcutsOpen(false); }}
+                className="p-2 text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded flex flex-col items-center gap-1 text-center font-bold touch-manipulation"
+              >
+                <RotateCcw size={16} />
+                <span>ضبط المصنع</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Content Body: Full width on mobile, comfortable padding */}
+        <main className="flex-1 bg-[#101015] p-3.5 sm:p-6 lg:p-10 overflow-y-auto min-h-0">
           <AdminErrorBoundary>
             {adminTab === 'orders' && <OrdersManager />}
             {adminTab === 'products' && <ProductsManager />}

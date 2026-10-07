@@ -54,27 +54,27 @@ export const SettingsManager = () => {
   };
 
   return (
-    <div className="max-w-4xl space-y-8 animate-fadeIn">
+    <div className="max-w-4xl space-y-6 sm:space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="border-b border-white/10 pb-4">
-        <h2 className="text-xl font-black text-white mb-1 flex items-center gap-2">
-          <Settings size={22} className="text-neutral-300" />
+        <h2 className="text-lg sm:text-xl font-black text-white mb-1 flex items-center gap-2">
+          <Settings size={20} className="text-neutral-300 shrink-0" />
           <span>إعدادات المتجر وقاعدة البيانات والنسخ الاحتياطي</span>
         </h2>
-        <p className="text-xs text-gray-400">
+        <p className="text-[11px] sm:text-xs text-gray-400">
           تعديل تكاليف الشحن والعملة مع زر حفظ مخصص، وإدارة اتصال قاعدة بيانات Neon على Vercel، والنسخ الاحتياطي.
         </p>
       </div>
 
       {/* Shipping & Currency Card with Dedicated Save Button */}
-      <form onSubmit={handleSaveShipping} className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
-        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+      <form onSubmit={handleSaveShipping} className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-2.5">
           <h3 className="text-sm font-bold text-white">
             تكاليف الشحن والعملة (Shipping & Currency)
           </h3>
           <button
             type="submit"
-            className={`text-xs px-4 py-2 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+            className={`w-full sm:w-auto text-xs px-4 py-2.5 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
               isSaved 
                 ? 'bg-emerald-500 text-black font-black' 
                 : 'bg-white hover:bg-neutral-200 text-black font-black'
@@ -85,7 +85,7 @@ export const SettingsManager = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs">
           <div>
             <label className="block text-gray-400 mb-1">تكلفة الشحن الافتراضية (بالجنيه):</label>
             <input 
@@ -143,11 +143,11 @@ export const SettingsManager = () => {
       </form>
 
       {/* Neon PostgreSQL Serverless Database on Vercel */}
-      <div className="bg-[#181824] border border-cyan-500/30 p-5 rounded-lg space-y-4 shadow-xl">
+      <div className="bg-[#181824] border border-cyan-500/30 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-3 gap-2">
           <div>
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Database size={16} className="text-cyan-400" />
+              <Database size={16} className="text-cyan-400 shrink-0" />
               <span>قاعدة بيانات Neon PostgreSQL السحابية (قاعدة: keswawear)</span>
             </h3>
             <p className="text-[11px] text-gray-400 mt-0.5">
@@ -164,14 +164,14 @@ export const SettingsManager = () => {
           </span>
         </div>
 
-        <div className="bg-neutral-900/80 p-3.5 rounded border border-white/5 space-y-2 text-xs">
-          <div className="flex justify-between items-center text-gray-300">
+        <div className="bg-neutral-900/80 p-3 sm:p-3.5 rounded border border-white/5 space-y-2 text-xs">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 text-gray-300">
             <span>اسم قاعدة البيانات المخصصة (Neon Database):</span>
-            <strong className="text-white font-mono bg-neutral-800 px-2 py-0.5 rounded">keswawear</strong>
+            <strong className="text-white font-mono bg-neutral-800 px-2 py-0.5 rounded self-start sm:self-auto">keswawear</strong>
           </div>
-          <div className="flex justify-between items-center text-gray-300">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 text-gray-300">
             <span>المزود وخطة التشغيل:</span>
-            <span className="text-cyan-300 font-mono">Neon Serverless PostgreSQL (Node Runtime على Vercel)</span>
+            <span className="text-cyan-300 font-mono text-[11px] sm:text-xs">Neon Serverless PostgreSQL (Node Runtime على Vercel)</span>
           </div>
           {neonDetails?.counts && (
             <div className="flex justify-between items-center text-gray-300 border-t border-white/5 pt-2">
@@ -183,10 +183,10 @@ export const SettingsManager = () => {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2.5 pt-1">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-1">
           <button
             onClick={checkNeonConnection}
-            className="bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs px-4 py-2.5 rounded flex items-center gap-2 transition-colors border border-white/10"
+            className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs px-4 py-2.5 rounded flex items-center justify-center gap-2 transition-colors border border-white/10 touch-manipulation"
           >
             <RefreshCw size={14} className="text-cyan-400" />
             <span>فحص الاتصال بـ Neon</span>
@@ -194,16 +194,16 @@ export const SettingsManager = () => {
 
           <button
             onClick={syncAllToNeon}
-            className="bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs px-5 py-2.5 rounded flex items-center gap-2 transition-all shadow-lg"
+            className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs px-5 py-2.5 rounded flex items-center justify-center gap-2 transition-all shadow-lg touch-manipulation"
           >
             <Database size={14} />
-            <span>💾 مزامنة وتهيئة البيانات في Neon (قاعدة keswawear)</span>
+            <span>💾 مزامنة وتهيئة البيانات في Neon</span>
           </button>
         </div>
       </div>
 
       {/* Backup & Restore */}
-      <div className="bg-[#16161f] border border-white/10 p-5 rounded-lg space-y-4 shadow-xl">
+      <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
         <h3 className="text-sm font-bold text-white border-b border-white/5 pb-2">
           النسخ الاحتياطي واستيراد البيانات (Backup & Restore)
         </h3>
@@ -211,16 +211,16 @@ export const SettingsManager = () => {
           يمكنك تحميل نسخة كاملة من كافة المنتجات والطلبات والتعديلات التي أجريتها كملف JSON آمن، أو استعادتها في أي وقت بنقرة واحدة.
         </p>
         
-        <div className="flex flex-wrap gap-3 pt-2">
+        <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2.5 pt-2">
           <button
             onClick={exportData}
-            className="bg-white hover:bg-neutral-200 text-black font-black text-xs px-5 py-3 rounded flex items-center gap-2 transition-all shadow-md"
+            className="w-full sm:w-auto bg-white hover:bg-neutral-200 text-black font-black text-xs px-5 py-2.5 rounded flex items-center justify-center gap-2 transition-all shadow-md touch-manipulation"
           >
             <Download size={16} />
             <span>تحميل نسخة احتياطية (تصدير JSON)</span>
           </button>
 
-          <label className="bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs px-5 py-3 rounded flex items-center gap-2 transition-all cursor-pointer border border-white/10 shadow-md">
+          <label className="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs px-5 py-2.5 rounded flex items-center justify-center gap-2 transition-all cursor-pointer border border-white/10 shadow-md touch-manipulation text-center">
             <Upload size={16} />
             <span>استيراد ملف نسخة احتياطية (JSON)</span>
             <input 
@@ -233,7 +233,7 @@ export const SettingsManager = () => {
 
           <button
             onClick={resetToDefaultData}
-            className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs px-4 py-3 rounded flex items-center gap-2 transition-colors mr-auto"
+            className="w-full sm:w-auto bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold text-xs px-4 py-2.5 rounded flex items-center justify-center gap-2 transition-colors sm:mr-auto touch-manipulation"
           >
             <RotateCcw size={16} />
             <span>إعادة ضبط المصنع</span>

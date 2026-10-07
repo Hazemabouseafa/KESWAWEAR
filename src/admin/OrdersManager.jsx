@@ -119,21 +119,21 @@ export const OrdersManager = () => {
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
         <div>
-          <h2 className="text-xl font-black text-white mb-1 flex items-center gap-2">
-            <ShoppingBag size={22} className="text-amber-400" />
+          <h2 className="text-lg sm:text-xl font-black text-white mb-1 flex items-center gap-2">
+            <ShoppingBag size={20} className="text-amber-400 shrink-0" />
             <span>إدارة وتتبع طلبات العملاء ({orders.length} طلب)</span>
           </h2>
-          <p className="text-xs text-gray-400">
+          <p className="text-[11px] sm:text-xs text-gray-400">
             متابعة الطلبات، طباعة الفواتير، تحديث الحالات، ومراسلة العملاء بالواتساب بنقرة واحدة.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 pt-1 sm:pt-0">
           <button
             onClick={() => setIsManualOrderOpen(true)}
-            className="bg-white hover:bg-neutral-200 text-black text-xs font-black px-3.5 py-2 rounded flex items-center gap-1.5 transition-all shadow-md"
+            className="bg-white hover:bg-neutral-200 text-black text-xs font-black px-3 py-2 rounded flex items-center justify-center gap-1.5 transition-all shadow-md touch-manipulation"
           >
             <Plus size={14} />
             <span>إضافة طلب يدوي</span>
@@ -141,7 +141,7 @@ export const OrdersManager = () => {
 
           <button
             onClick={addTestOrder}
-            className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-xs font-bold px-3 py-2 rounded flex items-center gap-1.5 transition-colors"
+            className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/40 text-xs font-bold px-3 py-2 rounded flex items-center justify-center gap-1.5 transition-colors touch-manipulation"
           >
             <Plus size={14} />
             <span>طلب تجريبي</span>
@@ -149,7 +149,7 @@ export const OrdersManager = () => {
 
           <button
             onClick={exportOrdersCSV}
-            className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 border border-white/10 text-xs font-bold px-3 py-2 rounded flex items-center gap-1.5 transition-colors"
+            className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 border border-white/10 text-xs font-bold px-3 py-2 rounded flex items-center justify-center gap-1.5 transition-colors touch-manipulation"
             title="تصدير ملف إكسل CSV"
           >
             <FileSpreadsheet size={14} className="text-emerald-400" />
@@ -163,7 +163,7 @@ export const OrdersManager = () => {
                   clearAllOrders();
                 }
               }}
-              className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold px-3 py-2 rounded flex items-center gap-1.5 transition-colors"
+              className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold px-3 py-2 rounded flex items-center justify-center gap-1.5 transition-colors touch-manipulation"
             >
               <Trash2 size={14} />
               <span>مسح الكل</span>
@@ -173,39 +173,40 @@ export const OrdersManager = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-[#16161f] p-3.5 rounded border border-white/10 shadow-lg">
-          <span className="text-[11px] text-gray-400 block mb-1">إجمالي المبيعات</span>
-          <span className="text-xl font-black text-emerald-400 font-mono">{totalRevenue.toLocaleString()} ج.م</span>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        <div className="bg-[#16161f] p-2.5 sm:p-3.5 rounded border border-white/10 shadow-lg">
+          <span className="text-[10px] sm:text-[11px] text-gray-400 block mb-0.5">إجمالي المبيعات</span>
+          <span className="text-base sm:text-xl font-black text-emerald-400 font-mono">{totalRevenue.toLocaleString()} ج.م</span>
         </div>
-        <div className="bg-[#16161f] p-3.5 rounded border border-white/10 shadow-lg">
-          <span className="text-[11px] text-gray-400 block mb-1">طلبات قيد المراجعة</span>
-          <span className="text-xl font-black text-amber-400 font-mono">{pendingCount}</span>
+        <div className="bg-[#16161f] p-2.5 sm:p-3.5 rounded border border-white/10 shadow-lg">
+          <span className="text-[10px] sm:text-[11px] text-gray-400 block mb-0.5">قيد المراجعة</span>
+          <span className="text-base sm:text-xl font-black text-amber-400 font-mono">{pendingCount}</span>
         </div>
-        <div className="bg-[#16161f] p-3.5 rounded border border-white/10 shadow-lg">
-          <span className="text-[11px] text-gray-400 block mb-1">جاري الشحن والتجهيز</span>
-          <span className="text-xl font-black text-blue-400 font-mono">{processingCount}</span>
+        <div className="bg-[#16161f] p-2.5 sm:p-3.5 rounded border border-white/10 shadow-lg">
+          <span className="text-[10px] sm:text-[11px] text-gray-400 block mb-0.5">جاري التجهيز والشحن</span>
+          <span className="text-base sm:text-xl font-black text-blue-400 font-mono">{processingCount}</span>
         </div>
-        <div className="bg-[#16161f] p-3.5 rounded border border-white/10 shadow-lg">
-          <span className="text-[11px] text-gray-400 block mb-1">طلبات مكتملة</span>
-          <span className="text-xl font-black text-emerald-400 font-mono">{deliveredCount}</span>
+        <div className="bg-[#16161f] p-2.5 sm:p-3.5 rounded border border-white/10 shadow-lg">
+          <span className="text-[10px] sm:text-[11px] text-gray-400 block mb-0.5">مكتمل</span>
+          <span className="text-base sm:text-xl font-black text-emerald-400 font-mono">{deliveredCount}</span>
         </div>
       </div>
 
       {/* Search & Filter */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between bg-[#16161f] p-3 rounded border border-white/10">
+      <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between bg-[#16161f] p-2.5 sm:p-3 rounded border border-white/10">
         <div className="relative flex-1">
-          <Search size={14} className="absolute top-3 right-3 text-gray-400" />
+          <Search size={14} className="absolute top-2.5 right-3 text-gray-400" />
           <input 
-            type="text"
-            placeholder="ابحث برقم الطلب، اسم العميل، الهاتف، أو المحافظة..."
+            type="text" 
+            placeholder="ابحث برقم الطلب، اسم العميل، الهاتف..."
             value={orderSearchQuery}
             onChange={(e) => setOrderSearchQuery(e.target.value)}
-            className="w-full bg-neutral-900 border border-white/10 pr-9 pl-3 py-2 text-xs text-white rounded outline-none focus:border-white font-sans"
+            className="w-full bg-neutral-900 border border-white/10 pr-9 pl-3 py-1.5 text-xs text-white rounded outline-none focus:border-white font-sans"
           />
         </div>
 
-        <div className="flex flex-wrap gap-1.5 shrink-0">
+        {/* Scrollable status filter pills */}
+        <div className="flex overflow-x-auto pb-1 sm:pb-0 gap-1.5 shrink-0 scrollbar-none touch-manipulation">
           {[
             { id: 'ALL', label: `الكل (${orders.length})` },
             { id: 'Pending', label: `قيد المراجعة (${pendingCount})` },
@@ -217,7 +218,7 @@ export const OrdersManager = () => {
             <button
               key={f.id}
               onClick={() => setOrderFilter(f.id)}
-              className={`px-2.5 py-1 text-xs rounded transition-colors ${
+              className={`px-2.5 py-1 text-xs rounded whitespace-nowrap transition-colors touch-manipulation ${
                 orderFilter === f.id ? 'bg-white text-black font-bold shadow' : 'bg-neutral-900 text-gray-400 hover:text-white'
               }`}
             >
@@ -229,22 +230,22 @@ export const OrdersManager = () => {
 
       {/* Orders List */}
       {filteredOrders.length === 0 ? (
-        <div className="bg-[#16161f] border border-white/10 p-12 text-center rounded shadow-lg">
-          <ShoppingBag size={42} className="mx-auto text-gray-600 mb-3" />
+        <div className="bg-[#16161f] border border-white/10 p-8 sm:p-12 text-center rounded shadow-lg">
+          <ShoppingBag size={38} className="mx-auto text-gray-600 mb-3" />
           <p className="text-sm font-bold text-gray-300">لا توجد طلبات تطابق بحثك حالياً</p>
           <p className="text-xs text-gray-500 mt-1">اضغط على زر "إضافة طلب تجريبي" أو "إضافة طلب يدوي" بالأعلى للتجربة الفورية!</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {filteredOrders.map(order => (
-            <div key={order.id} className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl hover:border-white/20 transition-all">
+            <div key={order.id} className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded space-y-3 sm:space-y-4 shadow-xl hover:border-white/20 transition-all">
               
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/5 pb-3 gap-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/5 pb-3 gap-2.5">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-mono font-black text-white text-base">#{order.id}</span>
-                    <span className="text-[11px] font-mono text-gray-400 bg-neutral-900 px-2 py-0.5 rounded border border-white/5">
-                      {new Date(order.date || Date.now()).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}
+                    <span className="text-[10px] sm:text-[11px] font-mono text-gray-400 bg-neutral-900 px-2 py-0.5 rounded border border-white/5">
+                      {new Date(order.date || Date.now()).toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' })}
                     </span>
                   </div>
                   <div className="text-xs text-gray-300 mt-1">
@@ -253,7 +254,7 @@ export const OrdersManager = () => {
                 </div>
 
                 {/* Status Switcher & Actions */}
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto pt-1 sm:pt-0">
                   
                   {/* Print Invoice Button */}
                   <button
@@ -261,7 +262,7 @@ export const OrdersManager = () => {
                       setSelectedInvoiceOrder(order);
                       setIsInvoiceOpen(true);
                     }}
-                    className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-2.5 py-1.5 rounded flex items-center gap-1 transition-colors border border-white/10 shadow-sm"
+                    className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-2.5 py-1.5 rounded flex items-center justify-center gap-1 transition-colors border border-white/10 shadow-sm touch-manipulation"
                     title="طباعة الفاتورة وبوليصة الشحن"
                   >
                     <Printer size={13} className="text-amber-400" />
@@ -274,7 +275,7 @@ export const OrdersManager = () => {
                       setEditingOrder({ ...order });
                       setIsEditOrderOpen(true);
                     }}
-                    className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-2.5 py-1.5 rounded flex items-center gap-1 transition-colors border border-white/10 shadow-sm"
+                    className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-2.5 py-1.5 rounded flex items-center justify-center gap-1 transition-colors border border-white/10 shadow-sm touch-manipulation"
                     title="تعديل بيانات الطلب"
                   >
                     <Edit2 size={13} className="text-cyan-400" />
@@ -287,7 +288,7 @@ export const OrdersManager = () => {
                       href={`https://wa.me/2${getCleanPhone(order.customer.phone)}?text=${encodeURIComponent(`مرحباً ${order.customer.name || ''}، بخصوص طلبك رقم ${order.id} من متجر KESWA WEAR`)}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1.5 rounded flex items-center gap-1 transition-colors shadow"
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1.5 rounded flex items-center justify-center gap-1 transition-colors shadow touch-manipulation"
                       title="مراسلة واتساب"
                     >
                       <MessageSquare size={13} />
@@ -299,7 +300,7 @@ export const OrdersManager = () => {
                   {order.customer?.phone && (
                     <a
                       href={`tel:${order.customer.phone}`}
-                      className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-2.5 py-1.5 rounded flex items-center gap-1 transition-colors border border-white/5"
+                      className="bg-neutral-800 hover:bg-neutral-700 text-gray-200 text-xs px-2.5 py-1.5 rounded flex items-center justify-center gap-1 transition-colors border border-white/5 touch-manipulation"
                       title="اتصال هاتفي"
                     >
                       <Phone size={13} />
@@ -311,7 +312,7 @@ export const OrdersManager = () => {
                   <select 
                     value={order.status || 'Pending'}
                     onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                    className={`text-xs font-bold px-3 py-1.5 rounded outline-none border cursor-pointer ${
+                    className={`col-span-2 sm:col-span-1 text-xs font-bold px-2.5 py-1.5 rounded outline-none border cursor-pointer w-full sm:w-auto touch-manipulation ${
                       order.status === 'Delivered' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' :
                       order.status === 'Shipped' ? 'bg-blue-500/20 text-blue-400 border-blue-500/40' :
                       order.status === 'Processing' ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' :
@@ -333,10 +334,11 @@ export const OrdersManager = () => {
                         deleteOrder(order.id);
                       }
                     }}
-                    className="p-1.5 text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded transition-colors"
+                    className="col-span-2 sm:col-span-1 p-1.5 text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded transition-colors flex items-center justify-center touch-manipulation"
                     title="حذف الطلب"
                   >
                     <Trash2 size={13} />
+                    <span className="sm:hidden text-xs mr-1">حذف الطلب</span>
                   </button>
                 </div>
               </div>
@@ -381,14 +383,14 @@ export const OrdersManager = () => {
 
       {/* Manual Order Creation Modal */}
       {isManualOrderOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#16161f] border border-white/15 rounded-lg max-w-lg w-full p-6 space-y-4 shadow-2xl animate-scaleIn">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+          <div className="bg-[#16161f] border border-white/15 rounded-lg max-w-lg w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto animate-scaleIn">
             <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h3 className="text-base font-black text-white flex items-center gap-2">
-                <Plus size={18} className="text-amber-400" />
+              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                <Plus size={18} className="text-amber-400 shrink-0" />
                 <span>إضافة طلب يدوي جديد (Manual Order)</span>
               </h3>
-              <button onClick={() => setIsManualOrderOpen(false)} className="text-gray-400 hover:text-white">
+              <button onClick={() => setIsManualOrderOpen(false)} className="text-gray-400 hover:text-white p-1">
                 <X size={18} />
               </button>
             </div>
@@ -406,7 +408,7 @@ export const OrdersManager = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-gray-300 mb-1">رقم الهاتف *</label>
                   <input 
@@ -440,7 +442,7 @@ export const OrdersManager = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-gray-300 mb-1">إجمالي الطلب (ج.م) *</label>
                   <input 
@@ -475,17 +477,17 @@ export const OrdersManager = () => {
                 />
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-3 border-t border-white/10">
                 <button
                   type="button"
                   onClick={() => setIsManualOrderOpen(false)}
-                  className="px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded transition-colors text-center"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-black font-black rounded transition-all shadow-lg flex items-center gap-1.5"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-black rounded transition-all shadow-lg flex items-center justify-center gap-1.5 touch-manipulation"
                 >
                   <Save size={14} />
                   <span>💾 تأكيد وحفظ الطلب</span>
@@ -498,14 +500,14 @@ export const OrdersManager = () => {
 
       {/* Edit Order Modal */}
       {isEditOrderOpen && editingOrder && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#16161f] border border-white/15 rounded-lg max-w-lg w-full p-6 space-y-4 shadow-2xl animate-scaleIn">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+          <div className="bg-[#16161f] border border-white/15 rounded-lg max-w-lg w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto animate-scaleIn">
             <div className="flex justify-between items-center border-b border-white/10 pb-3">
-              <h3 className="text-base font-black text-white flex items-center gap-2">
-                <Edit2 size={18} className="text-cyan-400" />
+              <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                <Edit2 size={18} className="text-cyan-400 shrink-0" />
                 <span>تعديل بيانات الطلب #{editingOrder.id}</span>
               </h3>
-              <button onClick={() => setIsEditOrderOpen(false)} className="text-gray-400 hover:text-white">
+              <button onClick={() => setIsEditOrderOpen(false)} className="text-gray-400 hover:text-white p-1">
                 <X size={18} />
               </button>
             </div>
@@ -524,7 +526,7 @@ export const OrdersManager = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-gray-300 mb-1">رقم الهاتف</label>
                   <input 
@@ -564,7 +566,7 @@ export const OrdersManager = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-gray-300 mb-1">إجمالي الطلب (ج.م)</label>
                   <input 
@@ -596,17 +598,17 @@ export const OrdersManager = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-3 border-t border-white/10">
                 <button
                   type="button"
                   onClick={() => setIsEditOrderOpen(false)}
-                  className="px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 bg-neutral-800 text-gray-300 hover:text-white rounded transition-colors text-center"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded transition-all shadow-lg flex items-center gap-1.5"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded transition-all shadow-lg flex items-center justify-center gap-1.5 touch-manipulation"
                 >
                   <Save size={14} />
                   <span>💾 حفظ التعديلات</span>
