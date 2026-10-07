@@ -21,7 +21,7 @@ export const HeroHoodies = () => {
       {/* Background Image with Streetwear Overlay */}
       <div className="absolute inset-0 z-0">
         <img 
-          src={banner.image} 
+          src={banner.image || banner.bgImage} 
           alt={title}
           className="w-full h-full object-cover object-top opacity-75 transform scale-105 transition-transform duration-1000 ease-out hover:scale-100" 
         />
@@ -79,7 +79,7 @@ export const CategoryFeatureGrid = () => {
           className="group relative overflow-hidden rounded-sm bg-neutral-900 cursor-pointer h-[320px] md:h-full border border-white/5"
         >
           <img 
-            src={grid.card1?.image} 
+            src={grid.card1?.image || grid.card1?.bgImage} 
             alt=""
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85" 
           />
@@ -107,7 +107,7 @@ export const CategoryFeatureGrid = () => {
             className="group relative overflow-hidden rounded-sm bg-neutral-900 cursor-pointer h-[240px] md:h-full border border-white/5"
           >
             <img 
-              src={grid.card2?.image} 
+              src={grid.card2?.image || grid.card2?.bgImage} 
               alt=""
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85" 
             />
@@ -132,7 +132,7 @@ export const CategoryFeatureGrid = () => {
             className="group relative overflow-hidden rounded-sm bg-neutral-900 cursor-pointer h-[240px] md:h-full border border-white/5"
           >
             <img 
-              src={grid.card3?.image} 
+              src={grid.card3?.image || grid.card3?.bgImage} 
               alt=""
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-85" 
             />
@@ -171,7 +171,7 @@ export const HeroTshirts = () => {
     <section id="tshirts-banner" className="relative w-full h-[65vh] min-h-[460px] max-h-[700px] my-14 bg-black overflow-hidden flex items-center">
       <div className="absolute inset-0 z-0">
         <img 
-          src={banner.image} 
+          src={banner.image || banner.bgImage} 
           alt=""
           className="w-full h-full object-cover object-center opacity-80" 
         />
@@ -218,7 +218,7 @@ export const HeroSweatpants = () => {
     <section id="sweatpants-banner" className="relative w-full h-[65vh] min-h-[460px] max-h-[700px] my-14 bg-black overflow-hidden flex items-center justify-end">
       <div className="absolute inset-0 z-0">
         <img 
-          src={banner.image} 
+          src={banner.image || banner.bgImage} 
           alt=""
           className="w-full h-full object-cover object-center opacity-80" 
         />

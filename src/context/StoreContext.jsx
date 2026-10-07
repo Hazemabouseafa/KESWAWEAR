@@ -24,19 +24,31 @@ export const StoreProvider = ({ children }) => {
     }
   });
 
-  // 1. Site Content with full sectionsVisibility fallback
+  // 1. Site Content with full sectionsVisibility fallback & no discounts
   const [siteContent, setSiteContent] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.CONTENT);
       if (saved) {
         const parsed = JSON.parse(saved);
+        const nav = (parsed.navigation || initialSiteContent.navigation).filter(n => n.id !== 'sale');
+        const ann = parsed.announcement || initialSiteContent.announcement;
+        const cleanAnnText = (ann.text_ar && (ann.text_ar.includes('خصم') || ann.text_ar.includes('SALE'))) 
+          ? initialSiteContent.announcement.text_ar 
+          : ann.text_ar;
         return {
           ...initialSiteContent,
           ...parsed,
+          navigation: nav,
+          announcement: {
+            ...ann,
+            text_ar: cleanAnnText,
+            link: '#shop'
+          },
           categories: (parsed.categories && parsed.categories.length > 0) ? parsed.categories : initialSiteContent.categories,
           sectionsVisibility: {
             ...initialSiteContent.sectionsVisibility,
-            ...(parsed.sectionsVisibility || {})
+            ...(parsed.sectionsVisibility || {}),
+            superSale: false // permanently eliminate discount row
           }
         };
       }
@@ -46,19 +58,34 @@ export const StoreProvider = ({ children }) => {
     }
   });
 
-  // 2. Products Catalog
+  // Helper to remove any oldPrice or discount markings
+  const sanitizeProducts = (list) => {
+    return (list || [])
+      .filter(p => p.id !== 'h-07' && p.id !== 'h-08')
+      .map(p => {
+        const isDiscount = p.badge_ar && (p.badge_ar.includes('خصم') || p.badge_ar.includes('%'));
+        return {
+          ...p,
+          oldPrice: null,
+          badge_ar: isDiscount ? 'جديد' : (p.badge_ar || 'جديد'),
+          badge_en: isDiscount ? 'NEW' : (p.badge_en || 'NEW')
+        };
+      });
+  };
+
+  // 2. Products Catalog (with no discounts / oldPrice)
   const [products, setProducts] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          return parsed.filter(p => p.id !== 'h-07' && p.id !== 'h-08');
+          return sanitizeProducts(parsed);
         }
       }
-      return initialProducts;
+      return sanitizeProducts(initialProducts);
     } catch (e) {
-      return initialProducts;
+      return sanitizeProducts(initialProducts);
     }
   });
 
@@ -94,7 +121,12 @@ export const StoreProvider = ({ children }) => {
 
   // UI States
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname.startsWith('/admin') || window.location.hash === '#admin';
+    }
+    return false;
+  });
   const [adminTab, setAdminTab] = useState('orders'); // Defaults straight to orders management
   const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -103,9 +135,34 @@ export const StoreProvider = ({ children }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [notification, setNotification] = useState(null);
 
+  // Sync /admin URL route
+  useEffect(() => {
+    const handleLocation = () => {
+      if (window.location.pathname.startsWith('/admin') || window.location.hash === '#admin') {
+        setIsAdminOpen(true);
+      }
+    };
+    window.addEventListener('popstate', handleLocation);
+    window.addEventListener('hashchange', handleLocation);
+    return () => {
+      window.removeEventListener('popstate', handleLocation);
+      window.removeEventListener('hashchange', handleLocation);
+    };
+  }, []);
+
   const openAdminTab = (tab = 'orders') => {
     setAdminTab(tab);
     setIsAdminOpen(true);
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
+      window.history.pushState(null, '', '/admin');
+    }
+  };
+
+  const closeAdmin = () => {
+    setIsAdminOpen(false);
+    if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+      window.history.pushState(null, '', '/');
+    }
   };
 
   // Neon PostgreSQL Database State ('checking' | 'connected' | 'local' | 'error')
@@ -215,7 +272,7 @@ export const StoreProvider = ({ children }) => {
           if (prodRes && prodRes.ok) {
             const prodJson = await prodRes.json();
             if (prodJson.products && prodJson.products.length > 0 && isMounted) {
-              setProducts(prodJson.products.filter(p => p.id !== 'h-07' && p.id !== 'h-08'));
+              setProducts(sanitizeProducts(prodJson.products));
             }
           }
 
@@ -844,6 +901,7 @@ export const StoreProvider = ({ children }) => {
       adminTab,
       setAdminTab,
       openAdminTab,
+      closeAdmin,
       isTrackOrderOpen,
       setIsTrackOrderOpen,
       saveGeneralSettings,

@@ -46,8 +46,8 @@ export const ProductCard = ({ product }) => {
           loading="lazy"
         />
 
-        {/* Badge (Sale / New / Limited) */}
-        {badge && (
+        {/* Badge (New / Premium / Original - no discounts) */}
+        {badge && !badge.includes('خصم') && !badge.toUpperCase().includes('SALE') && !badge.includes('%') && (
           <span className="absolute top-2.5 start-2.5 bg-black text-white font-sans text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-none shadow-md z-10">
             {badge}
           </span>
@@ -133,11 +133,6 @@ export const ProductCard = ({ product }) => {
             <span className="text-sm sm:text-base font-black font-mono text-black">
               {product.price} {currency}
             </span>
-            {product.oldPrice && product.oldPrice > product.price && (
-              <span className="text-xs font-mono text-neutral-400 line-through">
-                {product.oldPrice} {currency}
-              </span>
-            )}
           </div>
 
           {/* Size Pills */}

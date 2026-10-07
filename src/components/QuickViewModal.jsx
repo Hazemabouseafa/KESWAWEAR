@@ -65,8 +65,8 @@ export const QuickViewModal = () => {
                 alt={productName}
                 className="w-full h-full object-cover object-top" 
               />
-              {productBadge && (
-                <span className="absolute top-3 start-3 bg-red-600 text-white font-sans text-[10px] font-black uppercase tracking-wider px-2.5 py-1">
+              {productBadge && !productBadge.includes('خصم') && !productBadge.toUpperCase().includes('SALE') && !productBadge.includes('%') && (
+                <span className="absolute top-3 start-3 bg-black text-white font-sans text-[10px] font-black uppercase tracking-wider px-2.5 py-1">
                   {productBadge}
                 </span>
               )}
@@ -108,11 +108,6 @@ export const QuickViewModal = () => {
                 <span className="text-2xl font-black font-mono text-white">
                   {quickViewProduct.price} {currency}
                 </span>
-                {quickViewProduct.oldPrice && quickViewProduct.oldPrice > quickViewProduct.price && (
-                  <span className="text-sm font-mono text-gray-500 line-through">
-                    {quickViewProduct.oldPrice} {currency}
-                  </span>
-                )}
                 <span className="text-[11px] font-sans text-emerald-400 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20">
                   {t('actions.inStock')}
                 </span>
