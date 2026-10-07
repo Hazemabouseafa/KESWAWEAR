@@ -11,7 +11,7 @@ export const ProductSection = ({
   viewAllText,
   limit = 8 
 }) => {
-  const { products, setActiveCategory, searchQuery, language, t, getLocalized } = useStore();
+  const { products, setActiveCategory, searchQuery, language, t } = useStore();
 
   let filtered = products.filter(p => {
     if (category && p.category !== category) return false;
@@ -39,13 +39,13 @@ export const ProductSection = ({
   return (
     <section id={id} className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-white/10 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[#e5e3db] gap-4">
         <div>
-          <h2 className="text-2xl sm:text-4xl font-black uppercase font-display tracking-tight text-white">
+          <h2 className="text-2xl sm:text-4xl font-black uppercase font-display tracking-tight text-neutral-900">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-xs sm:text-sm font-sans text-gray-400 mt-1">
+            <p className="text-xs sm:text-sm font-sans text-neutral-500 mt-1">
               {subtitle}
             </p>
           )}
@@ -57,7 +57,7 @@ export const ProductSection = ({
             const shopTarget = document.querySelector('#shop');
             if (shopTarget) shopTarget.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-300 hover:text-white transition-colors group self-start sm:self-auto font-sans"
+          className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors group self-start sm:self-auto font-sans"
         >
           <span>{displayViewAll}</span>
           {language === 'ar' ? (

@@ -22,7 +22,7 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
 
-  const { announcement, brand, navigation } = siteContent;
+  const { announcement, brand, navigation, sectionsVisibility } = siteContent;
 
   const handleNavClick = (navId, link) => {
     setActiveCategory(navId === 'shop' ? 'all' : navId);
@@ -34,13 +34,14 @@ export const Navbar = () => {
     }
   };
 
+  const isAnnouncementVisible = sectionsVisibility?.announcement !== false && announcement?.enabled;
   const announcementText = getLocalized(announcement, 'text');
 
   return (
-    <header className="sticky top-0 z-40 w-full">
+    <header className="sticky top-0 z-40 w-full shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
       {/* Top Announcement Bar */}
-      {announcement?.enabled && (
-        <aside aria-label="Announcement" className="bg-[#121217] border-b border-white/10 text-[11px] font-medium tracking-wider text-gray-300 py-1.5 px-4 text-center flex items-center justify-center gap-2 relative z-50">
+      {isAnnouncementVisible && (
+        <aside aria-label="Announcement" className="bg-[#121216] text-[11px] font-medium tracking-wider text-gray-200 py-1.5 px-4 text-center flex items-center justify-center gap-2 relative z-50">
           <a 
             href={announcement.link || "#sale"} 
             className="hover:text-white transition-colors duration-200 flex items-center gap-1.5 font-sans"
@@ -50,8 +51,8 @@ export const Navbar = () => {
         </aside>
       )}
 
-      {/* Main Glass Navbar */}
-      <nav className="glass-nav transition-all duration-300">
+      {/* Main Glass Navbar for Off-White Background */}
+      <nav className="glass-nav-light transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             
@@ -63,10 +64,10 @@ export const Navbar = () => {
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id, item.link)}
-                    className="text-xs font-bold uppercase tracking-[0.15em] text-gray-300 hover:text-white transition-colors py-2 relative group"
+                    className="text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors py-2 relative group"
                   >
                     {label}
-                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
                   </button>
                 );
               })}
@@ -76,7 +77,7 @@ export const Navbar = () => {
             <div className="flex items-center lg:hidden">
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-gray-300 hover:text-white"
+                className="p-2 text-neutral-800 hover:text-black"
                 aria-label="Toggle Menu"
               >
                 {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -103,10 +104,10 @@ export const Navbar = () => {
               {/* Language Switcher Button (عربي / EN) */}
               <button
                 onClick={toggleLanguage}
-                className="flex items-center gap-1.5 bg-neutral-900/90 hover:bg-neutral-800 text-gray-200 border border-white/15 px-2.5 py-1.5 rounded text-xs font-bold font-mono transition-all hover:border-white/40"
+                className="flex items-center gap-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-[#dedcd4] px-2.5 py-1.5 rounded text-xs font-bold transition-all shadow-sm"
                 title={language === 'ar' ? "Switch to English" : "التحويل للغة العربية"}
               >
-                <Globe size={13} className="text-cyan-400" />
+                <Globe size={13} className="text-neutral-600" />
                 <span className="text-[11px] font-sans">
                   {language === 'ar' ? 'EN' : 'العربية'}
                 </span>
@@ -115,18 +116,18 @@ export const Navbar = () => {
               {/* Search Toggle / Input */}
               <div className="relative flex items-center">
                 {showSearchInput ? (
-                  <div className="flex items-center bg-[#1a1a22] border border-white/20 rounded-full px-3 py-1.5">
+                  <div className="flex items-center bg-white border border-[#dedcd4] rounded-full px-3 py-1.5 shadow-sm">
                     <input 
                       type="text"
                       placeholder={t('nav.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-transparent text-xs text-white placeholder-gray-400 outline-none w-32 sm:w-44"
+                      className="bg-transparent text-xs text-neutral-800 placeholder-neutral-400 outline-none w-32 sm:w-44 font-sans"
                       autoFocus
                     />
                     <button 
                       onClick={() => setShowSearchInput(false)}
-                      className="text-gray-400 hover:text-white ml-1 text-xs"
+                      className="text-neutral-400 hover:text-neutral-700 ml-1 text-xs"
                     >
                       ✕
                     </button>
@@ -134,7 +135,7 @@ export const Navbar = () => {
                 ) : (
                   <button 
                     onClick={() => setShowSearchInput(true)}
-                    className="p-2 text-gray-300 hover:text-white transition-colors"
+                    className="p-2 text-neutral-700 hover:text-black transition-colors"
                     title={t('nav.searchPlaceholder')}
                   >
                     <Search size={19} />
@@ -148,7 +149,7 @@ export const Navbar = () => {
                   const target = document.querySelector('#shop');
                   if (target) target.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="relative p-2 text-gray-300 hover:text-white transition-colors hidden sm:block"
+                className="relative p-2 text-neutral-700 hover:text-black transition-colors hidden sm:block"
                 title={t('nav.favorites')}
               >
                 <Heart size={19} />
@@ -162,12 +163,12 @@ export const Navbar = () => {
               {/* Cart Button */}
               <button 
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 text-gray-300 hover:text-white transition-colors group flex items-center"
+                className="relative p-2 text-neutral-700 hover:text-black transition-colors group flex items-center"
                 title={t('nav.cart')}
               >
                 <ShoppingBag size={20} className="group-hover:scale-110 transition-transform" />
                 {cartItemsCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-white text-black text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-bounce">
+                  <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-bounce">
                     {cartItemsCount}
                   </span>
                 )}
@@ -176,10 +177,10 @@ export const Navbar = () => {
               {/* Admin Panel Toggle Button */}
               <button 
                 onClick={() => setIsAdminOpen(true)}
-                className="flex items-center gap-1.5 bg-gradient-to-r from-neutral-800 to-neutral-900 hover:from-white hover:to-neutral-200 hover:text-black text-gray-300 border border-white/20 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all duration-300 shadow-md"
-                title="Open CMS Admin Dashboard"
+                className="flex items-center gap-1.5 bg-black hover:bg-neutral-800 text-white px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wider transition-all duration-300 shadow-md"
+                title="فتح لوحة تحكم المتجر"
               >
-                <Sliders size={13} className="text-amber-400 group-hover:text-black" />
+                <Sliders size={13} className="text-amber-400" />
                 <span className="font-sans">لوحة التحكم</span>
               </button>
 
@@ -190,27 +191,27 @@ export const Navbar = () => {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#0c0c10] border-b border-white/10 px-4 pt-3 pb-6 space-y-3 animate-fadeIn">
+          <div className="lg:hidden bg-[#f8f7f4] border-b border-[#e5e4de] px-4 pt-3 pb-6 space-y-3 animate-fadeIn">
             {navigation?.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id, item.link)}
-                className="block w-full text-left rtl:text-right py-2 text-sm font-bold uppercase tracking-wider text-gray-200 hover:text-white border-b border-white/5"
+                className="block w-full text-left rtl:text-right py-2 text-sm font-bold uppercase tracking-wider text-neutral-800 hover:text-black border-b border-black/5"
               >
                 {getLocalized(item, 'label')}
               </button>
             ))}
-            <div className="pt-2 flex justify-between items-center text-xs text-gray-400">
+            <div className="pt-2 flex justify-between items-center text-xs text-neutral-600">
               <button 
                 onClick={toggleLanguage}
-                className="flex items-center gap-1.5 text-white bg-neutral-800 px-3 py-1.5 rounded"
+                className="flex items-center gap-1.5 text-neutral-800 bg-white border border-[#dedcd4] px-3 py-1.5 rounded shadow-sm"
               >
                 <Globe size={13} />
                 <span>{language === 'ar' ? 'English Language' : 'اللغة العربية'}</span>
               </button>
               <button 
                 onClick={() => { setMobileMenuOpen(false); setIsAdminOpen(true); }}
-                className="text-white bg-white/10 px-3 py-1.5 rounded font-bold"
+                className="text-white bg-black px-3 py-1.5 rounded font-bold"
               >
                 لوحة التحكم
               </button>

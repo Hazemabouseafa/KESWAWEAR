@@ -1,4 +1,19 @@
 export const initialSiteContent = {
+  // 1. التحكم في ظهور وإخفاء صفوف وأقسام الموقع (Rows Visibility)
+  sectionsVisibility: {
+    announcement: true,       // 1. شريط الإعلانات العلوي
+    heroHoodies: true,        // 2. بنر الهوديز الرئيسي
+    categoryGrid: true,       // 3. شبكة الفئات الثلاثية (3 كروت)
+    hoodiesProducts: true,    // 4. صف منتجات الهوديز
+    heroTshirts: true,        // 5. بنر التيشرتات الصيفي
+    tshirtsProducts: true,    // 6. صف منتجات التيشرتات
+    heroSweatpants: true,     // 7. بنر السويت بانتس الحضري
+    sweatpantsProducts: true, // 8. صف منتجات السويت بانتس
+    superSale: true,          // 9. صف الخصم الكبير والعداد التنازلي
+    newsletter: true,         // 10. صف النادي البريدي
+    footer: true              // 11. الفوتر
+  },
+
   announcement: {
     enabled: true,
     text_ar: "🔥 شحن مجاني للطلبات فوق 1500 ج.م | كود الخصم: KESWA10 لخصم 10%",
@@ -10,6 +25,7 @@ export const initialSiteContent = {
     tagline_ar: "ملابس • أناقة • أنت",
     tagline_en: "CLOTHES • STYLE • YOU",
     logoStyle: "metallic", // 'metallic' | 'badge'
+    logoImage: "/assets/keswa-logo.jpg"
   },
   navigation: [
     { id: "shop", label_ar: "تسوق الكل", label_en: "SHOP ALL", link: "#shop" },
@@ -645,6 +661,8 @@ export const initialOrders = [
       {
         id: "h-01",
         name: "هودي أسود مغسول بوكسي ثقيل 450 جرام",
+        name_ar: "هودي أسود مغسول بوكسي ثقيل 450 جرام",
+        name_en: "Washed Black Boxy Heavyweight Hoodie",
         size: "L",
         color: "أسود مغسول",
         price: 950,
@@ -654,6 +672,8 @@ export const initialOrders = [
       {
         id: "p-01",
         name: "سويت بانتس رمادي باجي برباط أبيض سميك",
+        name_ar: "سويت بانتس رمادي باجي برباط أبيض سميك",
+        name_en: "Heather Grey Baggy Drawstring Sweatpants",
         size: "L",
         color: "رمادي ميلانج",
         price: 750,
@@ -680,6 +700,8 @@ export const initialOrders = [
       {
         id: "h-02",
         name: "هودي نبيتي فليس أوفرسايز فخم",
+        name_ar: "هودي نبيتي فليس أوفرسايز فخم",
+        name_en: "Burgundy Heavy Fleece Oversized Hoodie",
         size: "XL",
         color: "نبيتي",
         price: 920,

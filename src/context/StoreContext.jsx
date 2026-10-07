@@ -5,16 +5,16 @@ import { translations } from '../data/translations';
 const StoreContext = createContext();
 
 const STORAGE_KEYS = {
-  CONTENT: 'keswa_site_content_v2',
-  PRODUCTS: 'keswa_products_v2',
-  ORDERS: 'keswa_orders_v2',
-  CART: 'keswa_cart_v2',
-  WISHLIST: 'keswa_wishlist_v2',
-  LANG: 'keswa_language_v2'
+  CONTENT: 'keswa_site_content_v3',
+  PRODUCTS: 'keswa_products_v3',
+  ORDERS: 'keswa_orders_v3',
+  CART: 'keswa_cart_v3',
+  WISHLIST: 'keswa_wishlist_v3',
+  LANG: 'keswa_language_v3'
 };
 
 export const StoreProvider = ({ children }) => {
-  // 0. Language State ('ar' by default as requested by user, togglable to 'en')
+  // 0. Language State ('ar' by default, togglable to 'en')
   const [language, setLanguage] = useState(() => {
     try {
       const savedLang = localStorage.getItem(STORAGE_KEYS.LANG);
@@ -24,11 +24,22 @@ export const StoreProvider = ({ children }) => {
     }
   });
 
-  // 1. Site Content
+  // 1. Site Content with full sectionsVisibility fallback
   const [siteContent, setSiteContent] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.CONTENT);
-      return saved ? JSON.parse(saved) : initialSiteContent;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          ...initialSiteContent,
+          ...parsed,
+          sectionsVisibility: {
+            ...initialSiteContent.sectionsVisibility,
+            ...(parsed.sectionsVisibility || {})
+          }
+        };
+      }
+      return initialSiteContent;
     } catch (e) {
       return initialSiteContent;
     }
@@ -146,6 +157,22 @@ export const StoreProvider = ({ children }) => {
     }, 3500);
   };
 
+  // Row / Section Visibility Toggle
+  const toggleSectionVisibility = (sectionKey) => {
+    setSiteContent(prev => {
+      const currentVal = prev.sectionsVisibility?.[sectionKey] !== false;
+      const updated = {
+        ...prev,
+        sectionsVisibility: {
+          ...prev.sectionsVisibility,
+          [sectionKey]: !currentVal
+        }
+      };
+      return updated;
+    });
+    showToast(language === 'ar' ? "تم تحديث ظهور القسم في الواجهة!" : "Row visibility updated!", "info");
+  };
+
   // Content Management Handlers
   const updateContent = (path, value) => {
     setSiteContent(prev => {
@@ -159,7 +186,7 @@ export const StoreProvider = ({ children }) => {
       current[keys[keys.length - 1]] = value;
       return copy;
     });
-    showToast(language === 'ar' ? "تم حفظ التعديلات فورياً!" : "Changes saved in real-time!", "success");
+    showToast(language === 'ar' ? "تم حفظ التعديل فورياً!" : "Changes saved in real-time!", "success");
   };
 
   const updateBanner = (bannerKey, updatedFields) => {
@@ -173,7 +200,7 @@ export const StoreProvider = ({ children }) => {
         }
       }
     }));
-    showToast(language === 'ar' ? `تم تحديث البنر بنجاح!` : `Banner updated successfully!`, "success");
+    showToast(language === 'ar' ? "تم تحديث البنر بنجاح!" : "Banner updated successfully!", "success");
   };
 
   const updateSectionHeader = (sectionKey, updatedFields) => {
@@ -190,6 +217,12 @@ export const StoreProvider = ({ children }) => {
     showToast(language === 'ar' ? "تم تحديث عنوان القسم!" : "Section header updated!", "success");
   };
 
+  // Update Image URL directly
+  const updateImage = (path, url) => {
+    updateContent(path, url);
+    showToast(language === 'ar' ? "تم تحديث الصورة بنجاح!" : "Image updated successfully!", "success");
+  };
+
   // Products CRUD
   const addProduct = (newProduct) => {
     const productWithId = {
@@ -197,7 +230,7 @@ export const StoreProvider = ({ children }) => {
       id: newProduct.id || `keswa-${Date.now()}`
     };
     setProducts(prev => [productWithId, ...prev]);
-    showToast(language === 'ar' ? `تمت إضافة المنتج بنجاح!` : `Product added!`, "success");
+    showToast(language === 'ar' ? "تمت إضافة المنتج بنجاح!" : "Product added!", "success");
     return productWithId;
   };
 
@@ -270,15 +303,15 @@ export const StoreProvider = ({ children }) => {
     setCart([]);
   };
 
-  // Checkout & Orders
+  // Checkout & Orders Management (FIXED)
   const createOrder = (customerDetails) => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shipping = subtotal >= (siteContent.general.freeShippingThreshold || 1500) ? 0 : (siteContent.general.shippingCost || 50);
+    const shipping = subtotal >= (siteContent.general?.freeShippingThreshold || 1500) ? 0 : (siteContent.general?.shippingCost || 50);
     const total = subtotal + shipping;
 
     const newOrder = {
       id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-      customer: customerDetails,
+      customer: { ...customerDetails },
       items: [...cart],
       subtotal,
       shipping,
@@ -290,7 +323,7 @@ export const StoreProvider = ({ children }) => {
 
     setOrders(prev => [newOrder, ...prev]);
     clearCart();
-    setIsCheckoutOpen(false);
+    // NOTE: We do NOT close isCheckoutOpen here so the customer sees the confirmed order screen!
     return newOrder;
   };
 
@@ -302,6 +335,52 @@ export const StoreProvider = ({ children }) => {
         : `Order #${orderId} status changed to: ${newStatus}`, 
       "info"
     );
+  };
+
+  const deleteOrder = (orderId) => {
+    setOrders(prev => prev.filter(o => o.id !== orderId));
+    showToast(language === 'ar' ? `تم حذف الطلب #${orderId}` : `Order #${orderId} deleted`, "info");
+  };
+
+  const clearAllOrders = () => {
+    if (window.confirm(language === 'ar' ? "هل تريد مسح كافة الطلبات المسجلة؟" : "Clear all registered orders?")) {
+      setOrders([]);
+      showToast(language === 'ar' ? "تم مسح كافة الطلبات" : "All orders cleared", "info");
+    }
+  };
+
+  const addTestOrder = () => {
+    const sampleProduct = products[0];
+    const testOrder = {
+      id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+      customer: {
+        name: "محمد عبد الله (طلب تجريبي)",
+        phone: "01023456789",
+        address: "24 شارع النصر، سموحة",
+        city: "Alexandria",
+        notes: "برجاء الاتصال قبل الاستلام",
+        paymentMethod: "الدفع عند الاستلام (COD)"
+      },
+      items: [
+        {
+          id: sampleProduct.id,
+          name: sampleProduct.name_ar || sampleProduct.name,
+          size: "L",
+          color: "أسود",
+          price: sampleProduct.price,
+          quantity: 1,
+          image: sampleProduct.images?.[0]
+        }
+      ],
+      subtotal: sampleProduct.price,
+      shipping: 50,
+      total: sampleProduct.price + 50,
+      status: "Pending",
+      paymentMethod: "الدفع عند الاستلام (COD)",
+      date: new Date().toISOString()
+    };
+    setOrders(prev => [testOrder, ...prev]);
+    showToast(language === 'ar' ? "تمت إضافة طلب تجريبي جديد بنجاح!" : "Test order added!", "success");
   };
 
   // Wishlist
@@ -373,9 +452,11 @@ export const StoreProvider = ({ children }) => {
       t,
       getLocalized,
       siteContent,
+      toggleSectionVisibility,
       updateContent,
       updateBanner,
       updateSectionHeader,
+      updateImage,
       products,
       addProduct,
       updateProduct,
@@ -383,6 +464,9 @@ export const StoreProvider = ({ children }) => {
       orders,
       createOrder,
       updateOrderStatus,
+      deleteOrder,
+      clearAllOrders,
+      addTestOrder,
       cart,
       addToCart,
       updateCartQuantity,

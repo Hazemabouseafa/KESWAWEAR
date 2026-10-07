@@ -9,8 +9,7 @@ export const ProductCard = ({ product }) => {
     wishlist, 
     toggleWishlist, 
     getLocalized,
-    t,
-    language 
+    t 
   } = useStore();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -32,11 +31,11 @@ export const ProductCard = ({ product }) => {
   return (
     <article 
       onClick={() => setQuickViewProduct(product)}
-      className="group relative flex flex-col bg-[#0e0e12] border border-white/5 hover:border-white/20 transition-all duration-300 rounded-sm cursor-pointer select-none"
+      className="group relative flex flex-col bg-white border border-[#e6e4dc] hover:border-black/30 rounded-sm cursor-pointer select-none transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-xl"
     >
       {/* Product Image Container */}
       <div 
-        className="relative w-full aspect-[3/4] bg-neutral-900 overflow-hidden"
+        className="relative w-full aspect-[3/4] bg-[#f1efe9] overflow-hidden"
         onMouseEnter={() => product.images?.length > 1 && setCurrentImageIndex(1)}
         onMouseLeave={() => setCurrentImageIndex(0)}
       >
@@ -49,7 +48,7 @@ export const ProductCard = ({ product }) => {
 
         {/* Badge (Sale / New / Limited) */}
         {badge && (
-          <span className="absolute top-2.5 start-2.5 bg-red-600 text-white font-sans text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-none shadow-md z-10">
+          <span className="absolute top-2.5 start-2.5 bg-black text-white font-sans text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-none shadow-md z-10">
             {badge}
           </span>
         )}
@@ -61,7 +60,7 @@ export const ProductCard = ({ product }) => {
             toggleWishlist(product.id);
           }}
           className={`absolute top-2.5 end-2.5 p-2 rounded-full backdrop-blur-md transition-all duration-200 z-10 ${
-            isFavorite ? 'bg-red-500 text-white' : 'bg-black/50 text-gray-300 hover:text-white hover:bg-black/80'
+            isFavorite ? 'bg-red-500 text-white' : 'bg-white/80 text-neutral-700 hover:text-black hover:bg-white shadow-sm'
           }`}
           aria-label={isFavorite ? `Remove from wishlist` : `Add to wishlist`}
         >
@@ -72,7 +71,7 @@ export const ProductCard = ({ product }) => {
         <div className="absolute inset-x-2 bottom-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
           <button 
             onClick={handleQuickAdd}
-            className="flex-1 bg-white hover:bg-neutral-200 text-black font-extrabold text-[11px] tracking-wider uppercase py-2.5 px-3 flex items-center justify-center gap-1.5 shadow-lg transition-transform active:scale-95 font-sans"
+            className="flex-1 bg-black hover:bg-neutral-800 text-white font-extrabold text-[11px] tracking-wider uppercase py-2.5 px-3 flex items-center justify-center gap-1.5 shadow-lg transition-transform active:scale-95 font-sans"
           >
             <ShoppingBag size={13} />
             <span>{t('actions.addToCart')}</span>
@@ -83,7 +82,7 @@ export const ProductCard = ({ product }) => {
               e.stopPropagation();
               setQuickViewProduct(product);
             }}
-            className="bg-black/80 hover:bg-black text-white p-2.5 backdrop-blur-md transition-colors"
+            className="bg-white/90 hover:bg-white text-black p-2.5 shadow-md backdrop-blur-md transition-colors"
             title={t('actions.quickView')}
             aria-label={`Quick view ${productName}`}
           >
@@ -93,7 +92,7 @@ export const ProductCard = ({ product }) => {
       </div>
 
       {/* Product Details */}
-      <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between">
+      <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between bg-white">
         
         <div>
           {/* Color Dots */}
@@ -109,33 +108,33 @@ export const ProductCard = ({ product }) => {
                       setSelectedColor(c);
                     }}
                     className={`w-3.5 h-3.5 rounded-full border transition-all ${
-                      selectedColor?.hex === c.hex ? 'border-white scale-110 shadow-[0_0_5px_rgba(255,255,255,0.6)]' : 'border-neutral-600 opacity-70'
+                      selectedColor?.hex === c.hex ? 'border-black scale-110 shadow-sm' : 'border-neutral-300 opacity-80'
                     }`}
                     style={{ backgroundColor: c.hex }}
                     title={colorTitle}
                   />
                 );
               })}
-              <span className="text-[10px] text-gray-400 font-sans mx-1">
+              <span className="text-[10px] text-neutral-500 font-sans mx-1">
                 {selectedColor ? getLocalized(selectedColor, 'name') : ''}
               </span>
             </div>
           )}
 
           {/* Product Name */}
-          <h3 className="text-xs sm:text-sm font-bold text-gray-200 group-hover:text-white transition-colors line-clamp-1 mb-1.5 font-sans">
+          <h3 className="text-xs sm:text-sm font-bold text-neutral-800 group-hover:text-black transition-colors line-clamp-1 mb-1.5 font-sans">
             {productName}
           </h3>
         </div>
 
         {/* Price & Sizes */}
-        <div className="flex items-baseline justify-between mt-2 pt-2 border-t border-white/5">
+        <div className="flex items-baseline justify-between mt-2 pt-2 border-t border-[#f1efe9]">
           <div className="flex items-baseline gap-2">
-            <span className="text-sm sm:text-base font-black font-mono text-white">
+            <span className="text-sm sm:text-base font-black font-mono text-black">
               {product.price} {currency}
             </span>
             {product.oldPrice && product.oldPrice > product.price && (
-              <span className="text-xs font-mono text-gray-500 line-through">
+              <span className="text-xs font-mono text-neutral-400 line-through">
                 {product.oldPrice} {currency}
               </span>
             )}
@@ -144,7 +143,7 @@ export const ProductCard = ({ product }) => {
           {/* Size Pills */}
           <div className="hidden sm:flex items-center gap-1">
             {product.sizes?.slice(0, 3).map((s) => (
-              <span key={s} className="text-[9px] font-mono text-gray-400 px-1 py-0.5 bg-neutral-900 border border-white/5 rounded-none">
+              <span key={s} className="text-[9px] font-mono text-neutral-500 px-1 py-0.5 bg-[#f6f5f0] border border-[#e8e6de] rounded-none">
                 {s}
               </span>
             ))}
