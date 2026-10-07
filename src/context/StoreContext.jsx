@@ -384,17 +384,49 @@ export const StoreProvider = ({ children }) => {
   };
 
   const updateBanner = (bannerKey, updatedFields) => {
-    setSiteContent(prev => ({
-      ...prev,
-      banners: {
-        ...prev.banners,
-        [bannerKey]: {
-          ...prev.banners[bannerKey],
-          ...updatedFields
-        }
+    setSiteContent(prev => {
+      const existing = prev.banners?.[bannerKey] || {};
+      let merged = { ...existing, ...updatedFields };
+      if (bannerKey === 'categoryGrid' && updatedFields) {
+        merged = {
+          ...existing,
+          ...updatedFields,
+          card1: updatedFields.card1 ? { ...existing.card1, ...updatedFields.card1 } : existing.card1,
+          card2: updatedFields.card2 ? { ...existing.card2, ...updatedFields.card2 } : existing.card2,
+          card3: updatedFields.card3 ? { ...existing.card3, ...updatedFields.card3 } : existing.card3,
+        };
       }
-    }));
+      return {
+        ...prev,
+        banners: {
+          ...prev.banners,
+          [bannerKey]: merged
+        }
+      };
+    });
     showToast(language === 'ar' ? "تم تحديث البنر بنجاح!" : "Banner updated successfully!", "success");
+    if (neonStatus === 'connected') {
+      fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...siteContent,
+          banners: {
+            ...siteContent.banners,
+            [bannerKey]: bannerKey === 'categoryGrid' && updatedFields ? {
+              ...siteContent.banners?.[bannerKey],
+              ...updatedFields,
+              card1: updatedFields.card1 ? { ...siteContent.banners?.[bannerKey]?.card1, ...updatedFields.card1 } : siteContent.banners?.[bannerKey]?.card1,
+              card2: updatedFields.card2 ? { ...siteContent.banners?.[bannerKey]?.card2, ...updatedFields.card2 } : siteContent.banners?.[bannerKey]?.card2,
+              card3: updatedFields.card3 ? { ...siteContent.banners?.[bannerKey]?.card3, ...updatedFields.card3 } : siteContent.banners?.[bannerKey]?.card3,
+            } : {
+              ...siteContent.banners?.[bannerKey],
+              ...updatedFields
+            }
+          }
+        })
+      }).catch(() => {});
+    }
   };
 
   const updateSectionHeader = (sectionKey, updatedFields) => {
@@ -403,12 +435,28 @@ export const StoreProvider = ({ children }) => {
       sectionHeaders: {
         ...prev.sectionHeaders,
         [sectionKey]: {
-          ...prev.sectionHeaders[sectionKey],
+          ...prev.sectionHeaders?.[sectionKey],
           ...updatedFields
         }
       }
     }));
     showToast(language === 'ar' ? "تم تحديث عنوان القسم!" : "Section header updated!", "success");
+    if (neonStatus === 'connected') {
+      fetch('/api/content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...siteContent,
+          sectionHeaders: {
+            ...siteContent.sectionHeaders,
+            [sectionKey]: {
+              ...siteContent.sectionHeaders?.[sectionKey],
+              ...updatedFields
+            }
+          }
+        })
+      }).catch(() => {});
+    }
   };
 
   // Update Image URL directly

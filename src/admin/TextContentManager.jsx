@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Layout, Save, CheckCircle2 } from 'lucide-react';
+import { Layout, Save, CheckCircle2, Grid, Bookmark } from 'lucide-react';
 
 export const TextContentManager = () => {
   const { 
@@ -38,6 +38,68 @@ export const TextContentManager = () => {
   );
   const [heroHoodiesBtn, setHeroHoodiesBtn] = useState(
     textLangTab === 'ar' ? (siteContent.banners?.heroHoodies?.buttonText_ar || '') : (siteContent.banners?.heroHoodies?.buttonText_en || '')
+  );
+
+  // 3-Card Category Grid
+  const [gridCard1Title, setGridCard1Title] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card1?.title_ar || '') : (siteContent.banners?.categoryGrid?.card1?.title_en || '')
+  );
+  const [gridCard1Subtitle, setGridCard1Subtitle] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card1?.subtitle_ar || '') : (siteContent.banners?.categoryGrid?.card1?.subtitle_en || '')
+  );
+  const [gridCard1Btn, setGridCard1Btn] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card1?.buttonText_ar || '') : (siteContent.banners?.categoryGrid?.card1?.buttonText_en || '')
+  );
+
+  const [gridCard2Title, setGridCard2Title] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card2?.title_ar || '') : (siteContent.banners?.categoryGrid?.card2?.title_en || '')
+  );
+  const [gridCard2Subtitle, setGridCard2Subtitle] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card2?.subtitle_ar || '') : (siteContent.banners?.categoryGrid?.card2?.subtitle_en || '')
+  );
+  const [gridCard2Btn, setGridCard2Btn] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card2?.buttonText_ar || '') : (siteContent.banners?.categoryGrid?.card2?.buttonText_en || '')
+  );
+
+  const [gridCard3Title, setGridCard3Title] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card3?.title_ar || '') : (siteContent.banners?.categoryGrid?.card3?.title_en || '')
+  );
+  const [gridCard3Subtitle, setGridCard3Subtitle] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card3?.subtitle_ar || '') : (siteContent.banners?.categoryGrid?.card3?.subtitle_en || '')
+  );
+  const [gridCard3Btn, setGridCard3Btn] = useState(
+    textLangTab === 'ar' ? (siteContent.banners?.categoryGrid?.card3?.buttonText_ar || '') : (siteContent.banners?.categoryGrid?.card3?.buttonText_en || '')
+  );
+
+  // Section Headers
+  const [secHoodiesTitle, setSecHoodiesTitle] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.hoodies?.title_ar || '') : (siteContent.sectionHeaders?.hoodies?.title_en || '')
+  );
+  const [secHoodiesSubtitle, setSecHoodiesSubtitle] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.hoodies?.subtitle_ar || '') : (siteContent.sectionHeaders?.hoodies?.subtitle_en || '')
+  );
+  const [secHoodiesViewAll, setSecHoodiesViewAll] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.hoodies?.viewAllText_ar || '') : (siteContent.sectionHeaders?.hoodies?.viewAllText_en || '')
+  );
+
+  const [secTshirtsTitle, setSecTshirtsTitle] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.tshirts?.title_ar || '') : (siteContent.sectionHeaders?.tshirts?.title_en || '')
+  );
+  const [secTshirtsSubtitle, setSecTshirtsSubtitle] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.tshirts?.subtitle_ar || '') : (siteContent.sectionHeaders?.tshirts?.subtitle_en || '')
+  );
+  const [secTshirtsViewAll, setSecTshirtsViewAll] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.tshirts?.viewAllText_ar || '') : (siteContent.sectionHeaders?.tshirts?.viewAllText_en || '')
+  );
+
+  const [secSweatsTitle, setSecSweatsTitle] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.sweatpants?.title_ar || '') : (siteContent.sectionHeaders?.sweatpants?.title_en || '')
+  );
+  const [secSweatsSubtitle, setSecSweatsSubtitle] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.sweatpants?.subtitle_ar || '') : (siteContent.sectionHeaders?.sweatpants?.subtitle_en || '')
+  );
+  const [secSweatsViewAll, setSecSweatsViewAll] = useState(
+    textLangTab === 'ar' ? (siteContent.sectionHeaders?.sweatpants?.viewAllText_ar || '') : (siteContent.sectionHeaders?.sweatpants?.viewAllText_en || '')
   );
 
   const [heroTshirtsTitle, setHeroTshirtsTitle] = useState(
@@ -92,6 +154,30 @@ export const TextContentManager = () => {
       setHeroHoodiesBadge(siteContent.banners?.heroHoodies?.badge_ar || '');
       setHeroHoodiesBtn(siteContent.banners?.heroHoodies?.buttonText_ar || '');
 
+      setGridCard1Title(siteContent.banners?.categoryGrid?.card1?.title_ar || '');
+      setGridCard1Subtitle(siteContent.banners?.categoryGrid?.card1?.subtitle_ar || '');
+      setGridCard1Btn(siteContent.banners?.categoryGrid?.card1?.buttonText_ar || '');
+
+      setGridCard2Title(siteContent.banners?.categoryGrid?.card2?.title_ar || '');
+      setGridCard2Subtitle(siteContent.banners?.categoryGrid?.card2?.subtitle_ar || '');
+      setGridCard2Btn(siteContent.banners?.categoryGrid?.card2?.buttonText_ar || '');
+
+      setGridCard3Title(siteContent.banners?.categoryGrid?.card3?.title_ar || '');
+      setGridCard3Subtitle(siteContent.banners?.categoryGrid?.card3?.subtitle_ar || '');
+      setGridCard3Btn(siteContent.banners?.categoryGrid?.card3?.buttonText_ar || '');
+
+      setSecHoodiesTitle(siteContent.sectionHeaders?.hoodies?.title_ar || '');
+      setSecHoodiesSubtitle(siteContent.sectionHeaders?.hoodies?.subtitle_ar || '');
+      setSecHoodiesViewAll(siteContent.sectionHeaders?.hoodies?.viewAllText_ar || '');
+
+      setSecTshirtsTitle(siteContent.sectionHeaders?.tshirts?.title_ar || '');
+      setSecTshirtsSubtitle(siteContent.sectionHeaders?.tshirts?.subtitle_ar || '');
+      setSecTshirtsViewAll(siteContent.sectionHeaders?.tshirts?.viewAllText_ar || '');
+
+      setSecSweatsTitle(siteContent.sectionHeaders?.sweatpants?.title_ar || '');
+      setSecSweatsSubtitle(siteContent.sectionHeaders?.sweatpants?.subtitle_ar || '');
+      setSecSweatsViewAll(siteContent.sectionHeaders?.sweatpants?.viewAllText_ar || '');
+
       setHeroTshirtsTitle(siteContent.banners?.heroTshirts?.title_ar || '');
       setHeroTshirtsSubtitle(siteContent.banners?.heroTshirts?.subtitle_ar || '');
       setHeroTshirtsBtn(siteContent.banners?.heroTshirts?.buttonText_ar || '');
@@ -113,6 +199,30 @@ export const TextContentManager = () => {
       setHeroHoodiesSubtitle(siteContent.banners?.heroHoodies?.subtitle_en || '');
       setHeroHoodiesBadge(siteContent.banners?.heroHoodies?.badge_en || '');
       setHeroHoodiesBtn(siteContent.banners?.heroHoodies?.buttonText_en || '');
+
+      setGridCard1Title(siteContent.banners?.categoryGrid?.card1?.title_en || '');
+      setGridCard1Subtitle(siteContent.banners?.categoryGrid?.card1?.subtitle_en || '');
+      setGridCard1Btn(siteContent.banners?.categoryGrid?.card1?.buttonText_en || '');
+
+      setGridCard2Title(siteContent.banners?.categoryGrid?.card2?.title_en || '');
+      setGridCard2Subtitle(siteContent.banners?.categoryGrid?.card2?.subtitle_en || '');
+      setGridCard2Btn(siteContent.banners?.categoryGrid?.card2?.buttonText_en || '');
+
+      setGridCard3Title(siteContent.banners?.categoryGrid?.card3?.title_en || '');
+      setGridCard3Subtitle(siteContent.banners?.categoryGrid?.card3?.subtitle_en || '');
+      setGridCard3Btn(siteContent.banners?.categoryGrid?.card3?.buttonText_en || '');
+
+      setSecHoodiesTitle(siteContent.sectionHeaders?.hoodies?.title_en || '');
+      setSecHoodiesSubtitle(siteContent.sectionHeaders?.hoodies?.subtitle_en || '');
+      setSecHoodiesViewAll(siteContent.sectionHeaders?.hoodies?.viewAllText_en || '');
+
+      setSecTshirtsTitle(siteContent.sectionHeaders?.tshirts?.title_en || '');
+      setSecTshirtsSubtitle(siteContent.sectionHeaders?.tshirts?.subtitle_en || '');
+      setSecTshirtsViewAll(siteContent.sectionHeaders?.tshirts?.viewAllText_en || '');
+
+      setSecSweatsTitle(siteContent.sectionHeaders?.sweatpants?.title_en || '');
+      setSecSweatsSubtitle(siteContent.sectionHeaders?.sweatpants?.subtitle_en || '');
+      setSecSweatsViewAll(siteContent.sectionHeaders?.sweatpants?.viewAllText_en || '');
 
       setHeroTshirtsTitle(siteContent.banners?.heroTshirts?.title_en || '');
       setHeroTshirtsSubtitle(siteContent.banners?.heroTshirts?.subtitle_en || '');
@@ -161,6 +271,50 @@ export const TextContentManager = () => {
     });
     notifySaved('heroHoodies');
     showToast(language === 'ar' ? 'تم حفظ نصوص بنر الهوديز! 💾' : 'Hoodies banner copy saved! 💾', 'success');
+  };
+
+  const handleSaveCategoryGrid = () => {
+    const isAr = textLangTab === 'ar';
+    updateBanner('categoryGrid', {
+      card1: {
+        [isAr ? 'title_ar' : 'title_en']: gridCard1Title,
+        [isAr ? 'subtitle_ar' : 'subtitle_en']: gridCard1Subtitle,
+        [isAr ? 'buttonText_ar' : 'buttonText_en']: gridCard1Btn
+      },
+      card2: {
+        [isAr ? 'title_ar' : 'title_en']: gridCard2Title,
+        [isAr ? 'subtitle_ar' : 'subtitle_en']: gridCard2Subtitle,
+        [isAr ? 'buttonText_ar' : 'buttonText_en']: gridCard2Btn
+      },
+      card3: {
+        [isAr ? 'title_ar' : 'title_en']: gridCard3Title,
+        [isAr ? 'subtitle_ar' : 'subtitle_en']: gridCard3Subtitle,
+        [isAr ? 'buttonText_ar' : 'buttonText_en']: gridCard3Btn
+      }
+    });
+    notifySaved('categoryGrid');
+    showToast(language === 'ar' ? 'تم حفظ نصوص كروت الأقسام الثلاثية! 💾' : 'Category grid texts saved! 💾', 'success');
+  };
+
+  const handleSaveSectionHeaders = () => {
+    const isAr = textLangTab === 'ar';
+    updateSectionHeader('hoodies', {
+      [isAr ? 'title_ar' : 'title_en']: secHoodiesTitle,
+      [isAr ? 'subtitle_ar' : 'subtitle_en']: secHoodiesSubtitle,
+      [isAr ? 'viewAllText_ar' : 'viewAllText_en']: secHoodiesViewAll
+    });
+    updateSectionHeader('tshirts', {
+      [isAr ? 'title_ar' : 'title_en']: secTshirtsTitle,
+      [isAr ? 'subtitle_ar' : 'subtitle_en']: secTshirtsSubtitle,
+      [isAr ? 'viewAllText_ar' : 'viewAllText_en']: secTshirtsViewAll
+    });
+    updateSectionHeader('sweatpants', {
+      [isAr ? 'title_ar' : 'title_en']: secSweatsTitle,
+      [isAr ? 'subtitle_ar' : 'subtitle_en']: secSweatsSubtitle,
+      [isAr ? 'viewAllText_ar' : 'viewAllText_en']: secSweatsViewAll
+    });
+    notifySaved('sectionHeaders');
+    showToast(language === 'ar' ? 'تم حفظ عناوين وأوصاف أقسام المنتجات! 💾' : 'Section headers saved! 💾', 'success');
   };
 
   const handleSaveHeroTshirts = () => {
@@ -370,7 +524,253 @@ export const TextContentManager = () => {
         </div>
       </div>
 
-      {/* 4. Hero T-Shirts Texts */}
+      {/* 4. Category Feature Grid (3 Cards) Texts */}
+      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
+        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <Grid size={15} className="text-amber-400" />
+            <span>نصوص كروت شبكة الأقسام الثلاثية (3-Cards Feature Grid)</span>
+          </h3>
+          <button
+            onClick={handleSaveCategoryGrid}
+            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+              savedKey === 'categoryGrid' 
+                ? 'bg-emerald-500 text-black font-black' 
+                : 'bg-white hover:bg-neutral-200 text-black'
+            }`}
+          >
+            {savedKey === 'categoryGrid' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+            <span>{savedKey === 'categoryGrid' ? '✓ تم الحفظ!' : '💾 حفظ نصوص الكروت'}</span>
+          </button>
+        </div>
+
+        {/* Card 1: Oversized Hoodies */}
+        <div className="p-3 bg-neutral-900/60 border border-white/5 rounded space-y-2">
+          <span className="text-xs font-bold text-amber-300">الكارت الأول (الكبير - الهوديز):</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label className="block text-gray-400 mb-1">العنوان:</label>
+              <input 
+                type="text" 
+                value={gridCard1Title} 
+                onChange={(e) => setGridCard1Title(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">الوصف الفرعي:</label>
+              <input 
+                type="text" 
+                value={gridCard1Subtitle} 
+                onChange={(e) => setGridCard1Subtitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">نص الزر:</label>
+              <input 
+                type="text" 
+                value={gridCard1Btn} 
+                onChange={(e) => setGridCard1Btn(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded font-bold"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Card 2: Retro Polo Tees */}
+        <div className="p-3 bg-neutral-900/60 border border-white/5 rounded space-y-2">
+          <span className="text-xs font-bold text-blue-300">الكارت الثاني (العلوي يمين - التيشرتات):</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label className="block text-gray-400 mb-1">العنوان:</label>
+              <input 
+                type="text" 
+                value={gridCard2Title} 
+                onChange={(e) => setGridCard2Title(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">الوصف الفرعي:</label>
+              <input 
+                type="text" 
+                value={gridCard2Subtitle} 
+                onChange={(e) => setGridCard2Subtitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">نص الزر:</label>
+              <input 
+                type="text" 
+                value={gridCard2Btn} 
+                onChange={(e) => setGridCard2Btn(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded font-bold"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Card 3: Baggy Sweats */}
+        <div className="p-3 bg-neutral-900/60 border border-white/5 rounded space-y-2">
+          <span className="text-xs font-bold text-emerald-300">الكارت الثالث (السفلي يمين - السويت بانتس):</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label className="block text-gray-400 mb-1">العنوان:</label>
+              <input 
+                type="text" 
+                value={gridCard3Title} 
+                onChange={(e) => setGridCard3Title(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">الوصف الفرعي:</label>
+              <input 
+                type="text" 
+                value={gridCard3Subtitle} 
+                onChange={(e) => setGridCard3Subtitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">نص الزر:</label>
+              <input 
+                type="text" 
+                value={gridCard3Btn} 
+                onChange={(e) => setGridCard3Btn(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded font-bold"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. Section Headers for Product Rows */}
+      <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
+        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <Bookmark size={15} className="text-indigo-400" />
+            <span>عناوين وأوصاف أقسام المنتجات (Product Sections Headers)</span>
+          </h3>
+          <button
+            onClick={handleSaveSectionHeaders}
+            className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md ${
+              savedKey === 'sectionHeaders' 
+                ? 'bg-emerald-500 text-black font-black' 
+                : 'bg-white hover:bg-neutral-200 text-black'
+            }`}
+          >
+            {savedKey === 'sectionHeaders' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+            <span>{savedKey === 'sectionHeaders' ? '✓ تم الحفظ!' : '💾 حفظ عناوين الأقسام'}</span>
+          </button>
+        </div>
+
+        {/* Hoodies Header */}
+        <div className="p-3 bg-neutral-900/60 border border-white/5 rounded space-y-2">
+          <span className="text-xs font-bold text-white">قسم الهوديز (Hoodies Row Header):</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label className="block text-gray-400 mb-1">عنوان القسم:</label>
+              <input 
+                type="text" 
+                value={secHoodiesTitle} 
+                onChange={(e) => setSecHoodiesTitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">الوصف الفرعي:</label>
+              <input 
+                type="text" 
+                value={secHoodiesSubtitle} 
+                onChange={(e) => setSecHoodiesSubtitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">نص رابط عرض الكل:</label>
+              <input 
+                type="text" 
+                value={secHoodiesViewAll} 
+                onChange={(e) => setSecHoodiesViewAll(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* T-Shirts Header */}
+        <div className="p-3 bg-neutral-900/60 border border-white/5 rounded space-y-2">
+          <span className="text-xs font-bold text-white">قسم التيشرتات (T-Shirts Row Header):</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label className="block text-gray-400 mb-1">عنوان القسم:</label>
+              <input 
+                type="text" 
+                value={secTshirtsTitle} 
+                onChange={(e) => setSecTshirtsTitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">الوصف الفرعي:</label>
+              <input 
+                type="text" 
+                value={secTshirtsSubtitle} 
+                onChange={(e) => setSecTshirtsSubtitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">نص رابط عرض الكل:</label>
+              <input 
+                type="text" 
+                value={secTshirtsViewAll} 
+                onChange={(e) => setSecTshirtsViewAll(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Sweatpants Header */}
+        <div className="p-3 bg-neutral-900/60 border border-white/5 rounded space-y-2">
+          <span className="text-xs font-bold text-white">قسم السويت بانتس (Sweatpants Row Header):</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <label className="block text-gray-400 mb-1">عنوان القسم:</label>
+              <input 
+                type="text" 
+                value={secSweatsTitle} 
+                onChange={(e) => setSecSweatsTitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">الوصف الفرعي:</label>
+              <input 
+                type="text" 
+                value={secSweatsSubtitle} 
+                onChange={(e) => setSecSweatsSubtitle(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">نص رابط عرض الكل:</label>
+              <input 
+                type="text" 
+                value={secSweatsViewAll} 
+                onChange={(e) => setSecSweatsViewAll(e.target.value)}
+                className="w-full bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-white rounded"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. Hero T-Shirts Texts */}
       <div className="bg-[#16161f] border border-white/10 p-5 rounded space-y-4 shadow-xl">
         <div className="flex justify-between items-center border-b border-white/5 pb-2">
           <h3 className="text-sm font-bold text-white">
