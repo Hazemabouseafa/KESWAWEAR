@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStore } from '../context/StoreContext';
 import { KeswaLogo } from './KeswaLogo';
-import { Phone, Mail, MapPin, ArrowUp, Shield, ShieldCheck } from 'lucide-react';
+import { Phone, Mail, MapPin, ArrowUp } from 'lucide-react';
 
 const InstagramIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -17,7 +17,7 @@ const FacebookIcon = () => (
   </svg>
 );
 
-export const Footer = ({ onNavigateAdmin }) => {
+export const Footer = () => {
   const { siteContent, setActiveCategory, setIsAdminOpen, setIsTrackOrderOpen, getLocalized, t } = useStore();
   const { footer, brand } = siteContent;
 
@@ -128,10 +128,10 @@ export const Footer = ({ onNavigateAdmin }) => {
             </ul>
           </div>
 
-          {/* Col 4: Control & Social */}
+          {/* Col 4: Social */}
           <div className="space-y-3">
             <h4 className="text-white font-bold uppercase tracking-wider text-xs font-display">
-              {t('footer.adminPortal')}
+              {language === 'ar' ? 'تابعنا على منصاتنا' : 'FOLLOW US'}
             </h4>
             <div className="flex gap-3 text-white">
               <a href={footer?.social?.instagram || "#"} target="_blank" rel="noreferrer" className="p-2 bg-neutral-900 border border-white/10 hover:border-white transition-colors" aria-label="Instagram">
@@ -141,50 +141,17 @@ export const Footer = ({ onNavigateAdmin }) => {
                 <FacebookIcon />
               </a>
             </div>
-
-            <div className="pt-2">
-              <a 
-                href="/admin"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (onNavigateAdmin) onNavigateAdmin();
-                  else {
-                    window.history.pushState(null, '', '/admin');
-                    window.dispatchEvent(new PopStateEvent('popstate'));
-                  }
-                }}
-                className="w-full text-left rtl:text-right bg-neutral-900 border border-white/10 hover:border-white p-2.5 text-[11px] text-gray-300 hover:text-white flex items-center justify-between transition-colors font-sans"
-              >
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck size={14} className="text-amber-400" />
-                  <span>لوحة تحكم الإدارة (Admin Portal)</span>
-                </span>
-                <span className="text-[9px] bg-white text-black font-black px-1.5 py-0.5 font-mono">/admin</span>
-              </a>
-            </div>
+            <p className="text-[11px] text-gray-400 font-sans leading-relaxed pt-1">
+              {language === 'ar' ? 'أحدث صيحات الستريت وير المصري بجودة عالمية.' : 'Premium Egyptian streetwear designed for daily expression.'}
+            </p>
           </div>
 
         </div>
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] font-sans text-gray-500 gap-4">
-          <div className="flex items-center gap-3">
-            <span>{copyrightText}</span>
-            <span className="text-gray-700">•</span>
-            <a 
-              href="/admin"
-              onClick={(e) => {
-                e.preventDefault();
-                if (onNavigateAdmin) onNavigateAdmin();
-                else {
-                  window.history.pushState(null, '', '/admin');
-                  window.dispatchEvent(new PopStateEvent('popstate'));
-                }
-              }}
-              className="text-gray-500 hover:text-white font-mono text-[10px] transition-colors"
-            >
-              /admin
-            </a>
+          <div>
+            {copyrightText}
           </div>
 
           <div className="flex items-center gap-4">

@@ -260,8 +260,8 @@ export default function App() {
 
       </main>
 
-      {/* 3. Footer with Admin Portal Link */}
-      {isVisible('footer') && <Footer onNavigateAdmin={() => navigateTo('/admin')} />}
+      {/* 3. Footer */}
+      {isVisible('footer') && <Footer />}
 
       {/* 4. Drawers & Modals */}
       <CartDrawer />
