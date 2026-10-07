@@ -34,6 +34,59 @@ export const initialSiteContent = {
     { id: "sweatpants", label_ar: "سويت بانتس", label_en: "SWEATPANTS", link: "#sweatpants" },
     { id: "sale", label_ar: "العروض", label_en: "SALE", link: "#sale" }
   ],
+  categories: [
+    {
+      id: "hoodies",
+      name_ar: "هوديز",
+      name_en: "HOODIES",
+      subtitle_ar: "هوديز شتوية ثقيلة من أرقى أنواع القطن المصري للأناقة اليومية",
+      subtitle_en: "Signature heavyweight oversized fits crafted for ultimate street comfort",
+      bannerImage: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2070&auto=format&fit=crop",
+      showBanner: true,
+      showProducts: true,
+      viewAllText_ar: "عرض الكل",
+      viewAllText_en: "VIEW ALL",
+      badge_ar: "تشكيلة 2026 الجديدة",
+      badge_en: "NEW DROP 2026",
+      buttonText_ar: "تسوق التشكيلة",
+      buttonText_en: "SHOP COLLECTION",
+      isCore: true
+    },
+    {
+      id: "tshirts",
+      name_ar: "تيشرتات",
+      name_en: "T-SHIRTS",
+      subtitle_ar: "قطن مصري نقي وقصات أوفرسايز مريحة وطباعات متميزة",
+      subtitle_en: "Breathable pure Egyptian cotton and boxy drop-shoulder graphics",
+      bannerImage: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?q=80&w=2070&auto=format&fit=crop",
+      showBanner: true,
+      showProducts: true,
+      viewAllText_ar: "عرض الكل",
+      viewAllText_en: "VIEW ALL",
+      badge_ar: "صيف 2026",
+      badge_en: "SUMMER ESSENTIALS",
+      buttonText_ar: "اكتشف التيشرتات",
+      buttonText_en: "EXPLORE TEES",
+      isCore: true
+    },
+    {
+      id: "sweatpants",
+      name_ar: "سويت بانتس",
+      name_en: "SWEATPANTS",
+      subtitle_ar: "بناطيل فليس وجوجرز وكارجو واسعة مصممة للراحة والحركة",
+      subtitle_en: "Ultra-comfortable fleece joggers, cargos and wide-leg silhouettes",
+      bannerImage: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?q=80&w=2070&auto=format&fit=crop",
+      showBanner: true,
+      showProducts: true,
+      viewAllText_ar: "عرض الكل",
+      viewAllText_en: "VIEW ALL",
+      badge_ar: "راحة الشارع",
+      badge_en: "STREET FLEECE",
+      buttonText_ar: "تسوق البناطيل",
+      buttonText_en: "SHOP PANTS",
+      isCore: true
+    }
+  ],
   banners: {
     heroHoodies: {
       enabled: true,

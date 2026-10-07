@@ -444,3 +444,54 @@ export const NewsletterSection = () => {
     </section>
   );
 };
+
+/**
+ * 7. Dynamic Category Banner for Custom User-Added Blocks
+ */
+export const DynamicCategoryBanner = ({ category }) => {
+  const { setActiveCategory, getLocalized, language } = useStore();
+  if (!category || !category.bannerImage) return null;
+  const title = getLocalized(category, 'name') || category.name_en;
+  const subtitle = getLocalized(category, 'subtitle');
+  const badge = getLocalized(category, 'badge') || (language === 'ar' ? 'تشكيلة مميزة' : 'EXCLUSIVE DROP');
+  const buttonText = getLocalized(category, 'buttonText') || (language === 'ar' ? 'تسوق التشكيلة' : 'SHOP NOW');
+
+  return (
+    <section id={`${category.id}-hero`} className="relative w-full h-[65vh] min-h-[460px] max-h-[750px] bg-black overflow-hidden flex items-center justify-center my-4">
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={category.bannerImage} 
+          alt={title}
+          className="w-full h-full object-cover object-center opacity-80 transform scale-105 transition-transform duration-1000 ease-out hover:scale-100" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0c] via-black/35 to-black/60" />
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 text-center flex flex-col items-center">
+        {badge && (
+          <span className="inline-block bg-white text-black text-[11px] font-black tracking-widest px-3.5 py-1 mb-3 uppercase rounded-sm shadow-lg font-sans">
+            {badge}
+          </span>
+        )}
+        <h2 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase font-display tracking-tight text-white mb-3 drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+          {title}
+        </h2>
+        {subtitle && (
+          <p className="text-xs sm:text-sm font-medium tracking-wide text-gray-300 max-w-xl mb-6 uppercase font-sans">
+            {subtitle}
+          </p>
+        )}
+        <a
+          href={`#${category.id}`}
+          onClick={() => setActiveCategory(category.id)}
+          className="inline-flex items-center gap-2 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm tracking-wider uppercase px-7 py-3.5 rounded-none transition-all duration-300 shadow-2xl"
+        >
+          <span>{buttonText}</span>
+          {language === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
+        </a>
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#f8f7f4] to-transparent z-10" />
+    </section>
+  );
+};
+

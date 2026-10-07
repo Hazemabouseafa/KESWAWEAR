@@ -7,7 +7,8 @@ import {
   HeroTshirts, 
   HeroSweatpants, 
   SuperSaleSection, 
-  NewsletterSection 
+  NewsletterSection,
+  DynamicCategoryBanner
 } from './components/HeroBanners';
 import { ProductSection } from './components/ProductSection';
 import { Footer } from './components/Footer';
@@ -28,9 +29,23 @@ export default function App() {
     language 
   } = useStore();
 
-  const { sectionHeaders, sectionsVisibility } = siteContent;
+  const { sectionHeaders, sectionsVisibility, categories = [] } = siteContent;
 
   const isVisible = (rowKey) => sectionsVisibility?.[rowKey] !== false;
+
+  const hoodiesCat = categories.find(c => c.id === 'hoodies');
+  const tshirtsCat = categories.find(c => c.id === 'tshirts');
+  const sweatpantsCat = categories.find(c => c.id === 'sweatpants');
+  const customCategories = categories.filter(c => c.id !== 'hoodies' && c.id !== 'tshirts' && c.id !== 'sweatpants');
+
+  const getCategoryTitle = (catId) => {
+    const found = categories.find(c => c.id === catId);
+    if (found) return getLocalized(found, 'name') || found.name_en;
+    if (catId === 'hoodies') return language === 'ar' ? 'هوديز' : 'Hoodies';
+    if (catId === 'tshirts') return language === 'ar' ? 'تيشرتات' : 'T-Shirts';
+    if (catId === 'sweatpants') return language === 'ar' ? 'سويت بانتس' : 'Sweatpants';
+    return catId;
+  };
 
   return (
     <div id="top" className="min-h-screen bg-[#f8f7f4] text-[#121216] flex flex-col relative selection:bg-black selection:text-white font-sans">
@@ -64,9 +79,7 @@ export default function App() {
                   {language === 'ar' ? 'القسم الحالي:' : 'CATEGORY:'}
                 </span>
                 <span className="text-xl font-black font-display uppercase text-black bg-white px-3.5 py-1 border border-[#dedcd4] shadow-sm">
-                  {activeCategory === 'hoodies' ? (language === 'ar' ? 'هوديز' : 'Hoodies') :
-                   activeCategory === 'tshirts' ? (language === 'ar' ? 'تيشرتات' : 'T-Shirts') :
-                   activeCategory === 'sweatpants' ? (language === 'ar' ? 'سويت بانتس' : 'Sweatpants') : activeCategory}
+                  {getCategoryTitle(activeCategory)}
                 </span>
               </div>
               <button 
@@ -81,10 +94,10 @@ export default function App() {
               <ProductSection
                 id="hoodies"
                 category="hoodies"
-                title={getLocalized(sectionHeaders?.hoodies, 'title') || "HOODIES"}
-                subtitle={getLocalized(sectionHeaders?.hoodies, 'subtitle')}
-                viewAllText={getLocalized(sectionHeaders?.hoodies, 'viewAllText')}
-                limit={12}
+                title={getLocalized(hoodiesCat, 'name') || getLocalized(sectionHeaders?.hoodies, 'title') || "HOODIES"}
+                subtitle={getLocalized(hoodiesCat, 'subtitle') || getLocalized(sectionHeaders?.hoodies, 'subtitle')}
+                viewAllText={getLocalized(hoodiesCat, 'viewAllText') || getLocalized(sectionHeaders?.hoodies, 'viewAllText')}
+                limit={16}
               />
             )}
 
@@ -92,10 +105,10 @@ export default function App() {
               <ProductSection
                 id="tshirts"
                 category="tshirts"
-                title={getLocalized(sectionHeaders?.tshirts, 'title') || "T-SHIRTS"}
-                subtitle={getLocalized(sectionHeaders?.tshirts, 'subtitle')}
-                viewAllText={getLocalized(sectionHeaders?.tshirts, 'viewAllText')}
-                limit={12}
+                title={getLocalized(tshirtsCat, 'name') || getLocalized(sectionHeaders?.tshirts, 'title') || "T-SHIRTS"}
+                subtitle={getLocalized(tshirtsCat, 'subtitle') || getLocalized(sectionHeaders?.tshirts, 'subtitle')}
+                viewAllText={getLocalized(tshirtsCat, 'viewAllText') || getLocalized(sectionHeaders?.tshirts, 'viewAllText')}
+                limit={16}
               />
             )}
 
@@ -103,12 +116,32 @@ export default function App() {
               <ProductSection
                 id="sweatpants"
                 category="sweatpants"
-                title={getLocalized(sectionHeaders?.sweatpants, 'title') || "SWEATPANTS"}
-                subtitle={getLocalized(sectionHeaders?.sweatpants, 'subtitle')}
-                viewAllText={getLocalized(sectionHeaders?.sweatpants, 'viewAllText')}
-                limit={12}
+                title={getLocalized(sweatpantsCat, 'name') || getLocalized(sectionHeaders?.sweatpants, 'title') || "SWEATPANTS"}
+                subtitle={getLocalized(sweatpantsCat, 'subtitle') || getLocalized(sectionHeaders?.sweatpants, 'subtitle')}
+                viewAllText={getLocalized(sweatpantsCat, 'viewAllText') || getLocalized(sectionHeaders?.sweatpants, 'viewAllText')}
+                limit={16}
               />
             )}
+
+            {/* Custom Category Filtered View */}
+            {customCategories.some(c => c.id === activeCategory) && (() => {
+              const currentCat = customCategories.find(c => c.id === activeCategory);
+              return (
+                <div>
+                  {currentCat.bannerImage && currentCat.showBanner !== false && (
+                    <DynamicCategoryBanner category={currentCat} />
+                  )}
+                  <ProductSection
+                    id={currentCat.id}
+                    category={currentCat.id}
+                    title={getLocalized(currentCat, 'name') || currentCat.name_en}
+                    subtitle={getLocalized(currentCat, 'subtitle')}
+                    viewAllText={getLocalized(currentCat, 'viewAllText')}
+                    limit={16}
+                  />
+                </div>
+              );
+            })()}
           </div>
         ) : (
           /* FULL LAYOUT - ALL ROWS CONDITIONALLY RENDERED WITH VISIBILITY CONTROLS */
@@ -124,9 +157,9 @@ export default function App() {
               <ProductSection
                 id="hoodies"
                 category="hoodies"
-                title={getLocalized(sectionHeaders?.hoodies, 'title') || "HOODIES"}
-                subtitle={getLocalized(sectionHeaders?.hoodies, 'subtitle')}
-                viewAllText={getLocalized(sectionHeaders?.hoodies, 'viewAllText')}
+                title={getLocalized(hoodiesCat, 'name') || getLocalized(sectionHeaders?.hoodies, 'title') || "HOODIES"}
+                subtitle={getLocalized(hoodiesCat, 'subtitle') || getLocalized(sectionHeaders?.hoodies, 'subtitle')}
+                viewAllText={getLocalized(hoodiesCat, 'viewAllText') || getLocalized(sectionHeaders?.hoodies, 'viewAllText')}
                 limit={8}
               />
             )}
@@ -139,9 +172,9 @@ export default function App() {
               <ProductSection
                 id="tshirts"
                 category="tshirts"
-                title={getLocalized(sectionHeaders?.tshirts, 'title') || "T-SHIRTS"}
-                subtitle={getLocalized(sectionHeaders?.tshirts, 'subtitle')}
-                viewAllText={getLocalized(sectionHeaders?.tshirts, 'viewAllText')}
+                title={getLocalized(tshirtsCat, 'name') || getLocalized(sectionHeaders?.tshirts, 'title') || "T-SHIRTS"}
+                subtitle={getLocalized(tshirtsCat, 'subtitle') || getLocalized(sectionHeaders?.tshirts, 'subtitle')}
+                viewAllText={getLocalized(tshirtsCat, 'viewAllText') || getLocalized(sectionHeaders?.tshirts, 'viewAllText')}
                 limit={4}
               />
             )}
@@ -154,12 +187,33 @@ export default function App() {
               <ProductSection
                 id="sweatpants"
                 category="sweatpants"
-                title={getLocalized(sectionHeaders?.sweatpants, 'title') || "SWEATPANTS"}
-                subtitle={getLocalized(sectionHeaders?.sweatpants, 'subtitle')}
-                viewAllText={getLocalized(sectionHeaders?.sweatpants, 'viewAllText')}
+                title={getLocalized(sweatpantsCat, 'name') || getLocalized(sectionHeaders?.sweatpants, 'title') || "SWEATPANTS"}
+                subtitle={getLocalized(sweatpantsCat, 'subtitle') || getLocalized(sectionHeaders?.sweatpants, 'subtitle')}
+                viewAllText={getLocalized(sweatpantsCat, 'viewAllText') || getLocalized(sectionHeaders?.sweatpants, 'viewAllText')}
                 limit={8}
               />
             )}
+
+            {/* DYNAMIC CUSTOM CATEGORY BLOCKS (User-Added Rows & Categories) */}
+            {customCategories.map(cat => {
+              const showBanner = isVisible(`hero_${cat.id}`) && isVisible(`${cat.id}Banner`) && cat.showBanner !== false;
+              const showProducts = isVisible(`products_${cat.id}`) && isVisible(`${cat.id}Products`) && cat.showProducts !== false;
+              return (
+                <React.Fragment key={cat.id}>
+                  {showBanner && <DynamicCategoryBanner category={cat} />}
+                  {showProducts && (
+                    <ProductSection
+                      id={cat.id}
+                      category={cat.id}
+                      title={getLocalized(cat, 'name') || cat.name_en}
+                      subtitle={getLocalized(cat, 'subtitle')}
+                      viewAllText={getLocalized(cat, 'viewAllText')}
+                      limit={8}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
 
             {/* ROW 8: Super Sale with Interactive Live Countdown */}
             {isVisible('superSale') && <SuperSaleSection />}

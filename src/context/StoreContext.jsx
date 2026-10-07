@@ -33,6 +33,7 @@ export const StoreProvider = ({ children }) => {
         return {
           ...initialSiteContent,
           ...parsed,
+          categories: (parsed.categories && parsed.categories.length > 0) ? parsed.categories : initialSiteContent.categories,
           sectionsVisibility: {
             ...initialSiteContent.sectionsVisibility,
             ...(parsed.sectionsVisibility || {})
@@ -223,6 +224,103 @@ export const StoreProvider = ({ children }) => {
     showToast(language === 'ar' ? "تم تحديث الصورة بنجاح!" : "Image updated successfully!", "success");
   };
 
+  // Categories & Custom Blocks Management
+  const addCategory = (categoryData) => {
+    const rawId = categoryData.id || categoryData.name_en || `cat-${Date.now()}`;
+    const cleanId = rawId.toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-');
+    const newCategory = {
+      id: cleanId,
+      name_ar: categoryData.name_ar || 'قسم جديد',
+      name_en: categoryData.name_en || 'NEW CATEGORY',
+      subtitle_ar: categoryData.subtitle_ar || '',
+      subtitle_en: categoryData.subtitle_en || '',
+      bannerImage: categoryData.bannerImage || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=2070&auto=format&fit=crop',
+      showBanner: categoryData.showBanner !== false,
+      showProducts: categoryData.showProducts !== false,
+      viewAllText_ar: categoryData.viewAllText_ar || 'عرض الكل',
+      viewAllText_en: categoryData.viewAllText_en || 'VIEW ALL',
+      badge_ar: categoryData.badge_ar || 'تشكيلة جديدة',
+      badge_en: categoryData.badge_en || 'NEW DROP',
+      buttonText_ar: categoryData.buttonText_ar || 'تسوق التشكيلة',
+      buttonText_en: categoryData.buttonText_en || 'SHOP COLLECTION',
+      isCore: false
+    };
+
+    setSiteContent(prev => {
+      const existingList = prev.categories || initialSiteContent.categories;
+      const updatedList = [...existingList, newCategory];
+      
+      const currentNav = prev.navigation || [];
+      const updatedNav = [
+        ...currentNav.filter(item => item.id !== cleanId),
+        {
+          id: cleanId,
+          label_ar: newCategory.name_ar,
+          label_en: newCategory.name_en,
+          link: `#${cleanId}`
+        }
+      ];
+
+      return {
+        ...prev,
+        categories: updatedList,
+        navigation: updatedNav,
+        sectionsVisibility: {
+          ...prev.sectionsVisibility,
+          [`hero_${cleanId}`]: true,
+          [`products_${cleanId}`]: true
+        }
+      };
+    });
+
+    showToast(language === 'ar' ? `تمت إضافة قسم "${newCategory.name_ar}" بنجاح!` : `Category "${newCategory.name_en}" added!`, "success");
+    return newCategory;
+  };
+
+  const updateCategory = (categoryId, updatedData) => {
+    setSiteContent(prev => {
+      const existingList = prev.categories || initialSiteContent.categories;
+      const updatedList = existingList.map(cat => cat.id === categoryId ? { ...cat, ...updatedData } : cat);
+      
+      const currentNav = prev.navigation || [];
+      const updatedNav = currentNav.map(item => {
+        if (item.id === categoryId) {
+          return {
+            ...item,
+            label_ar: updatedData.name_ar || item.label_ar,
+            label_en: updatedData.name_en || item.label_en
+          };
+        }
+        return item;
+      });
+
+      return {
+        ...prev,
+        categories: updatedList,
+        navigation: updatedNav
+      };
+    });
+
+    showToast(language === 'ar' ? "تم تحديث بيانات القسم بنجاح!" : "Category updated!", "success");
+  };
+
+  const deleteCategory = (categoryId) => {
+    setSiteContent(prev => {
+      const existingList = prev.categories || initialSiteContent.categories;
+      const updatedList = existingList.filter(cat => cat.id !== categoryId);
+      const currentNav = prev.navigation || [];
+      const updatedNav = currentNav.filter(item => item.id !== categoryId);
+      
+      return {
+        ...prev,
+        categories: updatedList,
+        navigation: updatedNav
+      };
+    });
+
+    showToast(language === 'ar' ? "تم حذف القسم بنجاح" : "Category deleted", "info");
+  };
+
   // Products CRUD
   const addProduct = (newProduct) => {
     const productWithId = {
@@ -383,6 +481,83 @@ export const StoreProvider = ({ children }) => {
     showToast(language === 'ar' ? "تمت إضافة طلب تجريبي جديد بنجاح!" : "Test order added!", "success");
   };
 
+  const updateOrderDetails = (orderId, updatedDetails) => {
+    setOrders(prev => prev.map(o => {
+      if (o.id === orderId) {
+        return {
+          ...o,
+          customer: {
+            ...o.customer,
+            ...(updatedDetails.customer || {})
+          },
+          status: updatedDetails.status !== undefined ? updatedDetails.status : o.status,
+          paymentMethod: updatedDetails.paymentMethod !== undefined ? updatedDetails.paymentMethod : o.paymentMethod,
+          total: updatedDetails.total !== undefined ? Number(updatedDetails.total) : o.total
+        };
+      }
+      return o;
+    }));
+    showToast(language === 'ar' ? "تم حفظ تعديلات الطلب بنجاح!" : "Order details saved!", "success");
+  };
+
+  const createManualOrder = (orderData) => {
+    const subtotal = Number(orderData.subtotal) || 0;
+    const shipping = Number(orderData.shipping) || 0;
+    const total = Number(orderData.total) || (subtotal + shipping);
+
+    const newOrder = {
+      id: orderData.id || `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+      customer: {
+        name: orderData.name || "عميل المتجر",
+        phone: orderData.phone || "",
+        address: orderData.address || "",
+        city: orderData.city || "Alexandria",
+        notes: orderData.notes || ""
+      },
+      items: orderData.items || [],
+      subtotal,
+      shipping,
+      total,
+      status: orderData.status || "Pending",
+      paymentMethod: orderData.paymentMethod || "الدفع عند الاستلام (COD)",
+      date: new Date().toISOString()
+    };
+    setOrders(prev => [newOrder, ...prev]);
+    showToast(language === 'ar' ? `تم إنشاء الطلب #${newOrder.id} بنجاح!` : `Manual order #${newOrder.id} created!`, "success");
+    return newOrder;
+  };
+
+  const exportOrdersCSV = () => {
+    if (orders.length === 0) {
+      alert(language === 'ar' ? "لا توجد طلبات لتصديرها" : "No orders to export");
+      return;
+    }
+
+    const headers = ["رقم الطلب", "التاريخ", "اسم العميل", "رقم الهاتف", "المحافظة", "العنوان", "المنتجات", "الإجمالي", "حالة الطلب", "طريقة الدفع"];
+    const rows = orders.map(o => [
+      o.id,
+      new Date(o.date).toLocaleDateString('ar-EG'),
+      `"${(o.customer?.name || '').replace(/"/g, '""')}"`,
+      `"${(o.customer?.phone || '').replace(/"/g, '""')}"`,
+      `"${(o.customer?.city || '').replace(/"/g, '""')}"`,
+      `"${(o.customer?.address || '').replace(/"/g, '""')}"`,
+      `"${(o.items || []).map(i => `${i.quantity}x ${i.name_ar || i.name} (${i.size})`).join('; ').replace(/"/g, '""')}"`,
+      o.total,
+      o.status,
+      `"${(o.paymentMethod || '').replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = "\uFEFF" + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `keswa-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast(language === 'ar' ? "تم تصدير ملف إكسل CSV للطلبات!" : "Exported orders to CSV!", "success");
+  };
+
   // Wishlist
   const toggleWishlist = (productId) => {
     setWishlist(prev => {
@@ -457,6 +632,9 @@ export const StoreProvider = ({ children }) => {
       updateBanner,
       updateSectionHeader,
       updateImage,
+      addCategory,
+      updateCategory,
+      deleteCategory,
       products,
       addProduct,
       updateProduct,
@@ -464,6 +642,9 @@ export const StoreProvider = ({ children }) => {
       orders,
       createOrder,
       updateOrderStatus,
+      updateOrderDetails,
+      createManualOrder,
+      exportOrdersCSV,
       deleteOrder,
       clearAllOrders,
       addTestOrder,
