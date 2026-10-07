@@ -57,6 +57,11 @@ export const StoreProvider = ({ children }) => {
             text_ar: cleanAnnText,
             link: '#shop'
           },
+          whatsapp: {
+            ...initialSiteContent.whatsapp,
+            ...(parsed.whatsapp || {}),
+            phone: parsed.whatsapp?.phone || parsed.footer?.whatsapp || initialSiteContent.whatsapp.phone
+          },
           categories: (parsed.categories && parsed.categories.length > 0) ? parsed.categories : initialSiteContent.categories,
           sectionsVisibility: {
             ...initialSiteContent.sectionsVisibility,
@@ -591,21 +596,85 @@ export const StoreProvider = ({ children }) => {
     showToast(language === 'ar' ? "تم حفظ وتثبيت روابط السوشيال ميديا بنجاح! 💾" : "Social media links saved! 💾", "success");
   };
 
+  const formatWhatsAppNumber = (phone) => {
+    if (!phone) return '';
+    let cleaned = String(phone).replace(/[^0-9]/g, '');
+    if (cleaned.startsWith('00')) {
+      cleaned = cleaned.substring(2);
+    }
+    // If Egyptian local number starting with 01 (010, 011, 012, 015)
+    if (cleaned.startsWith('01') && cleaned.length === 11) {
+      cleaned = '20' + cleaned.substring(1);
+    }
+    return cleaned;
+  };
+
+  const saveWhatsAppSettings = (whatsAppSettings) => {
+    setSiteContent(prev => {
+      const currentWhatsApp = prev.whatsapp || initialSiteContent.whatsapp;
+      const updatedWhatsApp = {
+        ...currentWhatsApp,
+        ...whatsAppSettings,
+        enabled: whatsAppSettings.enabled !== undefined ? Boolean(whatsAppSettings.enabled) : currentWhatsApp.enabled,
+        showFloatingButton: whatsAppSettings.showFloatingButton !== undefined ? Boolean(whatsAppSettings.showFloatingButton) : currentWhatsApp.showFloatingButton,
+        phone: whatsAppSettings.phone !== undefined ? whatsAppSettings.phone : currentWhatsApp.phone
+      };
+
+      const updated = {
+        ...prev,
+        whatsapp: updatedWhatsApp,
+        footer: {
+          ...prev.footer,
+          whatsapp: updatedWhatsApp.phone
+        }
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
+    showToast(language === 'ar' ? "تم حفظ وتثبيت إعدادات الواتساب بنجاح! 💾" : "WhatsApp settings saved! 💾", "success");
+  };
+
+  const toggleWhatsApp = (explicitValue) => {
+    setSiteContent(prev => {
+      const current = prev.whatsapp?.enabled !== false;
+      const nextVal = explicitValue !== undefined ? Boolean(explicitValue) : !current;
+      const updatedWhatsApp = {
+        ...(prev.whatsapp || initialSiteContent.whatsapp),
+        enabled: nextVal
+      };
+      const updated = {
+        ...prev,
+        whatsapp: updatedWhatsApp
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
+    showToast(language === 'ar' ? "تم تحديث حالة تفعيل الواتساب بنجاح!" : "WhatsApp toggle updated!", "info");
+  };
+
   const saveTexts = (sectionKey, textData) => {
     setSiteContent(prev => {
       const mergedSection = {
         ...prev[sectionKey],
         ...textData
       };
-      if (sectionKey === 'footer' && textData.social) {
-        mergedSection.social = {
-          ...prev.footer?.social,
-          ...textData.social
-        };
+      if (sectionKey === 'footer') {
+        if (textData.social) {
+          mergedSection.social = {
+            ...prev.footer?.social,
+            ...textData.social
+          };
+        }
       }
       const updated = {
         ...prev,
-        [sectionKey]: mergedSection
+        [sectionKey]: mergedSection,
+        ...(sectionKey === 'footer' && textData.whatsapp ? {
+          whatsapp: {
+            ...(prev.whatsapp || initialSiteContent.whatsapp),
+            phone: textData.whatsapp
+          }
+        } : {})
       };
       persistSiteContent(updated);
       return updated;
@@ -1097,6 +1166,9 @@ export const StoreProvider = ({ children }) => {
       saveTexts,
       saveSocialLinks,
       formatSocialUrl,
+      saveWhatsAppSettings,
+      toggleWhatsApp,
+      formatWhatsAppNumber,
       isCheckoutOpen,
       setIsCheckoutOpen,
       quickViewProduct,

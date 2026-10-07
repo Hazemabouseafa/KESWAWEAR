@@ -2,6 +2,7 @@ import React from 'react';
 import { useStore } from '../context/StoreContext';
 import { KeswaLogo } from './KeswaLogo';
 import { Phone, Mail, MapPin, ArrowUp } from 'lucide-react';
+import { WhatsAppIcon } from './FloatingWhatsApp';
 
 const InstagramIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -24,7 +25,7 @@ const TikTokIcon = () => (
 );
 
 export const Footer = () => {
-  const { siteContent, setActiveCategory, setIsTrackOrderOpen, getLocalized, language, t } = useStore();
+  const { siteContent, setActiveCategory, setIsTrackOrderOpen, getLocalized, language, formatWhatsAppNumber, t } = useStore();
   const { footer, brand } = siteContent;
 
   const scrollToTop = () => {
@@ -34,6 +35,20 @@ export const Footer = () => {
   const aboutText = getLocalized(footer, 'about');
   const copyrightText = getLocalized(footer, 'copyright');
   const addressText = getLocalized(footer, 'address');
+
+  const whatsappConfig = siteContent?.whatsapp || {
+    enabled: true,
+    phone: siteContent?.footer?.whatsapp || '01023456789',
+    message_ar: 'مرحباً KESWA WEAR، أود الاستفسار عن تفاصيل الطلب والمنتجات',
+    message_en: 'Hello KESWA WEAR, I would like to inquire about products and orders'
+  };
+  const isWhatsAppEnabled = whatsappConfig.enabled !== false;
+  const whatsappPhone = whatsappConfig.phone || footer?.whatsapp || '01023456789';
+  const cleanWhatsApp = formatWhatsAppNumber ? formatWhatsAppNumber(whatsappPhone) : whatsappPhone.replace(/[^0-9]/g, '');
+  const whatsappMsg = language === 'ar' 
+    ? (whatsappConfig.message_ar || 'مرحباً KESWA WEAR، أود الاستفسار عن تفاصيل الطلب والمنتجات')
+    : (whatsappConfig.message_en || 'Hello KESWA WEAR, I would like to inquire about products and orders');
+  const whatsappUrl = `https://wa.me/${cleanWhatsApp}?text=${encodeURIComponent(whatsappMsg)}`;
 
   return (
     <footer className="bg-[#070709] border-t border-white/10 pt-16 pb-12 text-gray-400">
@@ -114,6 +129,23 @@ export const Footer = () => {
                 <Phone size={13} className="text-gray-300 shrink-0" />
                 <span className="font-mono">{footer?.phone}</span>
               </li>
+              {isWhatsAppEnabled && cleanWhatsApp && (
+                <li className="flex items-center gap-2">
+                  <WhatsAppIcon size={14} className="text-emerald-400 shrink-0" />
+                  <a 
+                    href={whatsappUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="font-mono text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1.5"
+                    title={language === 'ar' ? 'تواصل عبر واتساب' : 'Chat on WhatsApp'}
+                  >
+                    <span>{whatsappPhone}</span>
+                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-sans font-bold">
+                      {language === 'ar' ? 'واتساب' : 'WhatsApp'}
+                    </span>
+                  </a>
+                </li>
+              )}
               <li className="flex items-center gap-2">
                 <Mail size={13} className="text-gray-300 shrink-0" />
                 <span className="font-mono">{footer?.email}</span>
@@ -131,6 +163,18 @@ export const Footer = () => {
               {language === 'ar' ? 'تابعنا على منصاتنا' : 'FOLLOW US'}
             </h4>
             <div className="flex gap-3 text-white">
+              {isWhatsAppEnabled && cleanWhatsApp && (
+                <a 
+                  href={whatsappUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="p-2 bg-neutral-900 border border-white/10 hover:border-emerald-500 text-emerald-400 hover:text-emerald-300 transition-colors" 
+                  aria-label="WhatsApp"
+                  title="WhatsApp"
+                >
+                  <WhatsAppIcon size={16} />
+                </a>
+              )}
               {footer?.social?.instagram && (
                 <a 
                   href={footer.social.instagram} 

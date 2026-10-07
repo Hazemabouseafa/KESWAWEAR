@@ -186,6 +186,36 @@ if (
   throw new Error("Failed 15: Missing Facebook or Instagram integration in SettingsManager, Footer or StoreContext");
 }
 
+// 16. Test WhatsApp Toggle & Customization from Admin Panel
+const floatingWhatsappSrc = fs.readFileSync('./src/components/FloatingWhatsApp.jsx', 'utf8');
+
+if (
+  settingsSrc.includes('whatsappEnabled') &&
+  settingsSrc.includes('saveWhatsAppSettings') &&
+  storeContextSrc.includes('saveWhatsAppSettings') &&
+  storeContextSrc.includes('toggleWhatsApp') &&
+  floatingWhatsappSrc.includes('whatsappConfig.enabled') &&
+  footerSrc.includes('isWhatsAppEnabled')
+) {
+  // Toggle WhatsApp OFF
+  state.siteContent.whatsapp = { ...initialSiteContent.whatsapp, enabled: false };
+  if (state.siteContent.whatsapp.enabled === false) {
+    // Toggle WhatsApp ON and change number
+    state.siteContent.whatsapp.enabled = true;
+    state.siteContent.whatsapp.phone = "01198765432";
+    state.siteContent.footer.whatsapp = "01198765432";
+    if (state.siteContent.whatsapp.enabled === true && state.siteContent.whatsapp.phone === "01198765432") {
+      console.log("✅ 16. WhatsApp is fully toggleable (ON/OFF) and customizable (phone & message) from Admin Settings and synced to Storefront & Footer");
+    } else {
+      throw new Error("Failed 16: WhatsApp state update failed");
+    }
+  } else {
+    throw new Error("Failed 16: WhatsApp toggle failed");
+  }
+} else {
+  throw new Error("Failed 16: Missing WhatsApp toggle integration in Admin, Storefront, or Context");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 15 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 16 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");

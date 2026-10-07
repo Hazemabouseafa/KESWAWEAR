@@ -17,6 +17,7 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { QuickViewModal } from './components/QuickViewModal';
 import { AdminPanel } from './admin/AdminPanel';
 import { TrackOrderModal } from './components/TrackOrderModal';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
@@ -274,6 +275,9 @@ export default function App() {
       <CheckoutModal />
       <QuickViewModal />
       <TrackOrderModal />
+
+      {/* 5. Floating WhatsApp Button (Toggleable from Admin) */}
+      <FloatingWhatsApp />
 
       {/* 5. Toast Notification Banner */}
       {notification && (

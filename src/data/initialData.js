@@ -236,6 +236,13 @@ export const initialSiteContent = {
     currency_en: "EGP",
     shippingCost: 50,
     freeShippingThreshold: 1500
+  },
+  whatsapp: {
+    enabled: true,
+    phone: "01023456789",
+    message_ar: "مرحباً KESWA WEAR، أود الاستفسار عن تفاصيل الطلب والمنتجات",
+    message_en: "Hello KESWA WEAR, I would like to inquire about products and orders",
+    showFloatingButton: true
   }
 };
 

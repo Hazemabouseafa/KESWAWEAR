@@ -11,6 +11,8 @@ export const TrackOrderModal = () => {
     isTrackOrderOpen, 
     setIsTrackOrderOpen, 
     orders, 
+    siteContent,
+    formatWhatsAppNumber,
     language, 
     t 
   } = useStore();
@@ -203,15 +205,17 @@ export const TrackOrderModal = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <a
-                        href={`https://wa.me/201012345678?text=${encodeURIComponent(`مرحباً KESWA WEAR، أستفسر عن طلبي رقم ${order.id}`)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded flex items-center gap-1 font-bold transition-colors"
-                      >
-                        <MessageSquare size={13} />
-                        <span>{language === 'ar' ? 'استفسار عبر واتساب' : 'WhatsApp Support'}</span>
-                      </a>
+                      {siteContent?.whatsapp?.enabled !== false && (
+                        <a
+                          href={`https://wa.me/${formatWhatsAppNumber ? formatWhatsAppNumber(siteContent?.whatsapp?.phone || siteContent?.footer?.whatsapp || '01023456789') : '201023456789'}?text=${encodeURIComponent(`مرحباً KESWA WEAR، أستفسر عن طلبي رقم ${order.id}`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded flex items-center gap-1 font-bold transition-colors"
+                        >
+                          <MessageSquare size={13} />
+                          <span>{language === 'ar' ? 'استفسار عبر واتساب' : 'WhatsApp Support'}</span>
+                        </a>
+                      )}
                     </div>
                   </div>
 

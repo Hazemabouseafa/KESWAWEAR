@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
-import { Layout, Save, CheckCircle2, Grid, Bookmark, Share2 } from 'lucide-react';
+import { Layout, Save, CheckCircle2, Grid, Bookmark, Share2, Phone, ToggleLeft, ToggleRight } from 'lucide-react';
+import { WhatsAppIcon } from '../components/FloatingWhatsApp';
 
 export const TextContentManager = () => {
   const { 
     siteContent, 
     saveTexts, 
     saveSocialLinks,
+    saveWhatsAppSettings,
     updateBanner, 
     updateSectionHeader, 
     showToast, 
@@ -143,6 +145,8 @@ export const TextContentManager = () => {
   const [footerAddress, setFooterAddress] = useState(
     textLangTab === 'ar' ? (siteContent.footer?.address_ar || '') : (siteContent.footer?.address_en || '')
   );
+  const [footerWhatsapp, setFooterWhatsapp] = useState(siteContent.whatsapp?.phone || siteContent.footer?.whatsapp || '01023456789');
+  const [whatsappEnabled, setWhatsappEnabled] = useState(siteContent.whatsapp?.enabled !== false);
   const [footerFacebook, setFooterFacebook] = useState(siteContent.footer?.social?.facebook || '');
   const [footerInstagram, setFooterInstagram] = useState(siteContent.footer?.social?.instagram || '');
   const [footerTiktok, setFooterTiktok] = useState(siteContent.footer?.social?.tiktok || '');
@@ -154,6 +158,13 @@ export const TextContentManager = () => {
       setFooterTiktok(siteContent.footer.social.tiktok || '');
     }
   }, [siteContent.footer?.social]);
+
+  useEffect(() => {
+    if (siteContent.whatsapp) {
+      setFooterWhatsapp(siteContent.whatsapp.phone || siteContent.footer?.whatsapp || '01023456789');
+      setWhatsappEnabled(siteContent.whatsapp.enabled !== false);
+    }
+  }, [siteContent.whatsapp]);
 
   // Switch Language subtab
   const handleSwitchTab = (tab) => {
@@ -367,6 +378,7 @@ export const TextContentManager = () => {
       [textLangTab === 'ar' ? 'about_ar' : 'about_en']: footerAbout,
       phone: footerPhone,
       email: footerEmail,
+      whatsapp: footerWhatsapp,
       [textLangTab === 'ar' ? 'address_ar' : 'address_en']: footerAddress,
       social: {
         facebook: footerFacebook,
@@ -378,6 +390,10 @@ export const TextContentManager = () => {
       facebook: footerFacebook,
       instagram: footerInstagram,
       tiktok: footerTiktok
+    });
+    saveWhatsAppSettings({
+      enabled: whatsappEnabled,
+      phone: footerWhatsapp
     });
     notifySaved('footer');
   };
@@ -974,6 +990,32 @@ export const TextContentManager = () => {
               value={footerPhone}
               onChange={(e) => setFooterPhone(e.target.value)}
               className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded font-mono"
+            />
+          </div>
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-gray-400 flex items-center gap-1">
+                <WhatsAppIcon size={12} className="text-emerald-400" />
+                <span>رقم الواتساب:</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setWhatsappEnabled(!whatsappEnabled)}
+                className={`text-[10px] px-2 py-0.5 rounded font-bold transition-colors cursor-pointer ${
+                  whatsappEnabled 
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' 
+                    : 'bg-neutral-800 text-gray-400 border border-white/10'
+                }`}
+              >
+                {whatsappEnabled ? '🟢 مفعل' : '⚪ معطل'}
+              </button>
+            </div>
+            <input 
+              type="text" 
+              placeholder="01023456789"
+              value={footerWhatsapp}
+              onChange={(e) => setFooterWhatsapp(e.target.value)}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded font-mono outline-none focus:border-emerald-400"
             />
           </div>
           <div>
