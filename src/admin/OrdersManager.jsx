@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { InvoiceModal } from '../components/InvoiceModal';
 import { 
@@ -244,7 +244,7 @@ export const OrdersManager = () => {
                   <div className="flex items-center gap-2">
                     <span className="font-mono font-black text-white text-base">#{order.id}</span>
                     <span className="text-[11px] font-mono text-gray-400 bg-neutral-900 px-2 py-0.5 rounded border border-white/5">
-                      {new Date(order.date || Date.now()).toLocaleDateString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}
+                      {new Date(order.date || Date.now()).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}
                     </span>
                   </div>
                   <div className="text-xs text-gray-300 mt-1">

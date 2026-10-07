@@ -169,17 +169,52 @@ export const AdminPanel = ({ onBackToStore }) => {
 
         {/* Content Body */}
         <main className="flex-1 bg-[#101015] p-6 lg:p-10 overflow-y-auto min-h-[calc(100vh-65px)]">
-          {adminTab === 'orders' && <OrdersManager />}
-          {adminTab === 'products' && <ProductsManager />}
-          {adminTab === 'categories' && <CategoriesManager />}
-          {adminTab === 'rows' && <RowsVisibilityManager />}
-          {adminTab === 'images' && <ImageLibraryManager />}
-          {adminTab === 'texts' && <TextContentManager />}
-          {adminTab === 'settings' && <SettingsManager />}
+          <AdminErrorBoundary>
+            {adminTab === 'orders' && <OrdersManager />}
+            {adminTab === 'products' && <ProductsManager />}
+            {adminTab === 'categories' && <CategoriesManager />}
+            {adminTab === 'rows' && <RowsVisibilityManager />}
+            {adminTab === 'images' && <ImageLibraryManager />}
+            {adminTab === 'texts' && <TextContentManager />}
+            {adminTab === 'settings' && <SettingsManager />}
+          </AdminErrorBoundary>
         </main>
 
       </div>
     </div>
   );
 };
+
+class AdminErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("Admin Error caught:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 bg-[#181822] border border-rose-500/30 rounded-lg text-center space-y-4 max-w-lg mx-auto my-12">
+          <div className="text-rose-400 font-bold text-base">حدث خطأ أثناء تحميل هذا القسم</div>
+          <p className="text-xs text-gray-400">
+            {this.state.error?.message || 'Unknown error'}
+          </p>
+          <button
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className="px-4 py-2 bg-white text-black font-bold text-xs rounded hover:bg-neutral-200 transition-colors"
+          >
+            إعادة المحاولة (Retry)
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default AdminPanel;

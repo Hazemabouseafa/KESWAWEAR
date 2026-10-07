@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { InvoiceModal } from './InvoiceModal';
 import { 
@@ -120,7 +120,7 @@ export const TrackOrderModal = () => {
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-black text-white text-base">#{order.id}</span>
                         <span className="text-[10px] font-mono text-gray-400 bg-neutral-900 px-2 py-0.5 rounded border border-white/5">
-                          {new Date(order.date || Date.now()).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                          {new Date(order.date || Date.now()).toLocaleString(language === 'ar' ? 'ar-EG' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' })}
                         </span>
                       </div>
                       <p className="text-xs text-gray-300 mt-1">
