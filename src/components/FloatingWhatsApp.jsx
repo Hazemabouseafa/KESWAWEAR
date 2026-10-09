@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useStore } from '../context/StoreContext';
 
 export const WhatsAppIcon = ({ size = 22, className = "" }) => (
@@ -48,20 +48,20 @@ export const FloatingWhatsApp = () => {
   return (
     <aside 
       aria-label={language === 'ar' ? 'تواصل عبر واتساب' : 'WhatsApp Support'} 
-      className="fixed bottom-5 start-5 sm:bottom-6 sm:start-6 z-40 animate-fadeIn select-none"
+      className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-50 animate-fadeIn select-none"
     >
-      <div className="relative group">
+      <div className="relative group flex items-center">
         {/* Pulse animated ring */}
-        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-35 animate-ping pointer-events-none"></span>
+        <span className="absolute -inset-1 rounded-full bg-[#25D366] opacity-40 animate-ping pointer-events-none"></span>
 
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="relative flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20ba5a] active:bg-[#1caa52] text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 group focus:outline-hidden focus:ring-2 focus:ring-[#25D366]/50"
+          className="relative flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20ba5a] active:bg-[#1caa52] text-white p-3.5 sm:px-4 sm:py-3 rounded-full shadow-[0_4px_25px_rgba(37,211,102,0.45)] transition-all duration-300 transform hover:scale-105 active:scale-95 group focus:outline-hidden focus:ring-4 focus:ring-[#25D366]/40"
           title={language === 'ar' ? 'تواصل معنا مباشرة عبر واتساب' : 'Chat with us on WhatsApp'}
         >
-          <WhatsAppIcon size={24} className="shrink-0 transition-transform group-hover:rotate-6" />
+          <WhatsAppIcon size={25} className="shrink-0 transition-transform group-hover:rotate-6 drop-shadow-sm" />
 
           {/* Desktop Call to Action Pill */}
           <span className="hidden sm:inline-block text-xs font-bold font-sans tracking-wide">

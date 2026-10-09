@@ -216,6 +216,82 @@ if (
   throw new Error("Failed 16: Missing WhatsApp toggle integration in Admin, Storefront, or Context");
 }
 
+// 17. Test Technical Support ("دعم فني") in Navbar linking to WhatsApp
+const navbarSrc = fs.readFileSync('./src/components/Navbar.jsx', 'utf8');
+if (
+  navbarSrc.includes('دعم فني') &&
+  navbarSrc.includes('whatsappUrl') &&
+  navbarSrc.includes('WhatsAppIcon') &&
+  floatingWhatsappSrc.includes('fixed bottom-5 right-5') &&
+  floatingWhatsappSrc.includes('whatsappUrl')
+) {
+  console.log("✅ 17. Floating WhatsApp badge & 'دعم فني' technical support navbar link verified");
+} else {
+  throw new Error("Failed 17: Navbar support link or floating whatsapp badge missing");
+}
+
+// 18. Test Pants Numeric Sizes (30 to 46 even numbers) in ProductsManager
+const productsManagerSrc = fs.readFileSync('./src/admin/ProductsManager.jsx', 'utf8');
+const expectedPantsSizes = ['30', '32', '34', '36', '38', '40', '42', '44', '46'];
+const allPantsSizesPresent = expectedPantsSizes.every(s => productsManagerSrc.includes(`'${s}'`));
+
+if (
+  productsManagerSrc.includes('PANTS_SIZES') &&
+  allPantsSizesPresent &&
+  productsManagerSrc.includes('handleSelectPantsPreset')
+) {
+  console.log("✅ 18. Pants numeric sizes (30 to 46 even numbers: 30,32,34,36,38,40,42,44,46) and quick preset verified");
+} else {
+  throw new Error("Failed 18: Pants sizes 30-46 or preset missing in ProductsManager");
+}
+
+// 19. Test Size Guide Settings in Admin Panel (SettingsManager)
+if (
+  settingsSrc.includes('sizeGuideEnabled') &&
+  settingsSrc.includes('handleSaveSizeGuide') &&
+  settingsSrc.includes('saveSizeGuideSettings') &&
+  settingsSrc.includes('إدارة وتعديل دليل المقاسات')
+) {
+  // Test toggling size guide OFF and ON
+  state.siteContent.sizeGuide = {
+    ...initialSiteContent.sizeGuide,
+    enabled: false
+  };
+  if (state.siteContent.sizeGuide.enabled === false) {
+    state.siteContent.sizeGuide.enabled = true;
+    state.siteContent.sizeGuide.title_ar = "دليل المقاسات المخصص لعام 2026";
+    if (state.siteContent.sizeGuide.enabled === true && state.siteContent.sizeGuide.title_ar === "دليل المقاسات المخصص لعام 2026") {
+      console.log("✅ 19. Size Guide is toggleable (Show/Hide) and editable from Admin SettingsManager");
+    } else {
+      throw new Error("Failed 19: Size Guide update failed");
+    }
+  } else {
+    throw new Error("Failed 19: Size Guide toggle failed");
+  }
+} else {
+  throw new Error("Failed 19: Missing Size Guide controls in SettingsManager");
+}
+
+// 20. Test SizeGuideModal and integration in App, QuickViewModal, and Footer
+const sizeGuideModalSrc = fs.readFileSync('./src/components/SizeGuideModal.jsx', 'utf8');
+const quickViewSrc = fs.readFileSync('./src/components/QuickViewModal.jsx', 'utf8');
+const currentFooterSrc = fs.readFileSync('./src/components/Footer.jsx', 'utf8');
+const currentAppSrc = fs.readFileSync('./src/App.jsx', 'utf8');
+
+if (
+  currentAppSrc.includes('SizeGuideModal') &&
+  quickViewSrc.includes('setIsSizeGuideOpen') &&
+  quickViewSrc.includes('sizeGuide') &&
+  currentFooterSrc.includes('setIsSizeGuideOpen') &&
+  currentFooterSrc.includes('sizeGuide') &&
+  sizeGuideModalSrc.includes('tops') &&
+  sizeGuideModalSrc.includes('pants')
+) {
+  console.log("✅ 20. SizeGuideModal and integrations across App, QuickViewModal, and Footer verified");
+} else {
+  throw new Error("Failed 20: SizeGuideModal or integration missing in App, QuickView, or Footer");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 16 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 20 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");

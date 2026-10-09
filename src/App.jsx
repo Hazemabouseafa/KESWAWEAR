@@ -15,6 +15,7 @@ import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { QuickViewModal } from './components/QuickViewModal';
+import { SizeGuideModal } from './components/SizeGuideModal';
 import { AdminPanel } from './admin/AdminPanel';
 import { TrackOrderModal } from './components/TrackOrderModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
@@ -274,6 +275,7 @@ export default function App() {
       <CartDrawer />
       <CheckoutModal />
       <QuickViewModal />
+      <SizeGuideModal />
       <TrackOrderModal />
 
       {/* 5. Floating WhatsApp Button (Toggleable from Admin) */}

@@ -3,7 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { 
   Settings, Save, CheckCircle2, Download, Upload, 
   RotateCcw, RefreshCw, Database, Share2, ExternalLink,
-  Phone, MessageSquare, ToggleLeft, ToggleRight
+  Phone, MessageSquare, ToggleLeft, ToggleRight, Ruler
 } from 'lucide-react';
 import { WhatsAppIcon } from '../components/FloatingWhatsApp';
 
@@ -35,6 +35,8 @@ export const SettingsManager = () => {
     saveWhatsAppSettings,
     toggleWhatsApp,
     formatWhatsAppNumber,
+    saveSizeGuideSettings,
+    setIsSizeGuideOpen,
     neonStatus, 
     neonDetails, 
     checkNeonConnection, 
@@ -65,6 +67,14 @@ export const SettingsManager = () => {
   const [whatsappMessageEn, setWhatsappMessageEn] = useState(siteContent.whatsapp?.message_en || 'Hello KESWA WEAR, I would like to inquire about products and orders');
   const [whatsappShowFloating, setWhatsappShowFloating] = useState(siteContent.whatsapp?.showFloatingButton !== false);
   const [isWhatsappSaved, setIsWhatsappSaved] = useState(false);
+
+  // Size Guide State & Visibility Toggle
+  const [sizeGuideEnabled, setSizeGuideEnabled] = useState(siteContent.sizeGuide?.enabled !== false);
+  const [sizeGuideTitleAr, setSizeGuideTitleAr] = useState(siteContent.sizeGuide?.title_ar || 'دليل المقاسات الستريت وير');
+  const [sizeGuideTitleEn, setSizeGuideTitleEn] = useState(siteContent.sizeGuide?.title_en || 'Streetwear Size Guide');
+  const [sizeGuideSubtitleAr, setSizeGuideSubtitleAr] = useState(siteContent.sizeGuide?.subtitle_ar || 'جميع مقاساتنا مصممة بقصة واسعة ومريحة (Oversized Fit). إذا كنت تفضل المقاس المظبوط (Regular Fit) ننصح باختيار مقاس أصغر بدرجة واحدة.');
+  const [sizeGuideSubtitleEn, setSizeGuideSubtitleEn] = useState(siteContent.sizeGuide?.subtitle_en || 'All garments are cut in our signature relaxed oversized fit. If you prefer a regular fit, consider sizing down.');
+  const [isSizeGuideSaved, setIsSizeGuideSaved] = useState(false);
 
   // Keep state synchronized if siteContent updates from Neon database or API
   useEffect(() => {
@@ -128,6 +138,29 @@ export const SettingsManager = () => {
     });
     setIsWhatsappSaved(true);
     setTimeout(() => setIsWhatsappSaved(false), 2500);
+  };
+
+  useEffect(() => {
+    if (siteContent.sizeGuide) {
+      setSizeGuideEnabled(siteContent.sizeGuide.enabled !== false);
+      setSizeGuideTitleAr(siteContent.sizeGuide.title_ar || 'دليل المقاسات الستريت وير');
+      setSizeGuideTitleEn(siteContent.sizeGuide.title_en || 'Streetwear Size Guide');
+      setSizeGuideSubtitleAr(siteContent.sizeGuide.subtitle_ar || '');
+      setSizeGuideSubtitleEn(siteContent.sizeGuide.subtitle_en || '');
+    }
+  }, [siteContent.sizeGuide]);
+
+  const handleSaveSizeGuide = (e) => {
+    e.preventDefault();
+    saveSizeGuideSettings({
+      enabled: sizeGuideEnabled,
+      title_ar: sizeGuideTitleAr,
+      title_en: sizeGuideTitleEn,
+      subtitle_ar: sizeGuideSubtitleAr,
+      subtitle_en: sizeGuideSubtitleEn
+    });
+    setIsSizeGuideSaved(true);
+    setTimeout(() => setIsSizeGuideSaved(false), 2500);
   };
 
   const handleFileImport = (e) => {
@@ -521,6 +554,136 @@ export const SettingsManager = () => {
               }}
               className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded text-xs outline-none focus:border-emerald-400"
             />
+          </div>
+        </div>
+      </form>
+
+      {/* Size Guide Management & Toggle Card */}
+      <form onSubmit={handleSaveSizeGuide} className="bg-[#16161f] border border-amber-500/30 p-3.5 sm:p-5 rounded-lg space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
+          <div>
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Ruler size={18} className="text-amber-400 shrink-0" />
+              <span>إدارة وتعديل دليل المقاسات (Size Guide Manager)</span>
+            </h3>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              التحكم في إظهار أو إخفاء دليل المقاسات في واجهة المتجر والفوتر وتفاصيل المنتج، وتعديل العناوين وملاحظات القصة الستريت وير.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsSizeGuideOpen(true)}
+              className="bg-neutral-800 hover:bg-neutral-700 text-amber-300 border border-amber-500/30 text-xs px-3 py-2 rounded flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <span>👁️</span>
+              <span>معاينة دليل المقاسات</span>
+            </button>
+            <button
+              type="submit"
+              className={`w-full sm:w-auto text-xs px-4 py-2.5 rounded flex items-center justify-center gap-1.5 font-bold transition-all shadow-md touch-manipulation cursor-pointer ${
+                isSizeGuideSaved 
+                  ? 'bg-amber-400 text-black font-black' 
+                  : 'bg-amber-500 hover:bg-amber-400 text-black font-black'
+              }`}
+            >
+              {isSizeGuideSaved ? <CheckCircle2 size={14} /> : <Save size={14} />}
+              <span>{isSizeGuideSaved ? '✓ تم الحفظ والتثبيت!' : '💾 حفظ وتثبيت إعدادات دليل المقاسات'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Toggle Controls */}
+        <div className="p-3 bg-neutral-900/60 rounded border border-white/5">
+          <div className="flex items-center justify-between p-2.5 bg-neutral-800/80 rounded border border-white/5">
+            <div>
+              <span className="text-xs font-bold text-white block">حالة ظهور دليل المقاسات في المتجر (Size Guide Visibility):</span>
+              <span className="text-[11px] text-gray-400">
+                {sizeGuideEnabled 
+                  ? '🟢 ظاهر (مفعل في المتجر، ويظهر زر "دليل المقاسات" في نافذة المنتج وسريعة المعاينة والفوتر)' 
+                  : '⚪ مخفي (معطل ومخفي بالكامل من المتجر والفوتر وصفحات المنتجات)'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setSizeGuideEnabled(!sizeGuideEnabled);
+                setIsSizeGuideSaved(false);
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer touch-manipulation ${
+                sizeGuideEnabled 
+                  ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/20 font-black' 
+                  : 'bg-neutral-700 text-gray-400'
+              }`}
+            >
+              {sizeGuideEnabled ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+              <span>{sizeGuideEnabled ? 'ظاهر (مفعل)' : 'مخفي (معطل)'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Titles & Texts */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs">
+          <div className="space-y-1">
+            <label className="text-gray-300 font-bold block">عنوان دليل المقاسات (بالعربية):</label>
+            <input 
+              type="text" 
+              value={sizeGuideTitleAr}
+              onChange={(e) => {
+                setSizeGuideTitleAr(e.target.value);
+                setIsSizeGuideSaved(false);
+              }}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded text-xs outline-none focus:border-amber-400 font-bold"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-gray-300 font-bold block">العنوان بالإنجليزية (English Title):</label>
+            <input 
+              type="text" 
+              value={sizeGuideTitleEn}
+              onChange={(e) => {
+                setSizeGuideTitleEn(e.target.value);
+                setIsSizeGuideSaved(false);
+              }}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded text-xs outline-none focus:border-amber-400 font-mono"
+            />
+          </div>
+
+          <div className="sm:col-span-2 space-y-1">
+            <label className="text-gray-300 font-bold block">ملاحظة القصة وإرشادات المقاس بالعربية (Fit Advice):</label>
+            <textarea 
+              rows={2}
+              value={sizeGuideSubtitleAr}
+              onChange={(e) => {
+                setSizeGuideSubtitleAr(e.target.value);
+                setIsSizeGuideSaved(false);
+              }}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded text-xs outline-none focus:border-amber-400 leading-relaxed font-sans"
+            />
+          </div>
+
+          <div className="sm:col-span-2 space-y-1">
+            <label className="text-gray-300 font-bold block">إرشادات المقاس بالإنجليزية (English Fit Advice):</label>
+            <textarea 
+              rows={2}
+              value={sizeGuideSubtitleEn}
+              onChange={(e) => {
+                setSizeGuideSubtitleEn(e.target.value);
+                setIsSizeGuideSaved(false);
+              }}
+              className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded text-xs outline-none focus:border-amber-400 leading-relaxed font-sans"
+            />
+          </div>
+        </div>
+
+        {/* Info Box about Covered Sizing */}
+        <div className="p-3 bg-neutral-900/80 rounded border border-white/5 flex items-center justify-between text-xs text-gray-300">
+          <div className="flex items-center gap-2">
+            <span className="text-base">📐</span>
+            <span>
+              يتضمن دليل المقاسات جداول تفصيلية لكافة هوديز وتيشرتات المتجر (S إلى 3XL) ومقاسات البنطلونات بالأعداد الزوجية من 30 إلى 46.
+            </span>
           </div>
         </div>
       </form>

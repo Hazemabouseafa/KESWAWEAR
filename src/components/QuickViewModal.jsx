@@ -11,7 +11,9 @@ export const QuickViewModal = () => {
     toggleWishlist,
     language,
     t,
-    getLocalized 
+    getLocalized,
+    siteContent,
+    setIsSizeGuideOpen
   } = useStore();
 
   const [selectedImage, setSelectedImage] = useState(0);
@@ -148,9 +150,21 @@ export const QuickViewModal = () => {
               {/* Sizes */}
               {quickViewProduct.sizes && (
                 <div>
-                  <span className="text-[11px] font-sans text-gray-400 block mb-2">
-                    {t('quickView.selectSize')}
-                  </span>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-sans text-gray-400">
+                      {t('quickView.selectSize')}
+                    </span>
+                    {siteContent?.sizeGuide?.enabled !== false && (
+                      <button
+                        type="button"
+                        onClick={() => setIsSizeGuideOpen(true)}
+                        className="text-[11px] text-amber-400 hover:text-amber-300 underline font-sans flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <span>📐</span>
+                        <span>{language === 'ar' ? 'دليل المقاسات' : 'Size Guide'}</span>
+                      </button>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {quickViewProduct.sizes.map(size => (
                       <button

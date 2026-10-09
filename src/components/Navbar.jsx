@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { KeswaLogo } from './KeswaLogo';
+import { WhatsAppIcon } from './FloatingWhatsApp';
 import { ShoppingBag, Search, Heart, Sliders, Menu, X, Globe } from 'lucide-react';
 
 export const Navbar = () => {
@@ -16,6 +17,7 @@ export const Navbar = () => {
     toggleLanguage,
     t,
     getLocalized,
+    formatWhatsAppNumber,
     setIsTrackOrderOpen
   } = useStore();
 
@@ -36,6 +38,19 @@ export const Navbar = () => {
 
   const isAnnouncementVisible = sectionsVisibility?.announcement !== false && announcement?.enabled;
   const announcementText = getLocalized(announcement, 'text');
+
+  const whatsappConfig = siteContent?.whatsapp || {
+    enabled: true,
+    phone: siteContent?.footer?.whatsapp || '01023456789',
+    message_ar: 'مرحباً KESWA WEAR، أود التواصل مع الدعم الفني للاستفسار عن المنتجات والطلبات',
+    message_en: 'Hello KESWA WEAR, I need technical support'
+  };
+  const phone = whatsappConfig.phone || siteContent?.footer?.whatsapp || '01023456789';
+  const cleanPhone = formatWhatsAppNumber ? formatWhatsAppNumber(phone) : phone.replace(/[^0-9]/g, '');
+  const supportMessage = language === 'ar' 
+    ? (whatsappConfig.message_ar || 'مرحباً KESWA WEAR، أود التواصل مع الدعم الفني') 
+    : (whatsappConfig.message_en || 'Hello KESWA WEAR, I need technical support');
+  const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(supportMessage)}`;
 
   return (
     <header className="sticky top-0 z-40 w-full shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
@@ -71,6 +86,20 @@ export const Navbar = () => {
                   </button>
                 );
               })}
+
+              {/* WhatsApp Support Button "دعم فني" */}
+              {whatsappConfig.enabled !== false && (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 rounded-full transition-all duration-200 shadow-2xs group"
+                  title={language === 'ar' ? 'تواصل مع الدعم الفني عبر واتساب' : 'Contact Support on WhatsApp'}
+                >
+                  <WhatsAppIcon size={14} className="text-[#25D366] shrink-0 group-hover:scale-110 transition-transform" />
+                  <span>{language === 'ar' ? 'دعم فني' : 'Support'}</span>
+                </a>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -200,6 +229,24 @@ export const Navbar = () => {
                     {getLocalized(item, 'label')}
                   </button>
                 ))}
+
+                {whatsappConfig.enabled !== false && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between w-full py-2.5 px-2 text-sm font-bold text-emerald-700 hover:bg-emerald-50 rounded transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <WhatsAppIcon size={16} className="text-[#25D366]" />
+                      <span>{language === 'ar' ? 'دعم فني' : 'Technical Support'}</span>
+                    </div>
+                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-sans font-bold">
+                      واتساب
+                    </span>
+                  </a>
+                )}
               </div>
 
               {/* Quick Customer Links */}
@@ -226,6 +273,19 @@ export const Navbar = () => {
                   <Heart size={14} className="text-red-500" />
                   <span>{language === 'ar' ? 'المفضلة' : 'Wishlist'} ({wishlist.length})</span>
                 </button>
+
+                {whatsappConfig.enabled !== false && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="col-span-2 flex items-center justify-center gap-2 py-2.5 px-3 bg-emerald-500/10 border border-emerald-500/30 text-xs font-bold text-emerald-700 rounded shadow-xs hover:bg-emerald-500/20 transition-colors"
+                  >
+                    <WhatsAppIcon size={16} className="text-[#25D366]" />
+                    <span>{language === 'ar' ? 'دعم فني عبر واتساب' : 'Technical Support (WhatsApp)'}</span>
+                  </a>
+                )}
               </div>
 
               {/* Language Switcher in Mobile Drawer */}

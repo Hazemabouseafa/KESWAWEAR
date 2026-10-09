@@ -6,6 +6,9 @@ import {
   Check, AlertCircle, Image as ImageIcon, DollarSign
 } from 'lucide-react';
 
+export const STANDARD_SIZES = ['S', 'M', 'L', 'XL', 'XXL', '3XL', 'Oversized'];
+export const PANTS_SIZES = ['30', '32', '34', '36', '38', '40', '42', '44', '46'];
+
 export const ProductsManager = () => {
   const { 
     products, 
@@ -24,6 +27,7 @@ export const ProductsManager = () => {
   // Modals state
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState(null);
+  const [customSizeInput, setCustomSizeInput] = useState('');
 
   const [productForm, setProductForm] = useState({
     name_ar: '',
@@ -42,6 +46,40 @@ export const ProductsManager = () => {
       { name_ar: 'رمادي', name_en: 'Grey', hex: '#888888' }
     ]
   });
+
+  const handleSelectPantsPreset = () => {
+    setProductForm(prev => ({
+      ...prev,
+      sizes: [...PANTS_SIZES]
+    }));
+  };
+
+  const handleSelectStandardPreset = () => {
+    setProductForm(prev => ({
+      ...prev,
+      sizes: ['S', 'M', 'L', 'XL', 'XXL', '3XL']
+    }));
+  };
+
+  const handleClearSizes = () => {
+    setProductForm(prev => ({
+      ...prev,
+      sizes: []
+    }));
+  };
+
+  const handleAddCustomSize = (e) => {
+    e.preventDefault();
+    if (!customSizeInput.trim()) return;
+    const clean = customSizeInput.trim().toUpperCase();
+    if (!productForm.sizes.includes(clean)) {
+      setProductForm(prev => ({
+        ...prev,
+        sizes: [...prev.sizes, clean]
+      }));
+    }
+    setCustomSizeInput('');
+  };
 
   const handleOpenAddProduct = () => {
     const defaultCat = (categories && categories[0]?.id) || 'hoodies';
@@ -316,7 +354,18 @@ export const ProductsManager = () => {
                   <label className="block text-gray-300 mb-1">القسم / التصنيف *</label>
                   <select
                     value={productForm.category}
-                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    onChange={(e) => {
+                      const newCat = e.target.value;
+                      setProductForm(prev => {
+                        const isPants = newCat === 'sweatpants' || newCat.includes('pant');
+                        const hasOnlyDefaultTops = prev.sizes.length === 4 && prev.sizes.every(s => ['S', 'M', 'L', 'XL'].includes(s));
+                        return {
+                          ...prev,
+                          category: newCat,
+                          sizes: (isPants && hasOnlyDefaultTops) ? [...PANTS_SIZES] : prev.sizes
+                        };
+                      });
+                    }}
                     className="w-full bg-neutral-900 border border-white/15 px-3 py-2 text-white rounded outline-none focus:border-white"
                   >
                     {categories.map(c => (
@@ -346,25 +395,123 @@ export const ProductsManager = () => {
                 </div>
               </div>
 
-              {/* Sizes Selection */}
-              <div>
-                <label className="block text-gray-300 mb-1.5">المقاسات المتاحة:</label>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {['S', 'M', 'L', 'XL', 'XXL', 'Oversized'].map(size => {
-                    const active = productForm.sizes.includes(size);
-                    return (
-                      <button
-                        type="button"
-                        key={size}
-                        onClick={() => handleToggleSize(size)}
-                        className={`px-3 py-1.5 rounded font-mono font-bold text-xs transition-colors border touch-manipulation ${
-                          active ? 'bg-white text-black border-white' : 'bg-neutral-900 text-gray-400 border-white/15 hover:border-white/40'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    );
-                  })}
+              {/* Sizes Selection with Pants (30-46 Even Numbers) & Standard Clothing */}
+              <div className="space-y-3 bg-neutral-900/60 p-3 rounded border border-white/10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2">
+                  <div>
+                    <label className="text-gray-200 font-bold block text-xs">
+                      المقاسات المتاحة للمنتج:
+                    </label>
+                    <span className="text-[11px] text-gray-400">
+                      المحددة ({productForm.sizes.length}): <strong className="text-white font-mono">{productForm.sizes.join(', ') || 'لم يتم تحديد أي مقاس'}</strong>
+                    </span>
+                  </div>
+
+                  {/* Quick Presets */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={handleSelectPantsPreset}
+                      className="px-2.5 py-1 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                      title="تحديد مقاسات البنطلونات 30، 32، 34، 36، 38، 40، 42، 44، 46"
+                    >
+                      👖 مقاسات بناطيل (30 - 46)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSelectStandardPreset}
+                      className="px-2.5 py-1 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                      title="تحديد المقاسات العادية S، M، L، XL، XXL، 3XL"
+                    >
+                      👕 مقاسات عادية (S - 3XL)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleClearSizes}
+                      className="px-2 py-1 bg-neutral-800 hover:bg-neutral-700 text-gray-400 rounded text-[11px] transition-colors cursor-pointer"
+                      title="إلغاء تحديد كافة المقاسات"
+                    >
+                      مسح
+                    </button>
+                  </div>
+                </div>
+
+                {/* Pants Numeric Sizes (30 to 46 Even Numbers) */}
+                <div>
+                  <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1.5 mb-1.5">
+                    <span>👖</span>
+                    <span>مقاسات البنطلونات والسويت بانتس (أعداد زوجية 30 إلى 46):</span>
+                  </span>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {PANTS_SIZES.map(size => {
+                      const active = productForm.sizes.includes(size);
+                      return (
+                        <button
+                          type="button"
+                          key={size}
+                          onClick={() => handleToggleSize(size)}
+                          className={`min-w-9 px-2.5 py-1.5 rounded font-mono font-bold text-xs transition-all border touch-manipulation cursor-pointer ${
+                            active 
+                              ? 'bg-amber-400 text-black border-amber-400 shadow-sm font-black scale-105' 
+                              : 'bg-neutral-900 text-gray-300 border-white/15 hover:border-white/40'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Regular Clothing Sizes */}
+                <div>
+                  <span className="text-[11px] font-bold text-cyan-400 flex items-center gap-1.5 mb-1.5">
+                    <span>👕</span>
+                    <span>مقاسات الملابس العادية (هوديز وتيشرتات):</span>
+                  </span>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {STANDARD_SIZES.map(size => {
+                      const active = productForm.sizes.includes(size);
+                      return (
+                        <button
+                          type="button"
+                          key={size}
+                          onClick={() => handleToggleSize(size)}
+                          className={`px-3 py-1.5 rounded font-mono font-bold text-xs transition-all border touch-manipulation cursor-pointer ${
+                            active 
+                              ? 'bg-white text-black border-white shadow-sm font-black scale-105' 
+                              : 'bg-neutral-900 text-gray-400 border-white/15 hover:border-white/40'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Custom Size Addition */}
+                <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+                  <input 
+                    type="text"
+                    placeholder="أو اكتب مقاس مخصص (مثل: 48 أو XS)..."
+                    value={customSizeInput}
+                    onChange={(e) => setCustomSizeInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddCustomSize(e);
+                      }
+                    }}
+                    className="bg-neutral-900 border border-white/15 px-2.5 py-1 text-xs text-white rounded outline-none focus:border-white flex-1 font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomSize}
+                    className="px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold rounded border border-white/10 cursor-pointer"
+                  >
+                    + إضافة
+                  </button>
                 </div>
               </div>
 

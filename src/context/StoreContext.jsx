@@ -62,6 +62,10 @@ export const StoreProvider = ({ children }) => {
             ...(parsed.whatsapp || {}),
             phone: parsed.whatsapp?.phone || parsed.footer?.whatsapp || initialSiteContent.whatsapp.phone
           },
+          sizeGuide: {
+            ...initialSiteContent.sizeGuide,
+            ...(parsed.sizeGuide || {})
+          },
           categories: (parsed.categories && parsed.categories.length > 0) ? parsed.categories : initialSiteContent.categories,
           sectionsVisibility: {
             ...initialSiteContent.sectionsVisibility,
@@ -149,6 +153,7 @@ export const StoreProvider = ({ children }) => {
   const [isTrackOrderOpen, setIsTrackOrderOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [notification, setNotification] = useState(null);
@@ -650,6 +655,24 @@ export const StoreProvider = ({ children }) => {
       return updated;
     });
     showToast(language === 'ar' ? "تم تحديث حالة تفعيل الواتساب بنجاح!" : "WhatsApp toggle updated!", "info");
+  };
+
+  const saveSizeGuideSettings = (sizeGuideSettings) => {
+    setSiteContent(prev => {
+      const currentGuide = prev.sizeGuide || initialSiteContent.sizeGuide;
+      const updatedGuide = {
+        ...currentGuide,
+        ...sizeGuideSettings,
+        enabled: sizeGuideSettings.enabled !== undefined ? Boolean(sizeGuideSettings.enabled) : currentGuide.enabled
+      };
+      const updated = {
+        ...prev,
+        sizeGuide: updatedGuide
+      };
+      persistSiteContent(updated);
+      return updated;
+    });
+    showToast(language === 'ar' ? "تم حفظ وتثبيت إعدادات دليل المقاسات! 📐" : "Size guide settings saved! 📐", "success");
   };
 
   const saveTexts = (sectionKey, textData) => {
@@ -1169,6 +1192,9 @@ export const StoreProvider = ({ children }) => {
       saveWhatsAppSettings,
       toggleWhatsApp,
       formatWhatsAppNumber,
+      isSizeGuideOpen,
+      setIsSizeGuideOpen,
+      saveSizeGuideSettings,
       isCheckoutOpen,
       setIsCheckoutOpen,
       quickViewProduct,

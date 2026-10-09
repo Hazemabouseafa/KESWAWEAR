@@ -243,6 +243,32 @@ export const initialSiteContent = {
     message_ar: "مرحباً KESWA WEAR، أود الاستفسار عن تفاصيل الطلب والمنتجات",
     message_en: "Hello KESWA WEAR, I would like to inquire about products and orders",
     showFloatingButton: true
+  },
+  sizeGuide: {
+    enabled: true,
+    title_ar: "دليل المقاسات الستريت وير",
+    title_en: "Streetwear Size Guide",
+    subtitle_ar: "جميع مقاساتنا مصممة بقصة واسعة ومريحة (Oversized Fit). إذا كنت تفضل المقاس المظبوط (Regular Fit) ننصح باختيار مقاس أصغر بدرجة واحدة.",
+    subtitle_en: "All garments are cut in our signature relaxed oversized fit. If you prefer a regular fit, consider sizing down.",
+    tops: [
+      { size: 'S', chest: '58 سم', length: '70 سم', shoulder: '52 سم' },
+      { size: 'M', chest: '61 سم', length: '72 سم', shoulder: '54 سم' },
+      { size: 'L', chest: '64 سم', length: '74 سم', shoulder: '56 سم' },
+      { size: 'XL', chest: '67 سم', length: '76 سم', shoulder: '58 سم' },
+      { size: 'XXL', chest: '70 سم', length: '78 سم', shoulder: '60 سم' },
+      { size: '3XL', chest: '73 سم', length: '80 سم', shoulder: '62 سم' }
+    ],
+    pants: [
+      { size: '30', waist: '76-80 سم', length: '102 سم', thigh: '62 سم' },
+      { size: '32', waist: '81-85 سم', length: '104 سم', thigh: '64 سم' },
+      { size: '34', waist: '86-90 سم', length: '106 سم', thigh: '66 سم' },
+      { size: '36', waist: '91-95 سم', length: '108 سم', thigh: '68 سم' },
+      { size: '38', waist: '96-100 سم', length: '110 سم', thigh: '70 سم' },
+      { size: '40', waist: '101-105 سم', length: '112 سم', thigh: '72 سم' },
+      { size: '42', waist: '106-110 سم', length: '114 سم', thigh: '74 سم' },
+      { size: '44', waist: '111-115 سم', length: '116 سم', thigh: '76 سم' },
+      { size: '46', waist: '116-120 سم', length: '118 سم', thigh: '78 سم' }
+    ]
   }
 };
 

@@ -25,7 +25,7 @@ const TikTokIcon = () => (
 );
 
 export const Footer = () => {
-  const { siteContent, setActiveCategory, setIsTrackOrderOpen, getLocalized, language, formatWhatsAppNumber, t } = useStore();
+  const { siteContent, setActiveCategory, setIsTrackOrderOpen, setIsSizeGuideOpen, getLocalized, language, formatWhatsAppNumber, t } = useStore();
   const { footer, brand } = siteContent;
 
   const scrollToTop = () => {
@@ -111,7 +111,15 @@ export const Footer = () => {
             <ul className="space-y-2">
               <li className="hover:text-white transition-colors cursor-pointer">{t('footer.shippingPolicy')}</li>
               <li className="hover:text-white transition-colors cursor-pointer">{t('footer.returnPolicy')}</li>
-              <li className="hover:text-white transition-colors cursor-pointer">{t('footer.sizeGuide')}</li>
+              {siteContent?.sizeGuide?.enabled !== false && (
+                <li 
+                  onClick={() => setIsSizeGuideOpen(true)}
+                  className="hover:text-white transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <span>📐</span>
+                  <span>{t('footer.sizeGuide')}</span>
+                </li>
+              )}
               <li onClick={() => setIsTrackOrderOpen(true)} className="hover:text-amber-300 text-amber-400 font-bold transition-colors cursor-pointer flex items-center gap-1.5">
                 <span>📦</span>
                 <span>{t('footer.trackOrder')}</span>
