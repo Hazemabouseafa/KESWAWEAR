@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { ImageUploader } from '../components/ImageUploader';
-import { Image as ImageIcon, Save, CheckCircle2 } from 'lucide-react';
+import { Image as ImageIcon, Save, CheckCircle2, Trash2 } from 'lucide-react';
 
 export const ImageLibraryManager = () => {
   const { siteContent, updateBanner, showToast, language } = useStore();
@@ -18,13 +18,23 @@ export const ImageLibraryManager = () => {
   const [savedBanner, setSavedBanner] = useState(null);
 
   const handleSaveHeroBanner = (bannerKey, imgUrl) => {
+    if (bannerKey === 'heroHoodies') setHoodiesBg(imgUrl);
+    if (bannerKey === 'heroTshirts') setTshirtsBg(imgUrl);
+    if (bannerKey === 'heroSweatpants') setSweatpantsBg(imgUrl);
     updateBanner(bannerKey, { image: imgUrl, bgImage: imgUrl });
     setSavedBanner(bannerKey);
     setTimeout(() => setSavedBanner(null), 2500);
-    showToast(language === 'ar' ? 'تم حفظ وتحديث صورة البنر بالواجهة بنجاح! 💾' : 'Banner image saved! 💾', 'success');
+    showToast(language === 'ar' ? (imgUrl ? 'تم حفظ وتحديث صورة البنر بالواجهة بنجاح! 💾' : 'تم حذف صورة البنر بنجاح! 🗑️') : 'Banner image updated! 💾', 'success');
+  };
+
+  const handleDeleteHeroBanner = (bannerKey) => {
+    handleSaveHeroBanner(bannerKey, '');
   };
 
   const handleSaveGridCard = (cardKey, imgUrl) => {
+    if (cardKey === 'card1') setCard1Img(imgUrl);
+    if (cardKey === 'card2') setCard2Img(imgUrl);
+    if (cardKey === 'card3') setCard3Img(imgUrl);
     const currentGrid = banners.categoryGrid || {};
     const updatedCard = {
       ...(currentGrid[cardKey] || {}),
@@ -37,7 +47,11 @@ export const ImageLibraryManager = () => {
     });
     setSavedBanner(cardKey);
     setTimeout(() => setSavedBanner(null), 2500);
-    showToast(language === 'ar' ? 'تم حفظ وتحديث صورة الكارت بالواجهة بنجاح! 💾' : 'Card image saved! 💾', 'success');
+    showToast(language === 'ar' ? (imgUrl ? 'تم حفظ وتحديث صورة الكارت بالواجهة بنجاح! 💾' : 'تم حذف صورة الكارت بنجاح! 🗑️') : 'Card image updated! 💾', 'success');
+  };
+
+  const handleDeleteGridCard = (cardKey) => {
+    handleSaveGridCard(cardKey, '');
   };
 
   return (
@@ -61,21 +75,33 @@ export const ImageLibraryManager = () => {
           <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">بنر الهوديز الرئيسي</h4>
-              <button
-                onClick={() => handleSaveHeroBanner('heroHoodies', hoodiesBg)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
-                  savedBanner === 'heroHoodies' 
-                    ? 'bg-emerald-500 text-black font-black' 
-                    : 'bg-white hover:bg-neutral-200 text-black'
-                }`}
-              >
-                {savedBanner === 'heroHoodies' ? <CheckCircle2 size={13} /> : <Save size={13} />}
-                <span>{savedBanner === 'heroHoodies' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {hoodiesBg && (
+                  <button
+                    onClick={() => handleDeleteHeroBanner('heroHoodies')}
+                    className="text-xs px-2.5 py-1.5 rounded flex items-center gap-1 font-bold transition-all bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 touch-manipulation"
+                    title="حذف صورة البنر نهائياً"
+                  >
+                    <Trash2 size={13} />
+                    <span>حذف</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => handleSaveHeroBanner('heroHoodies', hoodiesBg)}
+                  className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
+                    savedBanner === 'heroHoodies' 
+                      ? 'bg-emerald-500 text-black font-black' 
+                      : 'bg-white hover:bg-neutral-200 text-black'
+                  }`}
+                >
+                  {savedBanner === 'heroHoodies' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+                  <span>{savedBanner === 'heroHoodies' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
+                </button>
+              </div>
             </div>
             <ImageUploader 
               value={hoodiesBg}
-              onChange={(url) => setHoodiesBg(url)}
+              onChange={(url) => handleSaveHeroBanner('heroHoodies', url)}
               label="رفع صورة بنر الهوديز:"
               previewHeight="h-32 sm:h-36"
             />
@@ -85,21 +111,33 @@ export const ImageLibraryManager = () => {
           <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">بنر التيشرتات الصيفي</h4>
-              <button
-                onClick={() => handleSaveHeroBanner('heroTshirts', tshirtsBg)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
-                  savedBanner === 'heroTshirts' 
-                    ? 'bg-emerald-500 text-black font-black' 
-                    : 'bg-white hover:bg-neutral-200 text-black'
-                }`}
-              >
-                {savedBanner === 'heroTshirts' ? <CheckCircle2 size={13} /> : <Save size={13} />}
-                <span>{savedBanner === 'heroTshirts' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {tshirtsBg && (
+                  <button
+                    onClick={() => handleDeleteHeroBanner('heroTshirts')}
+                    className="text-xs px-2.5 py-1.5 rounded flex items-center gap-1 font-bold transition-all bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 touch-manipulation"
+                    title="حذف صورة البنر نهائياً"
+                  >
+                    <Trash2 size={13} />
+                    <span>حذف</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => handleSaveHeroBanner('heroTshirts', tshirtsBg)}
+                  className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
+                    savedBanner === 'heroTshirts' 
+                      ? 'bg-emerald-500 text-black font-black' 
+                      : 'bg-white hover:bg-neutral-200 text-black'
+                  }`}
+                >
+                  {savedBanner === 'heroTshirts' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+                  <span>{savedBanner === 'heroTshirts' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
+                </button>
+              </div>
             </div>
             <ImageUploader 
               value={tshirtsBg}
-              onChange={(url) => setTshirtsBg(url)}
+              onChange={(url) => handleSaveHeroBanner('heroTshirts', url)}
               label="رفع صورة بنر التيشرتات:"
               previewHeight="h-32 sm:h-36"
             />
@@ -109,21 +147,33 @@ export const ImageLibraryManager = () => {
           <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">بنر السويت بانتس الحضري</h4>
-              <button
-                onClick={() => handleSaveHeroBanner('heroSweatpants', sweatpantsBg)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
-                  savedBanner === 'heroSweatpants' 
-                    ? 'bg-emerald-500 text-black font-black' 
-                    : 'bg-white hover:bg-neutral-200 text-black'
-                }`}
-              >
-                {savedBanner === 'heroSweatpants' ? <CheckCircle2 size={13} /> : <Save size={13} />}
-                <span>{savedBanner === 'heroSweatpants' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {sweatpantsBg && (
+                  <button
+                    onClick={() => handleDeleteHeroBanner('heroSweatpants')}
+                    className="text-xs px-2.5 py-1.5 rounded flex items-center gap-1 font-bold transition-all bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 touch-manipulation"
+                    title="حذف صورة البنر نهائياً"
+                  >
+                    <Trash2 size={13} />
+                    <span>حذف</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => handleSaveHeroBanner('heroSweatpants', sweatpantsBg)}
+                  className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
+                    savedBanner === 'heroSweatpants' 
+                      ? 'bg-emerald-500 text-black font-black' 
+                      : 'bg-white hover:bg-neutral-200 text-black'
+                  }`}
+                >
+                  {savedBanner === 'heroSweatpants' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+                  <span>{savedBanner === 'heroSweatpants' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
+                </button>
+              </div>
             </div>
             <ImageUploader 
               value={sweatpantsBg}
-              onChange={(url) => setSweatpantsBg(url)}
+              onChange={(url) => handleSaveHeroBanner('heroSweatpants', url)}
               label="رفع صورة بنر السويت بانتس:"
               previewHeight="h-32 sm:h-36"
             />
@@ -139,21 +189,33 @@ export const ImageLibraryManager = () => {
           <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">كارت الهوديز الأوفرسايز</h4>
-              <button
-                onClick={() => handleSaveGridCard('card1', card1Img)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
-                  savedBanner === 'card1' 
-                    ? 'bg-emerald-500 text-black font-black' 
-                    : 'bg-white hover:bg-neutral-200 text-black'
-                }`}
-              >
-                {savedBanner === 'card1' ? <CheckCircle2 size={13} /> : <Save size={13} />}
-                <span>{savedBanner === 'card1' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {card1Img && (
+                  <button
+                    onClick={() => handleDeleteGridCard('card1')}
+                    className="text-xs px-2.5 py-1.5 rounded flex items-center gap-1 font-bold transition-all bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 touch-manipulation"
+                    title="حذف صورة الكارت نهائياً"
+                  >
+                    <Trash2 size={13} />
+                    <span>حذف</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => handleSaveGridCard('card1', card1Img)}
+                  className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
+                    savedBanner === 'card1' 
+                      ? 'bg-emerald-500 text-black font-black' 
+                      : 'bg-white hover:bg-neutral-200 text-black'
+                  }`}
+                >
+                  {savedBanner === 'card1' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+                  <span>{savedBanner === 'card1' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
+                </button>
+              </div>
             </div>
             <ImageUploader 
               value={card1Img}
-              onChange={(url) => setCard1Img(url)}
+              onChange={(url) => handleSaveGridCard('card1', url)}
               label="رفع صورة كارت الهوديز:"
               previewHeight="h-32 sm:h-36"
             />
@@ -163,21 +225,33 @@ export const ImageLibraryManager = () => {
           <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">كارت تيشرتات بولو</h4>
-              <button
-                onClick={() => handleSaveGridCard('card2', card2Img)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
-                  savedBanner === 'card2' 
-                    ? 'bg-emerald-500 text-black font-black' 
-                    : 'bg-white hover:bg-neutral-200 text-black'
-                }`}
-              >
-                {savedBanner === 'card2' ? <CheckCircle2 size={13} /> : <Save size={13} />}
-                <span>{savedBanner === 'card2' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {card2Img && (
+                  <button
+                    onClick={() => handleDeleteGridCard('card2')}
+                    className="text-xs px-2.5 py-1.5 rounded flex items-center gap-1 font-bold transition-all bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 touch-manipulation"
+                    title="حذف صورة الكارت نهائياً"
+                  >
+                    <Trash2 size={13} />
+                    <span>حذف</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => handleSaveGridCard('card2', card2Img)}
+                  className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
+                    savedBanner === 'card2' 
+                      ? 'bg-emerald-500 text-black font-black' 
+                      : 'bg-white hover:bg-neutral-200 text-black'
+                  }`}
+                >
+                  {savedBanner === 'card2' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+                  <span>{savedBanner === 'card2' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
+                </button>
+              </div>
             </div>
             <ImageUploader 
               value={card2Img}
-              onChange={(url) => setCard2Img(url)}
+              onChange={(url) => handleSaveGridCard('card2', url)}
               label="رفع صورة كارت التيشرتات:"
               previewHeight="h-32 sm:h-36"
             />
@@ -187,21 +261,33 @@ export const ImageLibraryManager = () => {
           <div className="bg-[#16161f] border border-white/10 p-3.5 sm:p-5 rounded-lg space-y-3 sm:space-y-4 shadow-xl">
             <div className="flex justify-between items-center border-b border-white/5 pb-2">
               <h4 className="text-xs font-bold text-white">كارت سويت بانتس باجي</h4>
-              <button
-                onClick={() => handleSaveGridCard('card3', card3Img)}
-                className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
-                  savedBanner === 'card3' 
-                    ? 'bg-emerald-500 text-black font-black' 
-                    : 'bg-white hover:bg-neutral-200 text-black'
-                }`}
-              >
-                {savedBanner === 'card3' ? <CheckCircle2 size={13} /> : <Save size={13} />}
-                <span>{savedBanner === 'card3' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                {card3Img && (
+                  <button
+                    onClick={() => handleDeleteGridCard('card3')}
+                    className="text-xs px-2.5 py-1.5 rounded flex items-center gap-1 font-bold transition-all bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 touch-manipulation"
+                    title="حذف صورة الكارت نهائياً"
+                  >
+                    <Trash2 size={13} />
+                    <span>حذف</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => handleSaveGridCard('card3', card3Img)}
+                  className={`text-xs px-3.5 py-1.5 rounded flex items-center gap-1.5 font-bold transition-all shadow-md touch-manipulation ${
+                    savedBanner === 'card3' 
+                      ? 'bg-emerald-500 text-black font-black' 
+                      : 'bg-white hover:bg-neutral-200 text-black'
+                  }`}
+                >
+                  {savedBanner === 'card3' ? <CheckCircle2 size={13} /> : <Save size={13} />}
+                  <span>{savedBanner === 'card3' ? '✓ تم الحفظ!' : '💾 حفظ'}</span>
+                </button>
+              </div>
             </div>
             <ImageUploader 
               value={card3Img}
-              onChange={(url) => setCard3Img(url)}
+              onChange={(url) => handleSaveGridCard('card3', url)}
               label="رفع صورة كارت السويت بانتس:"
               previewHeight="h-32 sm:h-36"
             />

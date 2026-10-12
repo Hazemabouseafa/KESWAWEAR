@@ -3,7 +3,7 @@
  * Handles file reading, canvas compression, and validation
  */
 
-export const processImageFile = (file, maxWidth = 1600, maxHeight = 1600, quality = 0.82) => {
+export const processImageFile = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.76) => {
   return new Promise((resolve, reject) => {
     if (!file) {
       reject(new Error("لم يتم تحديد أي ملف"));

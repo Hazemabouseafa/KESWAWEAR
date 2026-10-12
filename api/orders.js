@@ -1,5 +1,8 @@
 import { getSql, ensureTables, getConnectionString } from './db.js';
 
+// In-memory fallback cache for when DATABASE_URL is not yet configured or during warm lambda invocations
+let memoryOrdersCache = null;
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -9,13 +12,70 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  let body = req.body;
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      body = {};
+    }
+  }
+
   const connStr = getConnectionString();
   if (!connStr) {
-    return res.status(200).json({
-      success: false,
-      connected: false,
-      orders: []
-    });
+    if (req.method === 'GET') {
+      return res.status(200).json({
+        success: true,
+        connected: false,
+        orders: memoryOrdersCache || []
+      });
+    }
+
+    if (req.method === 'POST' || req.method === 'PUT') {
+      if (Array.isArray(body)) {
+        memoryOrdersCache = body;
+        return res.status(200).json({ success: true, connected: false, message: 'Orders batch cached' });
+      }
+
+      const order = body?.order || body;
+      if (!order || !order.id) {
+        return res.status(400).json({ error: 'Order ID is required' });
+      }
+
+      const existing = (memoryOrdersCache || []).filter(o => o.id !== order.id);
+      memoryOrdersCache = [order, ...existing];
+
+      return res.status(200).json({
+        success: true,
+        connected: false,
+        order
+      });
+    }
+
+    if (req.method === 'DELETE') {
+      const isClearAll = req.query?.clearAll === 'true' || body?.clearAll === true;
+      if (isClearAll) {
+        memoryOrdersCache = [];
+        return res.status(200).json({ success: true, connected: false, message: 'All orders cleared from cache' });
+      }
+
+      const id = req.query?.id || body?.id;
+      if (!id) {
+        return res.status(400).json({ error: 'Missing order ID to delete' });
+      }
+
+      if (memoryOrdersCache) {
+        memoryOrdersCache = memoryOrdersCache.filter(o => o.id !== id);
+      }
+
+      return res.status(200).json({
+        success: true,
+        connected: false,
+        message: `Order ${id} deleted from cache`
+      });
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
@@ -90,8 +150,19 @@ export default async function handler(req, res) {
       });
     }
 
-    // DELETE: Remove order
+    // DELETE: Remove order or clear all
     if (req.method === 'DELETE') {
+      const isClearAll = req.query?.clearAll === 'true' || body?.clearAll === true;
+      if (isClearAll) {
+        await sql`DELETE FROM orders;`;
+        memoryOrdersCache = [];
+        return res.status(200).json({
+          success: true,
+          connected: true,
+          message: 'All orders cleared from Neon'
+        });
+      }
+
       const id = req.query.id || (typeof req.body === 'object' ? req.body?.id : null);
       if (!id) {
         return res.status(400).json({ error: 'Missing order ID to delete' });
@@ -101,8 +172,13 @@ export default async function handler(req, res) {
         DELETE FROM orders WHERE id = ${id};
       `;
 
+      if (memoryOrdersCache) {
+        memoryOrdersCache = memoryOrdersCache.filter(o => o.id !== id);
+      }
+
       return res.status(200).json({
         success: true,
+        connected: true,
         message: `Order ${id} deleted from Neon`
       });
     }

@@ -368,20 +368,62 @@ export const ProductsManager = () => {
                 </div>
               </div>
 
-              {/* Image Uploader */}
-              <div>
-                <ImageUploader 
-                  value={productForm.images[0] || ''}
-                  onChange={(url) => {
-                    setProductForm(prev => {
-                      const updated = [...prev.images];
-                      updated[0] = url;
-                      return { ...prev, images: updated };
-                    });
-                  }}
-                  label="صورة المنتج الأساسية (رفع من الجهاز أو رابط):"
-                  previewHeight="h-32 sm:h-36"
-                />
+              {/* Product Images Management (Multiple Images Support) */}
+              <div className="space-y-3 bg-neutral-900/60 p-3 rounded border border-white/10">
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <label className="block text-gray-200 font-bold text-xs">صور المنتج ({productForm.images.filter(Boolean).length} صور):</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProductForm(prev => ({
+                        ...prev,
+                        images: [...prev.images, '']
+                      }));
+                    }}
+                    className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 bg-cyan-500/10 hover:bg-cyan-500/20 px-2 py-1 rounded border border-cyan-500/20 touch-manipulation"
+                  >
+                    <Plus size={12} />
+                    <span>إضافة صورة أخرى</span>
+                  </button>
+                </div>
+
+                {productForm.images.map((imgUrl, imgIdx) => (
+                  <div key={imgIdx} className="relative space-y-1.5 p-2 bg-black/40 rounded border border-white/5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-mono text-gray-400">
+                        {imgIdx === 0 ? 'الصورة الرئيسية (غلاف المنتج):' : `صورة إضافية #${imgIdx + 1}:`}
+                      </span>
+                      {productForm.images.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProductForm(prev => {
+                              const updated = prev.images.filter((_, idx) => idx !== imgIdx);
+                              return { ...prev, images: updated.length > 0 ? updated : [''] };
+                            });
+                          }}
+                          className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 touch-manipulation"
+                          title="حذف هذه الصورة"
+                        >
+                          <Trash2 size={11} />
+                          <span>حذف الصورة</span>
+                        </button>
+                      )}
+                    </div>
+                    <ImageUploader 
+                      value={imgUrl || ''}
+                      onChange={(url) => {
+                        setProductForm(prev => {
+                          const updated = [...prev.images];
+                          updated[imgIdx] = url;
+                          return { ...prev, images: updated };
+                        });
+                      }}
+                      label=""
+                      previewHeight="h-28 sm:h-32"
+                    />
+                  </div>
+                ))}
               </div>
 
               {/* Description */}

@@ -10,7 +10,39 @@ const STORAGE_KEYS = {
   ORDERS: 'keswa_orders_v3',
   CART: 'keswa_cart_v3',
   WISHLIST: 'keswa_wishlist_v3',
-  LANG: 'keswa_language_v3'
+  LANG: 'keswa_language_v3',
+  DELETED_ORDERS: 'keswa_deleted_orders_v3',
+  DELETED_PRODUCTS: 'keswa_deleted_products_v3',
+  DELETED_CATEGORIES: 'keswa_deleted_categories_v3'
+};
+
+const getDeletedIds = (key) => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
+const addDeletedId = (key, id) => {
+  try {
+    const current = getDeletedIds(key);
+    if (!current.includes(id)) {
+      const updated = [...current, id];
+      localStorage.setItem(key, JSON.stringify(updated));
+    }
+  } catch (e) {}
+};
+
+const removeDeletedId = (key, id) => {
+  try {
+    const current = getDeletedIds(key);
+    if (current.includes(id)) {
+      const updated = current.filter(x => x !== id);
+      localStorage.setItem(key, JSON.stringify(updated));
+    }
+  } catch (e) {}
 };
 
 export const StoreProvider = ({ children }) => {
@@ -95,13 +127,14 @@ export const StoreProvider = ({ children }) => {
   const [products, setProducts] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+      const deletedIds = getDeletedIds(STORAGE_KEYS.DELETED_PRODUCTS);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          return sanitizeProducts(parsed);
+          return sanitizeProducts(parsed).filter(p => !deletedIds.includes(p.id));
         }
       }
-      return sanitizeProducts(initialProducts);
+      return sanitizeProducts(initialProducts).filter(p => !deletedIds.includes(p.id));
     } catch (e) {
       return sanitizeProducts(initialProducts);
     }
@@ -111,7 +144,14 @@ export const StoreProvider = ({ children }) => {
   const [orders, setOrders] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.ORDERS);
-      return saved ? JSON.parse(saved) : initialOrders;
+      const deletedIds = getDeletedIds(STORAGE_KEYS.DELETED_ORDERS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(o => !deletedIds.includes(o.id));
+        }
+      }
+      return initialOrders.filter(o => !deletedIds.includes(o.id));
     } catch (e) {
       return initialOrders;
     }
@@ -290,9 +330,10 @@ export const StoreProvider = ({ children }) => {
           if (contentRes && contentRes.ok) {
             const contentJson = await contentRes.json();
             if (contentJson.data && isMounted) {
+              const deletedCategories = getDeletedIds(STORAGE_KEYS.DELETED_CATEGORIES);
               setSiteContent(prev => {
-                const neonCats = contentJson.data.categories || [];
-                const localCats = prev.categories || [];
+                const neonCats = (contentJson.data.categories || []).filter(c => !deletedCategories.includes(c.id));
+                const localCats = (prev.categories || []).filter(c => !deletedCategories.includes(c.id));
 
                 // Smart Merge: Preserve both Neon and local custom categories
                 const catMap = new Map();
@@ -305,8 +346,8 @@ export const StoreProvider = ({ children }) => {
                 const mergedCategories = Array.from(catMap.values());
 
                 // Smart Merge navigation
-                const neonNav = contentJson.data.navigation || [];
-                const localNav = prev.navigation || [];
+                const neonNav = (contentJson.data.navigation || []).filter(n => !deletedCategories.includes(n.id));
+                const localNav = (prev.navigation || []).filter(n => !deletedCategories.includes(n.id));
                 const navMap = new Map();
                 neonNav.forEach(n => navMap.set(n.id, n));
                 localNav.forEach(n => {
@@ -352,15 +393,24 @@ export const StoreProvider = ({ children }) => {
           if (prodRes && prodRes.ok) {
             const prodJson = await prodRes.json();
             if (prodJson.products && Array.isArray(prodJson.products) && prodJson.products.length > 0 && isMounted) {
+              const deletedProducts = getDeletedIds(STORAGE_KEYS.DELETED_PRODUCTS);
               setProducts(prev => {
-                const neonProds = sanitizeProducts(prodJson.products);
-                const localProds = prev || [];
+                const neonProds = sanitizeProducts(prodJson.products).filter(p => !deletedProducts.includes(p.id));
+                const localProds = (prev || []).filter(p => !deletedProducts.includes(p.id));
                 const prodMap = new Map();
                 neonProds.forEach(p => prodMap.set(p.id, p));
                 localProds.forEach(p => {
                   if (!prodMap.has(p.id)) prodMap.set(p.id, p);
                 });
-                return Array.from(prodMap.values());
+                const mergedProds = Array.from(prodMap.values());
+
+                // If local has new products not yet in Neon, push them to Neon!
+                const hasLocalNewProds = localProds.filter(lp => !neonProds.some(np => np.id === lp.id));
+                if (hasLocalNewProds.length > 0) {
+                  hasLocalNewProds.forEach(p => persistProduct(p, 'POST'));
+                }
+
+                return mergedProds;
               });
             }
           }
@@ -369,8 +419,26 @@ export const StoreProvider = ({ children }) => {
           const orderRes = await fetch('/api/orders').catch(() => null);
           if (orderRes && orderRes.ok) {
             const orderJson = await orderRes.json();
-            if (orderJson.orders && orderJson.orders.length > 0 && isMounted) {
-              setOrders(orderJson.orders);
+            if (orderJson.orders && Array.isArray(orderJson.orders) && isMounted) {
+              const deletedOrders = getDeletedIds(STORAGE_KEYS.DELETED_ORDERS);
+              const validNeonOrders = orderJson.orders.filter(o => !deletedOrders.includes(o.id));
+              setOrders(prev => {
+                const localOrders = (prev || []).filter(o => !deletedOrders.includes(o.id));
+                const orderMap = new Map();
+                validNeonOrders.forEach(o => orderMap.set(o.id, o));
+                localOrders.forEach(o => {
+                  if (!orderMap.has(o.id)) orderMap.set(o.id, o);
+                });
+                const mergedOrders = Array.from(orderMap.values());
+
+                // If local has new orders not in Neon, push them!
+                const hasLocalNewOrders = localOrders.filter(lo => !validNeonOrders.some(no => no.id === lo.id));
+                if (hasLocalNewOrders.length > 0) {
+                  hasLocalNewOrders.forEach(o => persistOrder(o, 'POST'));
+                }
+
+                return mergedOrders;
+              });
             }
           }
         } else {
@@ -452,6 +520,26 @@ export const StoreProvider = ({ children }) => {
         });
       }
     } catch (e) {}
+  };
+
+  const persistOrder = async (orderData, method = 'POST') => {
+    try {
+      if (method === 'DELETE') {
+        if (orderData?.clearAll) {
+          await fetch('/api/orders?clearAll=true', { method: 'DELETE' });
+        } else if (orderData?.id) {
+          await fetch(`/api/orders?id=${encodeURIComponent(orderData.id)}`, { method: 'DELETE' });
+        }
+      } else {
+        await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order: orderData })
+        });
+      }
+    } catch (e) {
+      console.warn('Backend order sync failed, saved in local storage:', e);
+    }
   };
 
   // Row / Section Visibility Toggle
@@ -767,6 +855,7 @@ export const StoreProvider = ({ children }) => {
     });
 
     showToast(language === 'ar' ? `تمت إضافة قسم "${newCategory.name_ar}" بنجاح للواجهة الرئيسية!` : `Category "${newCategory.name_en}" added to storefront!`, "success");
+    removeDeletedId(STORAGE_KEYS.DELETED_CATEGORIES, cleanId);
     return newCategory;
   };
 
@@ -802,6 +891,7 @@ export const StoreProvider = ({ children }) => {
   };
 
   const deleteCategory = (categoryId) => {
+    addDeletedId(STORAGE_KEYS.DELETED_CATEGORIES, categoryId);
     setSiteContent(prev => {
       const existingList = prev.categories || initialSiteContent.categories;
       const updatedList = existingList.filter(cat => cat.id !== categoryId);
@@ -828,7 +918,8 @@ export const StoreProvider = ({ children }) => {
       ...newProduct,
       id: newProduct.id || `keswa-${Date.now()}`
     };
-    setProducts(prev => [productWithId, ...prev]);
+    removeDeletedId(STORAGE_KEYS.DELETED_PRODUCTS, productWithId.id);
+    setProducts(prev => [productWithId, ...prev.filter(p => p.id !== productWithId.id)]);
     persistProduct(productWithId, 'POST');
     showToast(language === 'ar' ? "تمت إضافة المنتج بنجاح!" : "Product added!", "success");
     return productWithId;
@@ -845,6 +936,7 @@ export const StoreProvider = ({ children }) => {
   };
 
   const deleteProduct = (id) => {
+    addDeletedId(STORAGE_KEYS.DELETED_PRODUCTS, id);
     setProducts(prev => prev.filter(p => p.id !== id));
     persistProduct({ id }, 'DELETE');
     showToast(language === 'ar' ? "تم حذف المنتج من المتجر." : "Product deleted from store.", "info");
@@ -909,7 +1001,7 @@ export const StoreProvider = ({ children }) => {
     setCart([]);
   };
 
-  // Checkout & Orders Management (FIXED)
+  // Checkout & Orders Management (FIXED & PERSISTED)
   const createOrder = (customerDetails) => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = subtotal >= (siteContent.general?.freeShippingThreshold || 1500) ? 0 : (siteContent.general?.shippingCost || 50);
@@ -927,14 +1019,23 @@ export const StoreProvider = ({ children }) => {
       date: new Date().toISOString()
     };
 
-    setOrders(prev => [newOrder, ...prev]);
+    removeDeletedId(STORAGE_KEYS.DELETED_ORDERS, newOrder.id);
+    setOrders(prev => [newOrder, ...prev.filter(o => o.id !== newOrder.id)]);
+    persistOrder(newOrder, 'POST');
     clearCart();
     // NOTE: We do NOT close isCheckoutOpen here so the customer sees the confirmed order screen!
     return newOrder;
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    setOrders(prev => {
+      const next = prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+      const target = next.find(o => o.id === orderId);
+      if (target) {
+        persistOrder(target, 'POST');
+      }
+      return next;
+    });
     showToast(
       language === 'ar' 
         ? `تم تحديث حالة الطلب #${orderId} إلى: ${newStatus}` 
@@ -944,14 +1045,18 @@ export const StoreProvider = ({ children }) => {
   };
 
   const deleteOrder = (orderId) => {
+    addDeletedId(STORAGE_KEYS.DELETED_ORDERS, orderId);
     setOrders(prev => prev.filter(o => o.id !== orderId));
-    showToast(language === 'ar' ? `تم حذف الطلب #${orderId}` : `Order #${orderId} deleted`, "info");
+    persistOrder({ id: orderId }, 'DELETE');
+    showToast(language === 'ar' ? `تم حذف الطلب #${orderId} نهائياً` : `Order #${orderId} deleted`, "info");
   };
 
   const clearAllOrders = () => {
     if (window.confirm(language === 'ar' ? "هل تريد مسح كافة الطلبات المسجلة؟" : "Clear all registered orders?")) {
+      orders.forEach(o => addDeletedId(STORAGE_KEYS.DELETED_ORDERS, o.id));
       setOrders([]);
-      showToast(language === 'ar' ? "تم مسح كافة الطلبات" : "All orders cleared", "info");
+      persistOrder({ clearAll: true }, 'DELETE');
+      showToast(language === 'ar' ? "تم مسح كافة الطلبات بنجاح" : "All orders cleared", "info");
     }
   };
 
@@ -969,43 +1074,52 @@ export const StoreProvider = ({ children }) => {
       },
       items: [
         {
-          id: sampleProduct.id,
-          name: sampleProduct.name_ar || sampleProduct.name,
+          id: sampleProduct?.id || 'sample-1',
+          name: sampleProduct ? (sampleProduct.name_ar || sampleProduct.name) : 'هودي أساسي أسود',
           size: "L",
           color: "أسود",
-          price: sampleProduct.price,
+          price: sampleProduct?.price || 850,
           quantity: 1,
-          image: sampleProduct.images?.[0]
+          image: sampleProduct?.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900'
         }
       ],
-      subtotal: sampleProduct.price,
+      subtotal: sampleProduct?.price || 850,
       shipping: 50,
-      total: sampleProduct.price + 50,
+      total: (sampleProduct?.price || 850) + 50,
       status: "Pending",
       paymentMethod: "الدفع عند الاستلام (COD)",
       date: new Date().toISOString()
     };
-    setOrders(prev => [testOrder, ...prev]);
+    removeDeletedId(STORAGE_KEYS.DELETED_ORDERS, testOrder.id);
+    setOrders(prev => [testOrder, ...prev.filter(o => o.id !== testOrder.id)]);
+    persistOrder(testOrder, 'POST');
     showToast(language === 'ar' ? "تمت إضافة طلب تجريبي جديد بنجاح!" : "Test order added!", "success");
   };
 
   const updateOrderDetails = (orderId, updatedDetails) => {
-    setOrders(prev => prev.map(o => {
-      if (o.id === orderId) {
-        return {
-          ...o,
-          customer: {
-            ...o.customer,
-            ...(updatedDetails.customer || {})
-          },
-          status: updatedDetails.status !== undefined ? updatedDetails.status : o.status,
-          paymentMethod: updatedDetails.paymentMethod !== undefined ? updatedDetails.paymentMethod : o.paymentMethod,
-          total: updatedDetails.total !== undefined ? Number(updatedDetails.total) : o.total
-        };
+    setOrders(prev => {
+      const next = prev.map(o => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            customer: {
+              ...o.customer,
+              ...(updatedDetails.customer || {})
+            },
+            status: updatedDetails.status !== undefined ? updatedDetails.status : o.status,
+            paymentMethod: updatedDetails.paymentMethod !== undefined ? updatedDetails.paymentMethod : o.paymentMethod,
+            total: updatedDetails.total !== undefined ? Number(updatedDetails.total) : o.total
+          };
+        }
+        return o;
+      });
+      const target = next.find(o => o.id === orderId);
+      if (target) {
+        persistOrder(target, 'POST');
       }
-      return o;
-    }));
-    showToast(language === 'ar' ? "تم حفظ تعديلات الطلب بنجاح!" : "Order details saved!", "success");
+      return next;
+    });
+    showToast(language === 'ar' ? "تم حفظ تعديلات الطلب وتثبيتها بنجاح! 💾" : "Order details saved! 💾", "success");
   };
 
   const createManualOrder = (orderData) => {
@@ -1030,8 +1144,10 @@ export const StoreProvider = ({ children }) => {
       paymentMethod: orderData.paymentMethod || "الدفع عند الاستلام (COD)",
       date: new Date().toISOString()
     };
-    setOrders(prev => [newOrder, ...prev]);
-    showToast(language === 'ar' ? `تم إنشاء الطلب #${newOrder.id} بنجاح!` : `Manual order #${newOrder.id} created!`, "success");
+    removeDeletedId(STORAGE_KEYS.DELETED_ORDERS, newOrder.id);
+    setOrders(prev => [newOrder, ...prev.filter(o => o.id !== newOrder.id)]);
+    persistOrder(newOrder, 'POST');
+    showToast(language === 'ar' ? `تم إنشاء الطلب #${newOrder.id} بنجاح وحفظه! 💾` : `Manual order #${newOrder.id} created! 💾`, "success");
     return newOrder;
   };
 
