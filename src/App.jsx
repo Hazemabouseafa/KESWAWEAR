@@ -15,6 +15,7 @@ import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { QuickViewModal } from './components/QuickViewModal';
+import { ProductPage } from './components/ProductPage';
 import { AdminPanel } from './admin/AdminPanel';
 import { TrackOrderModal } from './components/TrackOrderModal';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
@@ -97,6 +98,20 @@ export default function App() {
     return catId;
   };
 
+  const getProductRouteId = () => {
+    // 1. Direct path /product/:id or /products/:id
+    const pathMatch = currentPath.match(/^\/(?:product|products)\/([^/?#]+)/);
+    if (pathMatch && pathMatch[1]) return decodeURIComponent(pathMatch[1]);
+
+    // 2. Hash path #/product/:id or #/products/:id or #product/:id
+    const hashMatch = currentHash.match(/^#\/?(?:product|products)\/([^/?#]+)/);
+    if (hashMatch && hashMatch[1]) return decodeURIComponent(hashMatch[1]);
+
+    return null;
+  };
+
+  const productRouteId = getProductRouteId();
+
   return (
     <div id="top" className="min-h-screen bg-[#f8f7f4] text-[#121216] flex flex-col relative selection:bg-black selection:text-white font-sans">
       
@@ -106,8 +121,10 @@ export default function App() {
       {/* 2. Main Storefront Content */}
       <main className="flex-1">
         
-        {/* If user filtered specifically to a single category from navbar */}
-        {activeCategory !== 'all' ? (
+        {/* Standalone Dedicated Product Page (Separate Page instead of Popup) */}
+        {productRouteId ? (
+          <ProductPage productId={productRouteId} onBackToStore={() => navigateTo('/')} />
+        ) : activeCategory !== 'all' ? (
           <div className="pt-8 pb-16">
             <div className="max-w-7xl mx-auto px-4 mb-6 flex items-center justify-between">
               <div className="flex items-center gap-3">

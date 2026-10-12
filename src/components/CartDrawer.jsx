@@ -16,7 +16,8 @@ export const CartDrawer = () => {
     setIsCheckoutOpen,
     language,
     t,
-    getLocalized
+    getLocalized,
+    navigateToProduct
   } = useStore();
 
   const [promoInput, setPromoInput] = useState('');
@@ -119,12 +120,22 @@ export const CartDrawer = () => {
                     <img 
                       src={item.image} 
                       alt="" 
-                      className="w-20 h-24 object-cover object-top rounded-none border border-white/5 shrink-0" 
+                      onClick={() => {
+                        setIsCartOpen(false);
+                        if (navigateToProduct) navigateToProduct(item.id);
+                      }}
+                      className="w-20 h-24 object-cover object-top rounded-none border border-white/5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity" 
                     />
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start gap-2">
-                          <h4 className="text-xs font-bold text-white line-clamp-1 font-sans">
+                          <h4 
+                            onClick={() => {
+                              setIsCartOpen(false);
+                              if (navigateToProduct) navigateToProduct(item.id);
+                            }}
+                            className="text-xs font-bold text-white line-clamp-1 font-sans cursor-pointer hover:underline"
+                          >
                             {displayName}
                           </h4>
                           <button 

@@ -6,9 +6,11 @@ export const ProductCard = ({ product }) => {
   const { 
     addToCart, 
     setQuickViewProduct, 
+    navigateToProduct,
     wishlist, 
     toggleWishlist, 
     getLocalized,
+    language,
     t 
   } = useStore();
 
@@ -21,6 +23,15 @@ export const ProductCard = ({ product }) => {
   const productName = getLocalized(product, 'name');
   const badge = getLocalized(product, 'badge');
 
+  const handleOpenProduct = (e) => {
+    if (e) e.preventDefault();
+    if (navigateToProduct) {
+      navigateToProduct(product.id);
+    } else if (setQuickViewProduct) {
+      setQuickViewProduct(product);
+    }
+  };
+
   const handleQuickAdd = (e) => {
     e.stopPropagation();
     const colorName = selectedColor ? getLocalized(selectedColor, 'name') : null;
@@ -29,7 +40,7 @@ export const ProductCard = ({ product }) => {
 
   return (
     <article 
-      onClick={() => setQuickViewProduct(product)}
+      onClick={handleOpenProduct}
       className="group relative flex flex-col bg-white border border-[#e6e4dc] hover:border-black/30 rounded-sm cursor-pointer select-none transition-all duration-300 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-xl"
     >
       {/* Product Image Container */}
@@ -75,11 +86,11 @@ export const ProductCard = ({ product }) => {
           <button 
             onClick={(e) => {
               e.stopPropagation();
-              setQuickViewProduct(product);
+              handleOpenProduct(e);
             }}
-            className="bg-white/90 hover:bg-white text-black p-2.5 shadow-md backdrop-blur-md transition-colors"
-            title={t('actions.quickView')}
-            aria-label={`Quick view ${productName}`}
+            className="bg-white/90 hover:bg-white text-black p-2.5 shadow-md backdrop-blur-md transition-colors cursor-pointer"
+            title={language === 'ar' ? 'عرض تفاصيل المنتج' : 'View Product Details'}
+            aria-label={`View ${productName}`}
           >
             <Eye size={14} />
           </button>

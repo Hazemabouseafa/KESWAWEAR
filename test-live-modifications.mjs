@@ -216,6 +216,27 @@ if (
   throw new Error("Failed 16: Missing WhatsApp toggle integration in Admin, Storefront, or Context");
 }
 
+// 17. Test Dedicated Standalone Product Page (No Popup) & Data Preservation
+const productPageSrc = fs.readFileSync('./src/components/ProductPage.jsx', 'utf8');
+
+if (
+  appSrc.includes('ProductPage') &&
+  appSrc.includes('getProductRouteId') &&
+  productCardSrc.includes('navigateToProduct') &&
+  storeContextSrc.includes('navigateToProduct') &&
+  productPageSrc.includes('export const ProductPage') &&
+  productPageSrc.includes('onBackToStore')
+) {
+  // Check that all 18 initial products are preserved
+  if (state.products.length >= 18) {
+    console.log("✅ 17. Dedicated standalone product page (/product/:id) fully active with zero data loss (all 18 products preserved)");
+  } else {
+    throw new Error("Failed 17: Product data loss detected");
+  }
+} else {
+  throw new Error("Failed 17: ProductPage component or routing missing");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 16 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 17 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");

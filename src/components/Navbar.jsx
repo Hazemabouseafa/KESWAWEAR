@@ -24,14 +24,51 @@ export const Navbar = () => {
 
   const { announcement, brand, navigation, sectionsVisibility } = siteContent;
 
+  const isCurrentProductPage = () => {
+    if (typeof window === 'undefined') return false;
+    return window.location.pathname.startsWith('/product') || 
+           window.location.pathname.startsWith('/products') || 
+           window.location.hash.includes('product');
+  };
+
   const handleNavClick = (navId, link) => {
     setActiveCategory(navId === 'shop' ? 'all' : navId);
     setMobileMenuOpen(false);
 
-    const target = document.querySelector(link);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
+    const onProduct = isCurrentProductPage();
+    if (onProduct) {
+      window.history.pushState(null, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
     }
+
+    setTimeout(() => {
+      const target = document.querySelector(link);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, onProduct ? 120 : 0);
+  };
+
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    setActiveCategory('all');
+    if (isCurrentProductPage()) {
+      window.history.pushState(null, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleWishlistClick = () => {
+    const onProduct = isCurrentProductPage();
+    if (onProduct) {
+      window.history.pushState(null, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+    setTimeout(() => {
+      const target = document.querySelector('#shop');
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }, onProduct ? 120 : 0);
   };
 
   const isAnnouncementVisible = sectionsVisibility?.announcement !== false && announcement?.enabled;
@@ -89,10 +126,7 @@ export const Navbar = () => {
               <a 
                 href="#top" 
                 className="cursor-pointer py-1"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
+                onClick={handleLogoClick}
               >
                 <KeswaLogo variant={brand?.logoStyle === 'badge' ? 'badge' : 'inline'} size="md" />
               </a>
@@ -145,10 +179,7 @@ export const Navbar = () => {
 
               {/* Wishlist */}
               <button 
-                onClick={() => {
-                  const target = document.querySelector('#shop');
-                  if (target) target.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={handleWishlistClick}
                 className="relative p-1.5 sm:p-2 text-neutral-700 hover:text-black transition-colors hidden sm:block touch-manipulation"
                 title={t('nav.favorites')}
               >
@@ -218,8 +249,7 @@ export const Navbar = () => {
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    const target = document.querySelector('#shop');
-                    if (target) target.scrollIntoView({ behavior: 'smooth' });
+                    handleWishlistClick();
                   }}
                   className="flex items-center justify-center gap-2 py-2.5 px-3 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs"
                 >

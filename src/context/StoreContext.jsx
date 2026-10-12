@@ -183,6 +183,23 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
+  const navigateToProduct = (productId) => {
+    if (typeof window !== 'undefined') {
+      const targetPath = `/product/${productId}`;
+      window.history.pushState(null, '', targetPath);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  };
+
+  const navigateToHome = () => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  };
+
   // Neon PostgreSQL Database State ('checking' | 'connected' | 'local' | 'error')
   const [neonStatus, setNeonStatus] = useState('checking');
   const [neonDetails, setNeonDetails] = useState({ connected: false, database: 'keswawear', counts: {} });
@@ -1159,6 +1176,8 @@ export const StoreProvider = ({ children }) => {
       setAdminTab,
       openAdminTab,
       closeAdmin,
+      navigateToProduct,
+      navigateToHome,
       isTrackOrderOpen,
       setIsTrackOrderOpen,
       saveGeneralSettings,
