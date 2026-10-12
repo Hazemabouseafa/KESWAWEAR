@@ -24,12 +24,15 @@ export const Navbar = () => {
 
   const { announcement, brand, navigation, sectionsVisibility } = siteContent;
 
-  const isCurrentProductPage = () => {
+  const isSubPage = () => {
     if (typeof window === 'undefined') return false;
     return window.location.pathname.startsWith('/product') || 
            window.location.pathname.startsWith('/products') || 
-           window.location.hash.includes('product');
+           window.location.pathname.startsWith('/checkout') || 
+           window.location.hash.includes('product') ||
+           window.location.hash.includes('checkout');
   };
+  const isCurrentProductPage = isSubPage;
 
   const handleNavClick = (navId, link) => {
     setActiveCategory(navId === 'shop' ? 'all' : navId);

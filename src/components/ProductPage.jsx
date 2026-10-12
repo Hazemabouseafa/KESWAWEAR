@@ -15,6 +15,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
     addToCart, 
     setIsCartOpen,
     setIsCheckoutOpen,
+    navigateToCheckout,
     wishlist, 
     toggleWishlist, 
     language, 
@@ -108,7 +109,11 @@ export const ProductPage = ({ productId, onBackToStore }) => {
   const handleBuyNow = () => {
     const colorName = selectedColor ? getLocalized(selectedColor, 'name') : null;
     addToCart(product, selectedSize, colorName, quantity);
-    setIsCheckoutOpen(true);
+    if (navigateToCheckout) {
+      navigateToCheckout();
+    } else {
+      setIsCheckoutOpen(true);
+    }
   };
 
   const handleShare = () => {

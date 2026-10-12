@@ -14,6 +14,7 @@ export const CartDrawer = () => {
     cartTotal,
     freeShippingThreshold,
     setIsCheckoutOpen,
+    navigateToCheckout,
     language,
     t,
     getLocalized,
@@ -238,7 +239,11 @@ export const CartDrawer = () => {
               <button 
                 onClick={() => {
                   setIsCartOpen(false);
-                  setIsCheckoutOpen(true);
+                  if (navigateToCheckout) {
+                    navigateToCheckout();
+                  } else {
+                    setIsCheckoutOpen(true);
+                  }
                 }}
                 className="w-full bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-wider uppercase py-4 flex items-center justify-center gap-2 transition-all shadow-xl font-sans"
               >

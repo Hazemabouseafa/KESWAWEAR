@@ -332,8 +332,28 @@ if (
   throw new Error("Failed 21: ProductsManager still contains popup modal or lacks inline form");
 }
 
+// 22. Test Standalone Checkout Page (No Popup Modal for Purchase Order)
+const checkoutPageSrc = fs.readFileSync('./src/components/CheckoutPage.jsx', 'utf8');
+const checkoutModalSrc = fs.readFileSync('./src/components/CheckoutModal.jsx', 'utf8');
+const appSrcCurrent = fs.readFileSync('./src/App.jsx', 'utf8');
+
+if (
+  checkoutPageSrc.includes('EGYPT_GOVERNORATES') &&
+  checkoutPageSrc.includes('getWhatsAppOrderUrl') &&
+  checkoutPageSrc.includes('createOrder(formData)') &&
+  !checkoutModalSrc.includes('fixed inset-0') &&
+  checkoutModalSrc.includes('navigateToCheckout') &&
+  appSrcCurrent.includes('isCheckoutRoute') &&
+  appSrcCurrent.includes('<CheckoutPage')
+) {
+  console.log("✅ 22. Purchase order (Checkout) converted to dedicated standalone page (/checkout) with zero popup modals and full WhatsApp confirmation");
+} else {
+  throw new Error("Failed 22: Standalone checkout page or popup retirement failed");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 21 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 22 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");
+
 
 

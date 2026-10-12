@@ -232,6 +232,16 @@ export const StoreProvider = ({ children }) => {
     }
   };
 
+  const navigateToCheckout = () => {
+    if (typeof window !== 'undefined') {
+      const targetPath = '/checkout';
+      window.history.pushState(null, '', targetPath);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    setIsCheckoutOpen(true);
+  };
+
   const navigateToHome = () => {
     if (typeof window !== 'undefined') {
       window.history.pushState(null, '', '/');
@@ -1293,6 +1303,7 @@ export const StoreProvider = ({ children }) => {
       openAdminTab,
       closeAdmin,
       navigateToProduct,
+      navigateToCheckout,
       navigateToHome,
       isTrackOrderOpen,
       setIsTrackOrderOpen,

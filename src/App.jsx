@@ -14,6 +14,7 @@ import { ProductSection } from './components/ProductSection';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
+import { CheckoutPage } from './components/CheckoutPage';
 import { QuickViewModal } from './components/QuickViewModal';
 import { ProductPage } from './components/ProductPage';
 import { AdminPanel } from './admin/AdminPanel';
@@ -110,6 +111,13 @@ export default function App() {
     return null;
   };
 
+  const isCheckoutRoute = 
+    currentPath === '/checkout' || 
+    currentPath.startsWith('/checkout/') || 
+    currentHash === '#checkout' || 
+    currentHash === '#/checkout' || 
+    currentHash.startsWith('#/checkout/');
+
   const productRouteId = getProductRouteId();
 
   return (
@@ -121,8 +129,11 @@ export default function App() {
       {/* 2. Main Storefront Content */}
       <main className="flex-1">
         
-        {/* Standalone Dedicated Product Page (Separate Page instead of Popup) */}
-        {productRouteId ? (
+        {/* Dedicated Standalone Checkout Page (Separate Page instead of Popup) */}
+        {isCheckoutRoute ? (
+          <CheckoutPage onBackToStore={() => navigateTo('/')} />
+        ) : productRouteId ? (
+          /* Standalone Dedicated Product Page (Separate Page instead of Popup) */
           <ProductPage productId={productRouteId} onBackToStore={() => navigateTo('/')} />
         ) : activeCategory !== 'all' ? (
           <div className="pt-8 pb-16">
