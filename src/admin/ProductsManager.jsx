@@ -138,12 +138,20 @@ export const ProductsManager = () => {
       return;
     }
 
+    const validImages = productForm.images.filter(img => img && img.trim().length > 0);
+    const colorImages = productForm.colors.flatMap(c => (c.images || []).filter(img => img && img.trim().length > 0));
+    const finalImages = validImages.length > 0 
+      ? validImages 
+      : (colorImages.length > 0 
+          ? [colorImages[0]] 
+          : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop']);
+
     const payload = {
       ...productForm,
       name: productForm.name_ar || productForm.name_en,
       price: Number(productForm.price),
       oldPrice: null, // Zero discounts
-      images: productForm.images.filter(img => img && img.trim().length > 0),
+      images: finalImages,
       colors: productForm.colors.map(c => ({
         name_ar: c.name_ar,
         name_en: c.name_en,

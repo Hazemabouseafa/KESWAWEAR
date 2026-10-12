@@ -4,55 +4,33 @@ import { translations } from '../data/translations';
 
 const StoreContext = createContext();
 
-const STORAGE_KEYS = {
-  CONTENT: 'keswa_site_content_v3',
-  PRODUCTS: 'keswa_products_v3',
-  ORDERS: 'keswa_orders_v3',
-  CART: 'keswa_cart_v3',
-  WISHLIST: 'keswa_wishlist_v3',
-  LANG: 'keswa_language_v3',
-  DELETED_ORDERS: 'keswa_deleted_orders_v3',
-  DELETED_PRODUCTS: 'keswa_deleted_products_v3',
-  DELETED_CATEGORIES: 'keswa_deleted_categories_v3'
-};
+import {
+  STORAGE_KEYS,
+  safeSetStorage,
+  safeGetStorage,
+  cleanupLegacyStorage,
+  getDeletedIds,
+  addDeletedId,
+  removeDeletedId,
+  idbSet,
+  idbGet,
+  idbDelete
+} from '../utils/storage';
 
-export const safeSetStorage = (key, value) => {
-  try {
-    const serialized = typeof value === 'string' ? value : JSON.stringify(value);
-    localStorage.setItem(key, serialized);
-  } catch (err) {
-    console.warn(`[Storage] localStorage.setItem exceeded quota for "${key}". Falling back to sessionStorage.`, err);
-    try {
-      const serialized = typeof value === 'string' ? value : JSON.stringify(value);
-      sessionStorage.setItem(key, serialized);
-    } catch (sessionErr) {}
-  }
-};
-
-export const safeGetStorage = (key) => {
-  try {
-    const localVal = localStorage.getItem(key);
-    if (localVal !== null) return localVal;
-  } catch (e) {}
-  try {
-    const sessionVal = sessionStorage.getItem(key);
-    if (sessionVal !== null) return sessionVal;
-  } catch (e) {}
-  return null;
+export {
+  STORAGE_KEYS,
+  safeSetStorage,
+  safeGetStorage,
+  cleanupLegacyStorage,
+  getDeletedIds,
+  addDeletedId,
+  removeDeletedId,
+  idbSet,
+  idbGet,
+  idbDelete
 };
 
 // Automatic cleanup of legacy storage keys to reclaim browser quota
-export const cleanupLegacyStorage = () => {
-  if (typeof window === 'undefined') return;
-  try {
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('keswa_') && !k.endsWith('_v3')) {
-        localStorage.removeItem(k);
-      }
-    }
-  } catch (e) {}
-};
 cleanupLegacyStorage();
 
 // Sanitize cart items before saving to storage: omit huge base64 data URIs (>2KB)
@@ -71,35 +49,6 @@ export const sanitizeCartForStorage = (cartItems) => {
     color: item.color,
     quantity: item.quantity
   }));
-};
-
-const getDeletedIds = (key) => {
-  try {
-    const raw = safeGetStorage(key);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
-};
-
-const addDeletedId = (key, id) => {
-  try {
-    const current = getDeletedIds(key);
-    if (!current.includes(id)) {
-      const updated = [...current, id];
-      safeSetStorage(key, updated);
-    }
-  } catch (e) {}
-};
-
-const removeDeletedId = (key, id) => {
-  try {
-    const current = getDeletedIds(key);
-    if (current.includes(id)) {
-      const updated = current.filter(x => x !== id);
-      safeSetStorage(key, updated);
-    }
-  } catch (e) {}
 };
 
 export const StoreProvider = ({ children }) => {
@@ -399,6 +348,98 @@ export const StoreProvider = ({ children }) => {
     }, 3500);
   };
 
+  // IndexedDB Hydration on Boot (Guarantees zero data loss even if localStorage hit quota or was pruned)
+  useEffect(() => {
+    let isMounted = true;
+    const hydrateFromIndexedDB = async () => {
+      try {
+        const [idbProds, idbContent, idbOrders] = await Promise.all([
+          idbGet(STORAGE_KEYS.PRODUCTS),
+          idbGet(STORAGE_KEYS.CONTENT),
+          idbGet(STORAGE_KEYS.ORDERS)
+        ]);
+
+        if (!isMounted) return;
+
+        const deletedProds = getDeletedIds(STORAGE_KEYS.DELETED_PRODUCTS);
+        if (Array.isArray(idbProds) && idbProds.length > 0) {
+          const validIdbProds = idbProds.filter(p => !deletedProds.includes(p.id));
+          setProducts(prev => {
+            const currentIds = new Set((prev || []).map(p => p.id));
+            const hasMissing = validIdbProds.some(p => !currentIds.has(p.id));
+            const hasNewer = validIdbProds.some(p => {
+              const cur = (prev || []).find(x => x.id === p.id);
+              return cur && p._updatedAt && (!cur._updatedAt || p._updatedAt > cur._updatedAt);
+            });
+            if (hasMissing || hasNewer || validIdbProds.length > (prev || []).length) {
+              const prodMap = new Map();
+              validIdbProds.forEach(p => prodMap.set(p.id, p));
+              (prev || []).filter(p => !deletedProds.includes(p.id)).forEach(p => {
+                const existing = prodMap.get(p.id);
+                if (!existing || (p._updatedAt && existing._updatedAt && p._updatedAt >= existing._updatedAt)) {
+                  prodMap.set(p.id, p);
+                }
+              });
+              return Array.from(prodMap.values());
+            }
+            return prev;
+          });
+        }
+
+        if (idbContent && Array.isArray(idbContent.categories) && idbContent.categories.length > 0) {
+          const deletedCats = getDeletedIds(STORAGE_KEYS.DELETED_CATEGORIES);
+          const validIdbCats = idbContent.categories.filter(c => !deletedCats.includes(c.id));
+          setSiteContent(prev => {
+            const currentCatIds = new Set((prev.categories || []).map(c => c.id));
+            const hasMissing = validIdbCats.some(c => !currentCatIds.has(c.id));
+            if (hasMissing || validIdbCats.length > (prev.categories || []).length) {
+              const catMap = new Map();
+              validIdbCats.forEach(c => catMap.set(c.id, c));
+              (prev.categories || []).filter(c => !deletedCats.includes(c.id)).forEach(c => {
+                const existing = catMap.get(c.id);
+                if (!existing || (c._updatedAt && existing._updatedAt && c._updatedAt >= existing._updatedAt)) {
+                  catMap.set(c.id, c);
+                }
+              });
+              return {
+                ...prev,
+                ...idbContent,
+                categories: Array.from(catMap.values())
+              };
+            }
+            return prev;
+          });
+        }
+
+        if (Array.isArray(idbOrders) && idbOrders.length > 0) {
+          const deletedOrders = getDeletedIds(STORAGE_KEYS.DELETED_ORDERS);
+          const validIdbOrders = idbOrders.filter(o => !deletedOrders.includes(o.id));
+          setOrders(prev => {
+            const currentOrderIds = new Set((prev || []).map(o => o.id));
+            const hasMissing = validIdbOrders.some(o => !currentOrderIds.has(o.id));
+            if (hasMissing || validIdbOrders.length > (prev || []).length) {
+              const orderMap = new Map();
+              validIdbOrders.forEach(o => orderMap.set(o.id, o));
+              (prev || []).filter(o => !deletedOrders.includes(o.id)).forEach(o => {
+                const existing = orderMap.get(o.id);
+                if (!existing || (o._updatedAt && existing._updatedAt && o._updatedAt >= existing._updatedAt)) {
+                  orderMap.set(o.id, o);
+                }
+              });
+              return Array.from(orderMap.values());
+            }
+            return prev;
+          });
+        }
+      } catch (e) {
+        console.warn('[Storage] Hydration from IndexedDB failed:', e);
+      }
+    };
+
+    hydrateFromIndexedDB();
+    return () => { isMounted = false; };
+  }, []);
+
   // Neon Database Sync on Mount
   useEffect(() => {
     let isMounted = true;
@@ -427,12 +468,13 @@ export const StoreProvider = ({ children }) => {
                 const neonCats = (contentJson.data.categories || []).filter(c => !deletedCategories.includes(c.id));
                 const localCats = (prev.categories || []).filter(c => !deletedCategories.includes(c.id));
 
-                // Smart Merge: Preserve both Neon and local custom categories
+                // Smart Merge: Preserve both Neon and local custom categories, local edits take precedence
                 const catMap = new Map();
                 neonCats.forEach(c => catMap.set(c.id, c));
-                localCats.forEach(c => {
-                  if (!catMap.has(c.id)) {
-                    catMap.set(c.id, c);
+                localCats.forEach(lc => {
+                  const nc = catMap.get(lc.id);
+                  if (!nc || (lc._updatedAt && (!nc._updatedAt || lc._updatedAt >= nc._updatedAt))) {
+                    catMap.set(lc.id, lc);
                   }
                 });
                 const mergedCategories = Array.from(catMap.values());
@@ -442,10 +484,8 @@ export const StoreProvider = ({ children }) => {
                 const localNav = (prev.navigation || []).filter(n => !deletedCategories.includes(n.id));
                 const navMap = new Map();
                 neonNav.forEach(n => navMap.set(n.id, n));
-                localNav.forEach(n => {
-                  if (!navMap.has(n.id)) {
-                    navMap.set(n.id, n);
-                  }
+                localNav.forEach(ln => {
+                  navMap.set(ln.id, ln);
                 });
                 const mergedNav = Array.from(navMap.values());
 
@@ -475,6 +515,9 @@ export const StoreProvider = ({ children }) => {
                   }).catch(() => {});
                 }
 
+                safeSetStorage(STORAGE_KEYS.CONTENT, mergedContent);
+                idbSet(STORAGE_KEYS.CONTENT, mergedContent).catch(() => {});
+
                 return mergedContent;
               });
             }
@@ -491,16 +534,27 @@ export const StoreProvider = ({ children }) => {
                 const localProds = (prev || []).filter(p => !deletedProducts.includes(p.id));
                 const prodMap = new Map();
                 neonProds.forEach(p => prodMap.set(p.id, p));
-                localProds.forEach(p => {
-                  if (!prodMap.has(p.id)) prodMap.set(p.id, p);
+
+                // Local products with newer _updatedAt or not in neon take precedence
+                localProds.forEach(lp => {
+                  const np = prodMap.get(lp.id);
+                  if (!np || (lp._updatedAt && (!np._updatedAt || lp._updatedAt >= np._updatedAt))) {
+                    prodMap.set(lp.id, lp);
+                  }
                 });
                 const mergedProds = Array.from(prodMap.values());
 
-                // If local has new products not yet in Neon, push them to Neon!
-                const hasLocalNewProds = localProds.filter(lp => !neonProds.some(np => np.id === lp.id));
-                if (hasLocalNewProds.length > 0) {
-                  hasLocalNewProds.forEach(p => persistProduct(p, 'POST'));
+                // If local has new/updated products not yet matching Neon, push them to Neon!
+                const prodsToPush = localProds.filter(lp => {
+                  const np = neonProds.find(p => p.id === lp.id);
+                  return !np || (lp._updatedAt && (!np._updatedAt || lp._updatedAt > np._updatedAt));
+                });
+                if (prodsToPush.length > 0) {
+                  prodsToPush.forEach(p => persistProduct(p, 'POST'));
                 }
+
+                safeSetStorage(STORAGE_KEYS.PRODUCTS, mergedProds);
+                idbSet(STORAGE_KEYS.PRODUCTS, mergedProds).catch(() => {});
 
                 return mergedProds;
               });
@@ -518,8 +572,11 @@ export const StoreProvider = ({ children }) => {
                 const localOrders = (prev || []).filter(o => !deletedOrders.includes(o.id));
                 const orderMap = new Map();
                 validNeonOrders.forEach(o => orderMap.set(o.id, o));
-                localOrders.forEach(o => {
-                  if (!orderMap.has(o.id)) orderMap.set(o.id, o);
+                localOrders.forEach(lo => {
+                  const no = orderMap.get(lo.id);
+                  if (!no || (lo._updatedAt && (!no._updatedAt || lo._updatedAt >= no._updatedAt))) {
+                    orderMap.set(lo.id, lo);
+                  }
                 });
                 const mergedOrders = Array.from(orderMap.values());
 
@@ -528,6 +585,9 @@ export const StoreProvider = ({ children }) => {
                 if (hasLocalNewOrders.length > 0) {
                   hasLocalNewOrders.forEach(o => persistOrder(o, 'POST'));
                 }
+
+                safeSetStorage(STORAGE_KEYS.ORDERS, mergedOrders);
+                idbSet(STORAGE_KEYS.ORDERS, mergedOrders).catch(() => {});
 
                 return mergedOrders;
               });
@@ -881,6 +941,7 @@ export const StoreProvider = ({ children }) => {
 
   // Categories & Custom Blocks Management
   const addCategory = (categoryData) => {
+    const timestamp = Date.now();
     let cleanId = (categoryData.id || categoryData.name_en || '')
       .toLowerCase()
       .trim()
@@ -889,7 +950,7 @@ export const StoreProvider = ({ children }) => {
       .replace(/^-|-$/g, '');
 
     if (!cleanId || cleanId.length < 2) {
-      cleanId = `cat-${Date.now().toString(36)}`;
+      cleanId = `cat-${timestamp.toString(36)}`;
     }
 
     const newCategory = {
@@ -907,8 +968,11 @@ export const StoreProvider = ({ children }) => {
       badge_en: categoryData.badge_en || 'NEW DROP',
       buttonText_ar: categoryData.buttonText_ar || 'تسوق التشكيلة',
       buttonText_en: categoryData.buttonText_en || 'SHOP COLLECTION',
-      isCore: false
+      isCore: false,
+      _updatedAt: timestamp
     };
+
+    removeDeletedId(STORAGE_KEYS.DELETED_CATEGORIES, cleanId);
 
     setSiteContent(prev => {
       const existingList = prev.categories || initialSiteContent.categories;
@@ -938,23 +1002,26 @@ export const StoreProvider = ({ children }) => {
         ...prev,
         categories: updatedList,
         navigation: updatedNav,
-        sectionsVisibility: updatedVisibility
+        sectionsVisibility: updatedVisibility,
+        _updatedAt: timestamp
       };
 
+      safeSetStorage(STORAGE_KEYS.CONTENT, updatedContent);
+      idbSet(STORAGE_KEYS.CONTENT, updatedContent).catch(() => {});
       persistSiteContent(updatedContent);
 
       return updatedContent;
     });
 
-    showToast(language === 'ar' ? `تمت إضافة قسم "${newCategory.name_ar}" بنجاح للواجهة الرئيسية!` : `Category "${newCategory.name_en}" added to storefront!`, "success");
-    removeDeletedId(STORAGE_KEYS.DELETED_CATEGORIES, cleanId);
+    showToast(language === 'ar' ? `تمت إضافة قسم "${newCategory.name_ar}" بنجاح للواجهة الرئيسية! 💾` : `Category "${newCategory.name_en}" added to storefront! 💾`, "success");
     return newCategory;
   };
 
   const updateCategory = (categoryId, updatedData) => {
+    const timestamp = Date.now();
     setSiteContent(prev => {
       const existingList = prev.categories || initialSiteContent.categories;
-      const updatedList = existingList.map(cat => cat.id === categoryId ? { ...cat, ...updatedData } : cat);
+      const updatedList = existingList.map(cat => cat.id === categoryId ? { ...cat, ...updatedData, _updatedAt: timestamp } : cat);
       
       const currentNav = prev.navigation || [];
       const updatedNav = currentNav.map(item => {
@@ -971,15 +1038,18 @@ export const StoreProvider = ({ children }) => {
       const updatedContent = {
         ...prev,
         categories: updatedList,
-        navigation: updatedNav
+        navigation: updatedNav,
+        _updatedAt: timestamp
       };
 
+      safeSetStorage(STORAGE_KEYS.CONTENT, updatedContent);
+      idbSet(STORAGE_KEYS.CONTENT, updatedContent).catch(() => {});
       persistSiteContent(updatedContent);
 
       return updatedContent;
     });
 
-    showToast(language === 'ar' ? "تم تحديث بيانات القسم بنجاح!" : "Category updated!", "success");
+    showToast(language === 'ar' ? "تم تحديث بيانات القسم بنجاح! 💾" : "Category updated! 💾", "success");
   };
 
   const deleteCategory = (categoryId) => {
@@ -993,9 +1063,12 @@ export const StoreProvider = ({ children }) => {
       const updatedContent = {
         ...prev,
         categories: updatedList,
-        navigation: updatedNav
+        navigation: updatedNav,
+        _updatedAt: Date.now()
       };
 
+      safeSetStorage(STORAGE_KEYS.CONTENT, updatedContent);
+      idbSet(STORAGE_KEYS.CONTENT, updatedContent).catch(() => {});
       persistSiteContent(updatedContent);
 
       return updatedContent;
@@ -1006,30 +1079,45 @@ export const StoreProvider = ({ children }) => {
 
   // Products CRUD
   const addProduct = (newProduct) => {
+    const timestamp = Date.now();
     const productWithId = {
       ...newProduct,
-      id: newProduct.id || `keswa-${Date.now()}`
+      id: newProduct.id || `keswa-${timestamp}`,
+      _updatedAt: timestamp
     };
     removeDeletedId(STORAGE_KEYS.DELETED_PRODUCTS, productWithId.id);
-    setProducts(prev => [productWithId, ...prev.filter(p => p.id !== productWithId.id)]);
+    setProducts(prev => {
+      const updated = [productWithId, ...prev.filter(p => p.id !== productWithId.id)];
+      safeSetStorage(STORAGE_KEYS.PRODUCTS, updated);
+      idbSet(STORAGE_KEYS.PRODUCTS, updated).catch(() => {});
+      return updated;
+    });
     persistProduct(productWithId, 'POST');
-    showToast(language === 'ar' ? "تمت إضافة المنتج بنجاح!" : "Product added!", "success");
+    showToast(language === 'ar' ? "تمت إضافة المنتج بنجاح وتثبيته بالواجهة! 💾" : "Product added! 💾", "success");
     return productWithId;
   };
 
   const updateProduct = (id, updatedFields) => {
+    const timestamp = Date.now();
     setProducts(prev => {
-      const next = prev.map(p => p.id === id ? { ...p, ...updatedFields } : p);
+      const next = prev.map(p => p.id === id ? { ...p, ...updatedFields, _updatedAt: timestamp } : p);
       const found = next.find(p => p.id === id);
       if (found) persistProduct(found, 'POST');
+      safeSetStorage(STORAGE_KEYS.PRODUCTS, next);
+      idbSet(STORAGE_KEYS.PRODUCTS, next).catch(() => {});
       return next;
     });
-    showToast(language === 'ar' ? "تم تحديث بيانات المنتج بنجاح!" : "Product updated successfully!", "success");
+    showToast(language === 'ar' ? "تم تحديث بيانات المنتج بنجاح! 💾" : "Product updated successfully! 💾", "success");
   };
 
   const deleteProduct = (id) => {
     addDeletedId(STORAGE_KEYS.DELETED_PRODUCTS, id);
-    setProducts(prev => prev.filter(p => p.id !== id));
+    setProducts(prev => {
+      const next = prev.filter(p => p.id !== id);
+      safeSetStorage(STORAGE_KEYS.PRODUCTS, next);
+      idbSet(STORAGE_KEYS.PRODUCTS, next).catch(() => {});
+      return next;
+    });
     persistProduct({ id }, 'DELETE');
     showToast(language === 'ar' ? "تم حذف المنتج من المتجر." : "Product deleted from store.", "info");
   };
@@ -1111,6 +1199,7 @@ export const StoreProvider = ({ children }) => {
 
   // Checkout & Orders Management (FIXED & PERSISTED)
   const createOrder = (customerDetails) => {
+    const timestamp = Date.now();
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = subtotal >= (siteContent.general?.freeShippingThreshold || 1500) ? 0 : (siteContent.general?.shippingCost || 50);
     const total = subtotal + shipping;
@@ -1124,11 +1213,17 @@ export const StoreProvider = ({ children }) => {
       total,
       status: "Pending",
       paymentMethod: customerDetails.paymentMethod || "الدفع عند الاستلام (COD)",
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      _updatedAt: timestamp
     };
 
     removeDeletedId(STORAGE_KEYS.DELETED_ORDERS, newOrder.id);
-    setOrders(prev => [newOrder, ...prev.filter(o => o.id !== newOrder.id)]);
+    setOrders(prev => {
+      const updated = [newOrder, ...prev.filter(o => o.id !== newOrder.id)];
+      safeSetStorage(STORAGE_KEYS.ORDERS, updated);
+      idbSet(STORAGE_KEYS.ORDERS, updated).catch(() => {});
+      return updated;
+    });
     persistOrder(newOrder, 'POST');
     clearCart();
     // NOTE: We do NOT close isCheckoutOpen here so the customer sees the confirmed order screen!
@@ -1136,12 +1231,15 @@ export const StoreProvider = ({ children }) => {
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
+    const timestamp = Date.now();
     setOrders(prev => {
-      const next = prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
+      const next = prev.map(o => o.id === orderId ? { ...o, status: newStatus, _updatedAt: timestamp } : o);
       const target = next.find(o => o.id === orderId);
       if (target) {
         persistOrder(target, 'POST');
       }
+      safeSetStorage(STORAGE_KEYS.ORDERS, next);
+      idbSet(STORAGE_KEYS.ORDERS, next).catch(() => {});
       return next;
     });
     showToast(
@@ -1154,7 +1252,12 @@ export const StoreProvider = ({ children }) => {
 
   const deleteOrder = (orderId) => {
     addDeletedId(STORAGE_KEYS.DELETED_ORDERS, orderId);
-    setOrders(prev => prev.filter(o => o.id !== orderId));
+    setOrders(prev => {
+      const next = prev.filter(o => o.id !== orderId);
+      safeSetStorage(STORAGE_KEYS.ORDERS, next);
+      idbSet(STORAGE_KEYS.ORDERS, next).catch(() => {});
+      return next;
+    });
     persistOrder({ id: orderId }, 'DELETE');
     showToast(language === 'ar' ? `تم حذف الطلب #${orderId} نهائياً` : `Order #${orderId} deleted`, "info");
   };
@@ -1163,12 +1266,15 @@ export const StoreProvider = ({ children }) => {
     if (window.confirm(language === 'ar' ? "هل تريد مسح كافة الطلبات المسجلة؟" : "Clear all registered orders?")) {
       orders.forEach(o => addDeletedId(STORAGE_KEYS.DELETED_ORDERS, o.id));
       setOrders([]);
+      safeSetStorage(STORAGE_KEYS.ORDERS, []);
+      idbSet(STORAGE_KEYS.ORDERS, []).catch(() => {});
       persistOrder({ clearAll: true }, 'DELETE');
       showToast(language === 'ar' ? "تم مسح كافة الطلبات بنجاح" : "All orders cleared", "info");
     }
   };
 
   const addTestOrder = () => {
+    const timestamp = Date.now();
     const sampleProduct = products[0];
     const testOrder = {
       id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -1196,15 +1302,22 @@ export const StoreProvider = ({ children }) => {
       total: (sampleProduct?.price || 850) + 50,
       status: "Pending",
       paymentMethod: "الدفع عند الاستلام (COD)",
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      _updatedAt: timestamp
     };
     removeDeletedId(STORAGE_KEYS.DELETED_ORDERS, testOrder.id);
-    setOrders(prev => [testOrder, ...prev.filter(o => o.id !== testOrder.id)]);
+    setOrders(prev => {
+      const updated = [testOrder, ...prev.filter(o => o.id !== testOrder.id)];
+      safeSetStorage(STORAGE_KEYS.ORDERS, updated);
+      idbSet(STORAGE_KEYS.ORDERS, updated).catch(() => {});
+      return updated;
+    });
     persistOrder(testOrder, 'POST');
     showToast(language === 'ar' ? "تمت إضافة طلب تجريبي جديد بنجاح!" : "Test order added!", "success");
   };
 
   const updateOrderDetails = (orderId, updatedDetails) => {
+    const timestamp = Date.now();
     setOrders(prev => {
       const next = prev.map(o => {
         if (o.id === orderId) {
@@ -1216,7 +1329,8 @@ export const StoreProvider = ({ children }) => {
             },
             status: updatedDetails.status !== undefined ? updatedDetails.status : o.status,
             paymentMethod: updatedDetails.paymentMethod !== undefined ? updatedDetails.paymentMethod : o.paymentMethod,
-            total: updatedDetails.total !== undefined ? Number(updatedDetails.total) : o.total
+            total: updatedDetails.total !== undefined ? Number(updatedDetails.total) : o.total,
+            _updatedAt: timestamp
           };
         }
         return o;
@@ -1225,12 +1339,15 @@ export const StoreProvider = ({ children }) => {
       if (target) {
         persistOrder(target, 'POST');
       }
+      safeSetStorage(STORAGE_KEYS.ORDERS, next);
+      idbSet(STORAGE_KEYS.ORDERS, next).catch(() => {});
       return next;
     });
     showToast(language === 'ar' ? "تم حفظ تعديلات الطلب وتثبيتها بنجاح! 💾" : "Order details saved! 💾", "success");
   };
 
   const createManualOrder = (orderData) => {
+    const timestamp = Date.now();
     const subtotal = Number(orderData.subtotal) || 0;
     const shipping = Number(orderData.shipping) || 0;
     const total = Number(orderData.total) || (subtotal + shipping);
@@ -1250,10 +1367,16 @@ export const StoreProvider = ({ children }) => {
       total,
       status: orderData.status || "Pending",
       paymentMethod: orderData.paymentMethod || "الدفع عند الاستلام (COD)",
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      _updatedAt: timestamp
     };
     removeDeletedId(STORAGE_KEYS.DELETED_ORDERS, newOrder.id);
-    setOrders(prev => [newOrder, ...prev.filter(o => o.id !== newOrder.id)]);
+    setOrders(prev => {
+      const updated = [newOrder, ...prev.filter(o => o.id !== newOrder.id)];
+      safeSetStorage(STORAGE_KEYS.ORDERS, updated);
+      idbSet(STORAGE_KEYS.ORDERS, updated).catch(() => {});
+      return updated;
+    });
     persistOrder(newOrder, 'POST');
     showToast(language === 'ar' ? `تم إنشاء الطلب #${newOrder.id} بنجاح وحفظه! 💾` : `Manual order #${newOrder.id} created! 💾`, "success");
     return newOrder;

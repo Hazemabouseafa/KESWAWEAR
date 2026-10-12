@@ -3,7 +3,7 @@
  * Handles file reading, canvas compression, and validation
  */
 
-export const processImageFile = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.76) => {
+export const processImageFile = (file, maxWidth = 900, maxHeight = 900, quality = 0.70) => {
   return new Promise((resolve, reject) => {
     if (!file) {
       reject(new Error("لم يتم تحديد أي ملف"));
@@ -36,24 +36,24 @@ export const processImageFile = (file, maxWidth = 1200, maxHeight = 1200, qualit
 
           const ctx = canvas.getContext('2d');
           if (!ctx) {
-            // Fallback to original data URL if canvas context unavailable
             resolve(readerEvent.target.result);
             return;
           }
 
-          // Use high quality image smoothing
           ctx.imageSmoothingEnabled = true;
           ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Convert to optimized JPEG or keep PNG if transparent
-          const isPng = file.type === 'image/png' && file.size < 800000;
-          const outputType = isPng ? 'image/png' : 'image/jpeg';
-          const dataUrl = canvas.toDataURL(outputType, quality);
+          // Convert to optimized JPEG for minimal storage footprint
+          let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+          // If payload is still larger than 160KB, re-compress gently to save quota
+          if (dataUrl.length > 220000) {
+            dataUrl = canvas.toDataURL('image/jpeg', 0.62);
+          }
 
           resolve(dataUrl);
         } catch (err) {
-          // If canvas fails, fallback to raw reader result
           resolve(readerEvent.target.result);
         }
       };
