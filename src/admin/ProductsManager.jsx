@@ -41,6 +41,7 @@ export const ProductsManager = () => {
   const [editingProductId, setEditingProductId] = useState(null);
 
   const [customSizeInput, setCustomSizeInput] = useState('');
+  const [activeColorIdx, setActiveColorIdx] = useState(0);
   const [newColorForm, setNewColorForm] = useState({
     name_ar: '',
     name_en: '',
@@ -60,7 +61,7 @@ export const ProductsManager = () => {
     images: ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop'],
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
-      { name_ar: 'أسود', name_en: 'Black', hex: '#111111' }
+      { name_ar: 'أسود', name_en: 'Black', hex: '#111111', images: [] }
     ]
   });
 
@@ -79,10 +80,11 @@ export const ProductsManager = () => {
       images: ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop'],
       sizes: ['S', 'M', 'L', 'XL'],
       colors: [
-        { name_ar: 'أسود', name_en: 'Black', hex: '#111111' }
+        { name_ar: 'أسود', name_en: 'Black', hex: '#111111', images: [] }
       ]
     });
     setEditingProductId(null);
+    setActiveColorIdx(0);
     setIsFormActive(true);
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -102,13 +104,15 @@ export const ProductsManager = () => {
       description_en: prod.description_en || prod.description || '',
       images: prod.images && prod.images.length > 0 ? [...prod.images] : [''],
       sizes: prod.sizes ? [...prod.sizes] : ['S', 'M', 'L', 'XL'],
-      colors: prod.colors ? prod.colors.map(c => ({
+      colors: prod.colors && prod.colors.length > 0 ? prod.colors.map(c => ({
         name_ar: c.name_ar || c.name || 'لون',
         name_en: c.name_en || c.name || 'Color',
-        hex: c.hex || '#111111'
-      })) : [{ name_ar: 'أسود', name_en: 'Black', hex: '#111111' }]
+        hex: c.hex || '#111111',
+        images: Array.isArray(c.images) ? [...c.images] : []
+      })) : [{ name_ar: 'أسود', name_en: 'Black', hex: '#111111', images: [] }]
     });
     setEditingProductId(prod.id);
+    setActiveColorIdx(0);
     setIsFormActive(true);
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -139,7 +143,13 @@ export const ProductsManager = () => {
       name: productForm.name_ar || productForm.name_en,
       price: Number(productForm.price),
       oldPrice: null, // Zero discounts
-      images: productForm.images.filter(img => img && img.trim().length > 0)
+      images: productForm.images.filter(img => img && img.trim().length > 0),
+      colors: productForm.colors.map(c => ({
+        name_ar: c.name_ar,
+        name_en: c.name_en,
+        hex: c.hex,
+        images: (c.images || []).filter(img => img && img.trim().length > 0)
+      }))
     };
 
     if (editingProductId) {
@@ -178,22 +188,76 @@ export const ProductsManager = () => {
   const handleAddColor = (colorObj) => {
     if (!colorObj.hex) return;
     const exists = productForm.colors.some(c => c.hex?.toLowerCase() === colorObj.hex?.toLowerCase());
-    if (exists) return;
+    if (exists) {
+      const existingIdx = productForm.colors.findIndex(c => c.hex?.toLowerCase() === colorObj.hex?.toLowerCase());
+      if (existingIdx !== -1) setActiveColorIdx(existingIdx);
+      return;
+    }
+    const newColor = {
+      name_ar: colorObj.name_ar || 'لون',
+      name_en: colorObj.name_en || 'Color',
+      hex: colorObj.hex,
+      images: []
+    };
     setProductForm(prev => ({
       ...prev,
-      colors: [...prev.colors, {
-        name_ar: colorObj.name_ar || 'لون',
-        name_en: colorObj.name_en || 'Color',
-        hex: colorObj.hex
-      }]
+      colors: [...prev.colors, newColor]
     }));
+    setActiveColorIdx(productForm.colors.length);
   };
 
   const handleRemoveColor = (index) => {
-    setProductForm(prev => ({
-      ...prev,
-      colors: prev.colors.filter((_, i) => i !== index)
-    }));
+    setProductForm(prev => {
+      const remaining = prev.colors.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        colors: remaining.length > 0 ? remaining : [{ name_ar: 'أسود', name_en: 'Black', hex: '#111111', images: [] }]
+      };
+    });
+    setActiveColorIdx(prev => Math.max(0, prev >= index ? prev - 1 : prev));
+  };
+
+  const handleAddColorImage = (colorIndex) => {
+    setProductForm(prev => {
+      const colors = [...prev.colors];
+      if (colors[colorIndex]) {
+        const currentImgs = colors[colorIndex].images || [];
+        colors[colorIndex] = {
+          ...colors[colorIndex],
+          images: [...currentImgs, '']
+        };
+      }
+      return { ...prev, colors };
+    });
+  };
+
+  const handleUpdateColorImage = (colorIndex, imgIndex, url) => {
+    setProductForm(prev => {
+      const colors = [...prev.colors];
+      if (colors[colorIndex]) {
+        const currentImgs = [...(colors[colorIndex].images || [])];
+        currentImgs[imgIndex] = url;
+        colors[colorIndex] = {
+          ...colors[colorIndex],
+          images: currentImgs
+        };
+      }
+      return { ...prev, colors };
+    });
+  };
+
+  const handleDeleteColorImage = (colorIndex, imgIndex) => {
+    setProductForm(prev => {
+      const colors = [...prev.colors];
+      if (colors[colorIndex]) {
+        const currentImgs = (colors[colorIndex].images || []).filter((_, i) => i !== imgIndex);
+        colors[colorIndex] = {
+          ...colors[colorIndex],
+          images: currentImgs
+        };
+      }
+      return { ...prev, colors };
+    });
   };
 
   const filteredProducts = products.filter(p => {
@@ -549,52 +613,231 @@ export const ProductsManager = () => {
               </div>
             </div>
 
-            {/* Card 5: Colors Management */}
-            <div className="bg-[#16161f] border border-white/10 rounded-lg p-4 sm:p-5 space-y-4 shadow-lg">
-              <div className="border-b border-white/10 pb-3">
-                <h3 className="text-sm font-black text-white flex items-center gap-2">
-                  <Palette size={16} className="text-rose-400" />
-                  <span>ألوان المنتج المتاحة ({productForm.colors.length})</span>
+          </div>
+
+          {/* Card 5: Full-Width Dedicated Colors & Dedicated Color Images Management */}
+          <div className="lg:col-span-3 bg-[#16161f] border border-white/10 rounded-lg p-4 sm:p-6 space-y-5 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                  <Palette size={18} className="text-rose-400" />
+                  <span>ألوان المنتج ومعرض الصور الخاص بكل لون ({productForm.colors.length} ألوان مضافة)</span>
                 </h3>
-                <span className="text-[11px] text-gray-400">تظهر كدوائر لونية في صفحة المنتج</span>
+                <p className="text-xs text-gray-400 mt-1">
+                  يمكنك تحديد ألوان المنتج ورفع صور مخصصة لكل لون على حدة. عند اختيار العميل لأي لون في المتجر، ستتحول صور المعرض تلقائياً لصور هذا اللون.
+                </p>
               </div>
 
-              {/* Current Colors Badges */}
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[11px] font-mono text-gray-400 bg-neutral-900 px-2.5 py-1 rounded border border-white/10">
+                  اللون المحدد حالياً: <strong className="text-white">{productForm.colors[activeColorIdx]?.name_ar || 'اختر لوناً'}</strong>
+                </span>
+              </div>
+            </div>
+
+            {/* Color Selector Tabs */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-gray-300 block">اختر اللون لإضافة أو تعديل صوره الخاصة:</span>
               <div className="flex flex-wrap gap-2">
-                {productForm.colors.map((c, i) => (
-                  <div 
-                    key={i}
-                    className="flex items-center gap-2 bg-neutral-900 border border-white/15 px-2.5 py-1.5 rounded"
-                  >
-                    <span 
-                      className="w-4 h-4 rounded-full border border-white/20 shrink-0" 
-                      style={{ backgroundColor: c.hex }}
-                    />
-                    <span className="text-xs text-white font-bold">{c.name_ar || c.name_en}</span>
+                {productForm.colors.map((c, i) => {
+                  const isActive = activeColorIdx === i;
+                  const imgCount = c.images?.filter(Boolean).length || 0;
+                  return (
                     <button
+                      key={i}
                       type="button"
-                      onClick={() => handleRemoveColor(i)}
-                      className="text-gray-400 hover:text-rose-400 p-0.5"
-                      title="حذف هذا اللون"
+                      onClick={() => setActiveColorIdx(i)}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-bold transition-all touch-manipulation ${
+                        isActive 
+                          ? 'bg-white text-black border-white shadow-lg ring-2 ring-white/20 scale-102 font-black' 
+                          : 'bg-neutral-900 text-gray-300 border-white/10 hover:border-white/30 hover:text-white'
+                      }`}
                     >
-                      <X size={12} />
+                      <span 
+                        className="w-4 h-4 rounded-full border border-black/20 shrink-0" 
+                        style={{ backgroundColor: c.hex }} 
+                      />
+                      <span>{c.name_ar || c.name_en}</span>
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                        isActive ? 'bg-black text-white' : imgCount > 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-neutral-800 text-gray-400'
+                      }`}>
+                        {imgCount} {imgCount === 1 ? 'صورة' : 'صور'}
+                      </span>
                     </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+            </div>
 
-              {/* Quick Preset Colors */}
-              <div className="pt-2 border-t border-white/5">
-                <span className="text-[11px] text-gray-400 block mb-2 font-mono">ألوان شائعة سريعة (انقر للإضافة):</span>
+            {/* Active Color Details & Color-Specific Images Panel */}
+            {productForm.colors[activeColorIdx] && (() => {
+              const currentColor = productForm.colors[activeColorIdx];
+              const colorImages = currentColor.images || [];
+
+              return (
+                <div className="bg-black/40 border border-white/10 rounded-lg p-4 sm:p-5 space-y-5 animate-fadeIn">
+                  
+                  {/* Top: Color Details & Delete Button */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span 
+                          className="w-6 h-6 rounded-full border-2 border-white/40 shadow shrink-0"
+                          style={{ backgroundColor: currentColor.hex }}
+                        />
+                        <span className="text-sm font-black text-white">{currentColor.name_ar}</span>
+                        <span className="text-xs font-mono text-gray-400">({currentColor.name_en})</span>
+                      </div>
+
+                      {/* Edit Color Name & HEX Inline */}
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="text"
+                          value={currentColor.name_ar}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setProductForm(prev => {
+                              const colors = [...prev.colors];
+                              colors[activeColorIdx] = { ...colors[activeColorIdx], name_ar: val };
+                              return { ...prev, colors };
+                            });
+                          }}
+                          placeholder="الاسم بالعربية"
+                          className="bg-neutral-900 border border-white/15 px-2.5 py-1 text-xs text-white rounded outline-none focus:border-white w-28 font-bold"
+                        />
+                        <input 
+                          type="text"
+                          value={currentColor.name_en}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setProductForm(prev => {
+                              const colors = [...prev.colors];
+                              colors[activeColorIdx] = { ...colors[activeColorIdx], name_en: val };
+                              return { ...prev, colors };
+                            });
+                          }}
+                          placeholder="Name EN"
+                          className="bg-neutral-900 border border-white/15 px-2.5 py-1 text-xs text-white rounded outline-none focus:border-white w-24 font-mono"
+                        />
+                        <input 
+                          type="color"
+                          value={currentColor.hex}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setProductForm(prev => {
+                              const colors = [...prev.colors];
+                              colors[activeColorIdx] = { ...colors[activeColorIdx], hex: val };
+                              return { ...prev, colors };
+                            });
+                          }}
+                          className="w-8 h-7 rounded bg-transparent cursor-pointer border border-white/20 p-0.5"
+                          title="تغيير كود اللون HEX"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleAddColorImage(activeColorIdx)}
+                        className="bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-colors touch-manipulation"
+                      >
+                        <Plus size={13} />
+                        <span>إضافة صورة لهذا اللون</span>
+                      </button>
+
+                      {productForm.colors.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveColor(activeColorIdx)}
+                          className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-colors touch-manipulation"
+                          title="حذف هذا اللون بالكامل"
+                        >
+                          <Trash2 size={13} />
+                          <span>حذف هذا اللون</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Images Grid for This Color */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+                        <ImageIcon size={14} className="text-cyan-400" />
+                        <span>معرض صور لون "{currentColor.name_ar}" ({colorImages.filter(Boolean).length} صور):</span>
+                      </label>
+                      <span className="text-[11px] text-gray-400">
+                        {colorImages.length === 0 ? 'لا توجد صور خاصة (يستخدم صور الغلاف العامة)' : 'هذه الصور ستظهر حصرياً عند نقر العميل على هذا اللون'}
+                      </span>
+                    </div>
+
+                    {colorImages.length === 0 ? (
+                      <div className="border border-dashed border-white/15 bg-neutral-900/40 rounded-lg p-6 text-center space-y-3">
+                        <ImageIcon size={28} className="text-gray-500 mx-auto" />
+                        <p className="text-xs text-gray-400 max-w-md mx-auto leading-relaxed">
+                          لم تقم برفع صور خاصة بلون <strong className="text-white">{currentColor.name_ar}</strong> بعد. في هذه الحالة سيعرض المتجر صور المنتج العامة تلقائياً.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => handleAddColorImage(activeColorIdx)}
+                          className="bg-white hover:bg-neutral-200 text-black px-4 py-2 rounded text-xs font-black inline-flex items-center gap-1.5 transition-all shadow"
+                        >
+                          <Plus size={14} />
+                          <span>رفع وإضافة أول صورة لهذا اللون</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                        {colorImages.map((imgUrl, imgIdx) => (
+                          <div key={imgIdx} className="p-3 bg-neutral-900 rounded-lg border border-white/10 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className={`text-[11px] font-mono font-bold ${imgIdx === 0 ? 'text-amber-400' : 'text-gray-300'}`}>
+                                {imgIdx === 0 ? `★ غلاف لون ${currentColor.name_ar}:` : `صورة إضافية #${imgIdx + 1}:`}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteColorImage(activeColorIdx, imgIdx)}
+                                className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 transition-colors touch-manipulation"
+                                title="حذف هذه الصورة من اللون"
+                              >
+                                <Trash2 size={11} />
+                                <span>حذف</span>
+                              </button>
+                            </div>
+
+                            <ImageUploader 
+                              value={imgUrl || ''}
+                              onChange={(url) => handleUpdateColorImage(activeColorIdx, imgIdx, url)}
+                              label=""
+                              previewHeight="h-32 sm:h-36"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              );
+            })()}
+
+            {/* Quick Add Presets & Custom Color Form */}
+            <div className="pt-3 border-t border-white/10 space-y-4">
+              {/* Presets */}
+              <div>
+                <span className="text-[11px] font-mono text-gray-400 block mb-2 font-bold">
+                  إضافة ألوان شائعة سريعة (انقر للإضافة):
+                </span>
                 <div className="flex flex-wrap gap-1.5">
                   {COLOR_PRESETS.map((preset, idx) => (
                     <button
                       type="button"
                       key={idx}
                       onClick={() => handleAddColor(preset)}
-                      className="flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 border border-white/10 px-2 py-1 rounded text-[11px] text-gray-300 transition-colors touch-manipulation"
+                      className="flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 border border-white/10 px-2.5 py-1.5 rounded text-xs text-gray-300 transition-colors touch-manipulation"
                     >
-                      <span className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: preset.hex }} />
+                      <span className="w-3.5 h-3.5 rounded-full border border-white/20" style={{ backgroundColor: preset.hex }} />
                       <span>{preset.name_ar}</span>
                     </button>
                   ))}
@@ -603,39 +846,50 @@ export const ProductsManager = () => {
 
               {/* Custom Color Input */}
               <div className="pt-2 border-t border-white/5 space-y-2">
-                <span className="text-[11px] text-gray-400 block font-mono">إضافة لون مخصص:</span>
-                <div className="grid grid-cols-2 gap-2">
+                <span className="text-[11px] font-mono text-gray-400 block font-bold">إضافة لون مخصص جديد:</span>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                   <input 
                     type="text"
-                    placeholder="اسم اللون بالعربية"
+                    placeholder="اسم اللون بالعربية (مثال: بترولي)"
                     value={newColorForm.name_ar}
                     onChange={(e) => setNewColorForm({ ...newColorForm, name_ar: e.target.value })}
-                    className="bg-neutral-900 border border-white/15 px-2.5 py-1.5 text-xs text-white rounded outline-none"
+                    className="bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded outline-none font-bold"
                   />
-                  <div className="flex gap-2">
+                  <input 
+                    type="text"
+                    placeholder="English Name (e.g. Teal)"
+                    value={newColorForm.name_en}
+                    onChange={(e) => setNewColorForm({ ...newColorForm, name_en: e.target.value })}
+                    className="bg-neutral-900 border border-white/15 px-3 py-2 text-xs text-white rounded outline-none font-mono"
+                  />
+                  <div className="flex items-center gap-2">
                     <input 
                       type="color"
                       value={newColorForm.hex}
                       onChange={(e) => setNewColorForm({ ...newColorForm, hex: e.target.value })}
-                      className="w-10 h-8 rounded bg-transparent cursor-pointer border border-white/20 p-0.5"
+                      className="w-12 h-9 rounded bg-transparent cursor-pointer border border-white/20 p-0.5"
                     />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (newColorForm.name_ar) {
-                          handleAddColor({
-                            name_ar: newColorForm.name_ar,
-                            name_en: newColorForm.name_en || newColorForm.name_ar,
-                            hex: newColorForm.hex
-                          });
-                          setNewColorForm({ name_ar: '', name_en: '', hex: '#111111' });
-                        }
-                      }}
-                      className="flex-1 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold rounded border border-white/10 transition-colors"
-                    >
-                      + إضافة
-                    </button>
+                    <span className="text-xs font-mono text-gray-400">{newColorForm.hex}</span>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newColorForm.name_ar) {
+                        handleAddColor({
+                          name_ar: newColorForm.name_ar,
+                          name_en: newColorForm.name_en || newColorForm.name_ar,
+                          hex: newColorForm.hex
+                        });
+                        setNewColorForm({ name_ar: '', name_en: '', hex: '#111111' });
+                      } else {
+                        alert("يرجى كتابة اسم اللون أولاً");
+                      }
+                    }}
+                    className="bg-white hover:bg-neutral-200 text-black text-xs font-black rounded border border-white transition-all shadow flex items-center justify-center gap-1.5 py-2"
+                  >
+                    <Plus size={14} />
+                    <span>إضافة هذا اللون إلى المنتج</span>
+                  </button>
                 </div>
               </div>
 

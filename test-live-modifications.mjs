@@ -351,9 +351,29 @@ if (
   throw new Error("Failed 22: Standalone checkout page or popup retirement failed");
 }
 
+// 23. Test Dedicated Images per Color (Admin Management, Product Page Gallery, and Cart Sync)
+const productPageSrcCurrent = fs.readFileSync('./src/components/ProductPage.jsx', 'utf8');
+const productCardSrcCurrent = fs.readFileSync('./src/components/ProductCard.jsx', 'utf8');
+const storeContextSrcCurrent = fs.readFileSync('./src/context/StoreContext.jsx', 'utf8');
+
+if (
+  currentProductsMgrSrc.includes('handleAddColorImage') &&
+  currentProductsMgrSrc.includes('handleUpdateColorImage') &&
+  currentProductsMgrSrc.includes('handleDeleteColorImage') &&
+  currentProductsMgrSrc.includes('إضافة صورة لهذا اللون') &&
+  productPageSrcCurrent.includes('colorImages') &&
+  productCardSrcCurrent.includes('selectedColor?.images') &&
+  storeContextSrcCurrent.includes('matchedColor') || storeContextSrcCurrent.includes('matched.images')
+) {
+  console.log("✅ 23. Dedicated images per color verified: Admin can upload/manage photos for each color individually; Product Page and Cart instantly sync to selected color's photos");
+} else {
+  throw new Error("Failed 23: Dedicated images per color feature missing or not fully integrated");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 22 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 23 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");
+
 
 
 

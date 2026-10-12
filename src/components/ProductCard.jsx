@@ -46,7 +46,7 @@ export const ProductCard = ({ product }) => {
       {/* Product Image Container */}
       <div className="relative w-full aspect-[3/4] bg-[#f1efe9] overflow-hidden">
         <img 
-          src={product.images?.[0] || ''} 
+          src={(selectedColor?.images && selectedColor.images[0]) || product.images?.[0] || ''} 
           alt={productName}
           className="w-full h-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105" 
           loading="lazy"

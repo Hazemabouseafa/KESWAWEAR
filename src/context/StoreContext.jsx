@@ -953,12 +953,28 @@ export const StoreProvider = ({ children }) => {
   };
 
   // Cart Management
-  const addToCart = (product, size = 'L', color = null, quantity = 1) => {
+  const addToCart = (product, size = 'L', color = null, quantity = 1, customImage = null) => {
     const selectedColor = color || (product.colors?.[0]?.name_ar || product.colors?.[0]?.name_en || 'Standard');
     const selectedSize = size || (product.sizes?.[0] || 'L');
     const cartItemId = `${product.id}-${selectedSize}-${selectedColor}`;
 
     const productName = getLocalized(product, 'name');
+
+    // Find image: customImage or matched color's dedicated image or product's primary image
+    let itemImage = customImage;
+    if (!itemImage && product.colors) {
+      const matched = product.colors.find(c => 
+        (c.name_ar && c.name_ar === selectedColor) || 
+        (c.name_en && c.name_en === selectedColor) ||
+        (c.name && c.name === selectedColor)
+      );
+      if (matched?.images && matched.images.length > 0 && matched.images[0]) {
+        itemImage = matched.images[0];
+      }
+    }
+    if (!itemImage) {
+      itemImage = product.images?.[0] || '';
+    }
 
     setCart(prev => {
       const existing = prev.find(item => item.cartItemId === cartItemId);
@@ -978,7 +994,7 @@ export const StoreProvider = ({ children }) => {
           name_ar: product.name_ar,
           name_en: product.name_en,
           price: product.price,
-          image: product.images?.[0] || '',
+          image: itemImage,
           size: selectedSize,
           color: selectedColor,
           quantity

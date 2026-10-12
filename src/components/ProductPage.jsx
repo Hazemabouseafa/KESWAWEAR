@@ -77,9 +77,13 @@ export const ProductPage = ({ productId, onBackToStore }) => {
   const badge = getLocalized(product, 'badge');
   const isFavorite = wishlist.includes(product.id);
   const currency = t('actions.egp');
-  const images = product.images && product.images.length > 0 
+  const colorImages = (selectedColor?.images && selectedColor.images.filter(Boolean).length > 0) 
+    ? selectedColor.images.filter(Boolean) 
+    : null;
+
+  const images = colorImages || (product.images && product.images.length > 0 
     ? product.images 
-    : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop'];
+    : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop']);
 
   const categoryItem = siteContent?.categories?.find(c => c.id === product.category);
   const categoryName = categoryItem ? (getLocalized(categoryItem, 'name') || categoryItem.name_en) : product.category;
@@ -338,7 +342,10 @@ export const ProductPage = ({ productId, onBackToStore }) => {
                       return (
                         <button
                           key={i}
-                          onClick={() => setSelectedColor(c)}
+                          onClick={() => {
+                            setSelectedColor(c);
+                            setSelectedImageIdx(0);
+                          }}
                           className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer ${
                             active 
                               ? 'border-black bg-black text-white shadow-sm' 
@@ -351,6 +358,11 @@ export const ProductPage = ({ productId, onBackToStore }) => {
                             style={{ backgroundColor: c.hex }} 
                           />
                           <span>{colorTitle}</span>
+                          {c.images && c.images.length > 0 && (
+                            <span className={`text-[10px] font-mono px-1 rounded ${active ? 'bg-white/20 text-white' : 'bg-neutral-100 text-neutral-600'}`}>
+                              {c.images.length} {language === 'ar' ? 'صور' : 'imgs'}
+                            </span>
+                          )}
                         </button>
                       );
                     })}
