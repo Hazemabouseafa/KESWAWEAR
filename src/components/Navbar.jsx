@@ -196,13 +196,17 @@ export const Navbar = () => {
 
               {/* Cart Button */}
               <button 
-                onClick={() => setIsCartOpen(true)}
-                className="relative p-1.5 sm:p-2 text-neutral-700 hover:text-black transition-colors group flex items-center touch-manipulation"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsCartOpen(true);
+                }}
+                className="relative p-2 sm:p-2.5 text-neutral-700 hover:text-black transition-colors group flex items-center justify-center min-w-[42px] min-h-[42px] touch-manipulation cursor-pointer active:scale-95"
                 title={t('nav.cart')}
+                aria-label={t('nav.cart')}
               >
                 <ShoppingBag size={20} className="group-hover:scale-110 transition-transform" />
                 {cartItemsCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-bounce">
+                  <span className="absolute top-0.5 end-0.5 bg-black text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center animate-bounce shadow-sm">
                     {cartItemsCount}
                   </span>
                 )}
@@ -236,17 +240,28 @@ export const Navbar = () => {
                 ))}
               </div>
 
-              {/* Quick Customer Links */}
-              <div className="pt-2 border-t border-[#dedcd4] grid grid-cols-2 gap-2">
+              {/* Quick Customer Links with Direct Mobile Cart */}
+              <div className="pt-2 border-t border-[#dedcd4] grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsCartOpen(true);
+                  }}
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs active:bg-neutral-100 touch-manipulation cursor-pointer"
+                >
+                  <ShoppingBag size={14} className="text-black shrink-0" />
+                  <span className="truncate">{language === 'ar' ? 'السلة' : 'Cart'} ({cartItemsCount})</span>
+                </button>
+
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setIsTrackOrderOpen(true);
                   }}
-                  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs active:bg-neutral-100 touch-manipulation cursor-pointer"
                 >
                   <span>📦</span>
-                  <span>{language === 'ar' ? 'تتبع طلبي' : 'Track Order'}</span>
+                  <span className="truncate">{language === 'ar' ? 'تتبع طلبي' : 'Track Order'}</span>
                 </button>
 
                 <button
@@ -254,10 +269,10 @@ export const Navbar = () => {
                     setMobileMenuOpen(false);
                     handleWishlistClick();
                   }}
-                  className="flex items-center justify-center gap-2 py-2.5 px-3 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs"
+                  className="flex items-center justify-center gap-1.5 py-2.5 px-2 bg-white border border-[#dedcd4] text-xs font-bold text-neutral-800 rounded shadow-xs active:bg-neutral-100 touch-manipulation cursor-pointer"
                 >
-                  <Heart size={14} className="text-red-500" />
-                  <span>{language === 'ar' ? 'المفضلة' : 'Wishlist'} ({wishlist.length})</span>
+                  <Heart size={14} className="text-red-500 shrink-0" />
+                  <span className="truncate">{language === 'ar' ? 'المفضلة' : 'Wishlist'} ({wishlist.length})</span>
                 </button>
               </div>
 

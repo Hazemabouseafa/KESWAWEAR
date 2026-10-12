@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ArrowLeft, Truck, Check } from 'lucide-react';
 
@@ -30,6 +30,29 @@ export const CartDrawer = () => {
   const remainingForFreeShipping = Math.max(0, freeShippingThreshold - cartSubtotal);
   const freeShippingProgress = Math.min(100, (cartSubtotal / freeShippingThreshold) * 100);
 
+  // Close drawer on ESC key
+  useEffect(() => {
+    if (!isCartOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsCartOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCartOpen, setIsCartOpen]);
+
+  // Lock body scroll while drawer is open on mobile and desktop
+  useEffect(() => {
+    if (isCartOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isCartOpen]);
+
   const handleApplyPromo = (e) => {
     e.preventDefault();
     if (promoInput.trim().toUpperCase() === 'KESWA10') {
@@ -46,28 +69,37 @@ export const CartDrawer = () => {
   if (!isCartOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      {/* Backdrop */}
+    <div 
+      className="fixed inset-0 z-50 overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cart-drawer-title"
+    >
+      {/* Backdrop with light dismiss */}
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity cursor-pointer"
         onClick={() => setIsCartOpen(false)}
+        aria-hidden="true"
       />
 
-      {/* Drawer */}
-      <div className={`fixed inset-y-0 ${language === 'ar' ? 'left-0 sm:pr-10' : 'right-0 sm:pl-10'} max-w-full flex`}>
-        <aside aria-label="Shopping Cart Drawer" className="w-full sm:w-[420px] bg-[#0e0e12] border-x border-white/10 flex flex-col shadow-2xl">
+      {/* Drawer Container (Mobile-first: full width on mobile, docked 440px on desktop) */}
+      <div className="fixed inset-y-0 end-0 w-full sm:w-[440px] max-w-full flex flex-col pointer-events-none">
+        <aside 
+          aria-label="Shopping Cart Drawer" 
+          className="pointer-events-auto w-full h-full h-[100dvh] max-h-[100dvh] bg-[#0e0e12] border-s border-white/10 flex flex-col shadow-2xl overflow-hidden animate-drawer"
+        >
           
           {/* Header */}
-          <div className="p-5 border-b border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShoppingBag size={18} className="text-white" />
-              <h2 className="font-display font-black text-lg uppercase tracking-wider text-white">
+          <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0e0e12]">
+            <div className="flex items-center gap-2.5">
+              <ShoppingBag size={20} className="text-white shrink-0" />
+              <h2 id="cart-drawer-title" className="font-display font-black text-base sm:text-lg uppercase tracking-wider text-white">
                 {t('cart.title')} ({cart.length})
               </h2>
             </div>
             <button 
               onClick={() => setIsCartOpen(false)}
-              className="p-2 text-gray-400 hover:text-white transition-colors"
+              className="p-2 sm:p-2.5 min-w-[42px] min-h-[42px] flex items-center justify-center text-gray-400 hover:text-white transition-colors touch-manipulation cursor-pointer rounded-full hover:bg-white/5 active:scale-95"
               aria-label="Close cart"
             >
               <X size={20} />
@@ -75,7 +107,7 @@ export const CartDrawer = () => {
           </div>
 
           {/* Free Shipping Progress */}
-          <div className="p-4 bg-neutral-900 border-b border-white/5">
+          <div className="p-3.5 sm:p-4 bg-neutral-900/90 border-b border-white/5 shrink-0">
             <div className="flex items-center gap-2 text-xs font-sans mb-2 text-gray-300">
               <Truck size={15} className="text-amber-400 shrink-0" />
               {remainingForFreeShipping > 0 ? (
@@ -96,20 +128,22 @@ export const CartDrawer = () => {
             </div>
           </div>
 
-          {/* Items List */}
-          <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          {/* Items List - Internal Scrollable Container */}
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y p-3.5 sm:p-5 space-y-3 sm:space-y-4">
             {cart.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                <ShoppingBag size={48} className="text-gray-600 mb-4 stroke-[1]" />
-                <p className="text-sm font-bold uppercase tracking-wider text-gray-300 mb-1">
+              <div className="h-full flex flex-col items-center justify-center text-center py-12 px-4">
+                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                  <ShoppingBag size={32} className="text-gray-500 stroke-[1.5]" />
+                </div>
+                <p className="text-sm font-bold uppercase tracking-wider text-gray-200 mb-1">
                   {t('cart.emptyTitle')}
                 </p>
-                <p className="text-xs text-gray-500 font-sans mb-6">
+                <p className="text-xs text-gray-400 font-sans mb-6 max-w-xs leading-relaxed">
                   {t('cart.emptyDesc')}
                 </p>
                 <button
                   onClick={() => setIsCartOpen(false)}
-                  className="bg-white text-black font-extrabold text-xs uppercase tracking-wider px-6 py-3 transition-colors hover:bg-neutral-200"
+                  className="bg-white text-black font-black text-xs uppercase tracking-wider px-6 py-3 transition-transform active:scale-95 hover:bg-neutral-200 cursor-pointer shadow-lg touch-manipulation"
                 >
                   {t('cart.startShopping')}
                 </button>
@@ -117,24 +151,25 @@ export const CartDrawer = () => {
             ) : (
               cart.map(item => {
                 const displayName = language === 'ar' ? (item.name_ar || item.name) : (item.name_en || item.name);
-                  const prod = products?.find(p => p.id === item.id);
-                  const colorObj = item.color ? prod?.colors?.find(c => {
-                    const cName = getLocalized(c, 'name');
-                    return cName === item.color || c.name === item.color || c.name_ar === item.color || c.name_en === item.color;
-                  }) : null;
-                  const itemImg = item.image || colorObj?.images?.[0] || prod?.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
-                  return (
-                    <div key={item.cartItemId} className="flex gap-4 p-3 bg-neutral-900/60 border border-white/5 rounded-sm">
-                      <img 
-                        src={itemImg} 
-                        alt="" 
-                        onClick={() => {
-                          setIsCartOpen(false);
-                          if (navigateToProduct) navigateToProduct(item.id);
-                        }}
-                        className="w-20 h-24 object-cover object-top rounded-none border border-white/5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity" 
-                      />
-                    <div className="flex-1 flex flex-col justify-between">
+                const prod = products?.find(p => p.id === item.id);
+                const colorObj = item.color ? prod?.colors?.find(c => {
+                  const cName = getLocalized(c, 'name');
+                  return cName === item.color || c.name === item.color || c.name_ar === item.color || c.name_en === item.color;
+                }) : null;
+                const itemImg = item.image || colorObj?.images?.[0] || prod?.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
+                
+                return (
+                  <div key={item.cartItemId} className="flex gap-3 sm:gap-4 p-3 bg-neutral-900/70 border border-white/5 rounded-sm">
+                    <img 
+                      src={itemImg} 
+                      alt="" 
+                      onClick={() => {
+                        setIsCartOpen(false);
+                        if (navigateToProduct) navigateToProduct(item.id);
+                      }}
+                      className="w-18 h-22 sm:w-20 sm:h-24 object-cover object-top rounded-none border border-white/5 shrink-0 cursor-pointer hover:opacity-85 transition-opacity" 
+                    />
+                    <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start gap-2">
                           <h4 
@@ -142,50 +177,54 @@ export const CartDrawer = () => {
                               setIsCartOpen(false);
                               if (navigateToProduct) navigateToProduct(item.id);
                             }}
-                            className="text-xs font-bold text-white line-clamp-1 font-sans cursor-pointer hover:underline"
+                            className="text-xs sm:text-sm font-bold text-white line-clamp-1 font-sans cursor-pointer hover:underline"
                           >
                             {displayName}
                           </h4>
                           <button 
                             onClick={() => removeFromCart(item.cartItemId)}
-                            className="text-gray-500 hover:text-red-400 p-1"
+                            className="text-gray-400 hover:text-red-400 p-1.5 -m-1 touch-manipulation cursor-pointer transition-colors"
                             title={t('actions.remove')}
                             aria-label={`Remove ${displayName} from cart`}
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={14} />
                           </button>
                         </div>
-                        <div className="flex items-center gap-2 mt-1 text-[11px] font-sans text-gray-400">
+                        <div className="flex items-center gap-2 mt-1 text-[11px] font-sans text-gray-400 flex-wrap">
                           <span className="bg-black/60 px-1.5 py-0.5 border border-white/5">
                             {t('cart.size')}: {item.size}
                           </span>
-                          <span>•</span>
-                          <span>{item.color}</span>
+                          {item.color && (
+                            <>
+                              <span>•</span>
+                              <span>{item.color}</span>
+                            </>
+                          )}
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center justify-between mt-3 gap-2">
                         <div className="flex items-center border border-white/10 rounded-none bg-black">
                           <button 
                             onClick={() => updateCartQuantity(item.cartItemId, item.quantity - 1)}
-                            className="p-1.5 text-gray-400 hover:text-white"
+                            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white touch-manipulation cursor-pointer active:bg-neutral-800"
                             aria-label={`Decrease quantity of ${displayName}`}
                           >
-                            <Minus size={11} />
+                            <Minus size={12} />
                           </button>
-                          <span className="px-2 text-xs font-mono font-bold text-white">
+                          <span className="px-2 text-xs font-mono font-bold text-white min-w-[20px] text-center">
                             {item.quantity}
                           </span>
                           <button 
                             onClick={() => updateCartQuantity(item.cartItemId, item.quantity + 1)}
-                            className="p-1.5 text-gray-400 hover:text-white"
+                            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white touch-manipulation cursor-pointer active:bg-neutral-800"
                             aria-label={`Increase quantity of ${displayName}`}
                           >
-                            <Plus size={11} />
+                            <Plus size={12} />
                           </button>
                         </div>
 
-                        <span className="text-xs font-black font-mono text-white">
+                        <span className="text-xs sm:text-sm font-black font-mono text-white shrink-0">
                           {item.price * item.quantity} {currency}
                         </span>
                       </div>
@@ -196,9 +235,9 @@ export const CartDrawer = () => {
             )}
           </div>
 
-          {/* Footer & Checkout */}
+          {/* Footer & Checkout (Fixed height guaranteed, iOS safe-area padded) */}
           {cart.length > 0 && (
-            <div className="p-5 border-t border-white/10 bg-[#0a0a0c] space-y-4">
+            <div className="p-4 sm:p-5 border-t border-white/10 bg-[#0a0a0c] space-y-3 sm:space-y-4 shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
               
               {/* Promo Code Input */}
               <form onSubmit={handleApplyPromo} className="flex gap-2">
@@ -207,25 +246,25 @@ export const CartDrawer = () => {
                   placeholder={t('cart.couponPlaceholder')}
                   value={promoInput}
                   onChange={(e) => setPromoInput(e.target.value)}
-                  className="flex-1 bg-neutral-900 border border-white/10 px-3 py-2 text-xs text-white uppercase placeholder-gray-500 outline-none focus:border-white/40"
+                  className="flex-1 bg-neutral-900 border border-white/10 px-3 py-2 text-xs text-white uppercase placeholder-gray-500 outline-none focus:border-white/40 font-mono"
                 />
                 <button 
                   type="submit"
-                  className="bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold uppercase px-4 py-2"
+                  className="bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold uppercase px-3.5 py-2 shrink-0 touch-manipulation cursor-pointer transition-colors active:scale-95"
                 >
                   {t('cart.apply')}
                 </button>
               </form>
 
               {promoApplied && (
-                <div className="flex justify-between items-center text-xs font-sans text-emerald-400">
+                <div className="flex justify-between items-center text-xs font-sans text-emerald-400 bg-emerald-500/10 px-2.5 py-1.5 border border-emerald-500/20">
                   <span>{t('cart.couponDiscount')}</span>
-                  <span>-{discountAmount} {currency}</span>
+                  <span className="font-mono font-bold">-{discountAmount} {currency}</span>
                 </div>
               )}
 
-              {/* Totals */}
-              <div className="space-y-1.5 text-xs font-sans text-gray-400 border-t border-white/5 pt-3">
+              {/* Totals Summary */}
+              <div className="space-y-1.5 text-xs font-sans text-gray-400 border-t border-white/5 pt-2.5">
                 <div className="flex justify-between">
                   <span>{t('cart.subtotal')}</span>
                   <span className="text-white font-bold font-mono">{cartSubtotal} {currency}</span>
@@ -238,7 +277,7 @@ export const CartDrawer = () => {
                 </div>
                 <div className="flex justify-between text-sm sm:text-base font-bold text-white border-t border-white/10 pt-2">
                   <span>{t('cart.total')}</span>
-                  <span className="font-mono text-lg text-emerald-400">{finalTotal} {currency}</span>
+                  <span className="font-mono text-base sm:text-lg text-emerald-400">{finalTotal} {currency}</span>
                 </div>
               </div>
 
@@ -262,10 +301,10 @@ export const CartDrawer = () => {
                     }
                   }
                 }}
-                className="w-full bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-wider uppercase py-4 flex items-center justify-center gap-2 transition-all shadow-xl font-sans"
+                className="w-full bg-white hover:bg-neutral-200 active:scale-[0.98] text-black font-black text-xs sm:text-sm tracking-wider uppercase py-3.5 sm:py-4 flex items-center justify-center gap-2 transition-all shadow-xl font-sans cursor-pointer touch-manipulation"
               >
                 <span>{t('actions.checkout')}</span>
-                {language === 'ar' ? <ArrowLeft size={15} /> : <ArrowRight size={15} />}
+                {language === 'ar' ? <ArrowLeft size={16} /> : <ArrowRight size={16} />}
               </button>
 
             </div>

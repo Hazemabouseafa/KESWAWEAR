@@ -28,7 +28,8 @@ export default function App() {
     setActiveCategory, 
     notification, 
     getLocalized,
-    language 
+    language,
+    isCartOpen 
   } = useStore();
 
   // Robust URL Route State
@@ -306,9 +307,9 @@ export default function App() {
       <FloatingWhatsApp />
 
       {/* 5. Toast Notification Banner */}
-      {notification && (
-        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
-          <div className="bg-[#181824] border border-white/20 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-sans backdrop-blur-md">
+      {notification && !isCartOpen && (
+        <div className="fixed top-20 sm:top-24 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none transition-all">
+          <div className="bg-[#181824]/95 border border-white/20 text-white px-5 py-3 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-sans backdrop-blur-md">
             {notification.type === 'error' ? (
               <AlertCircle size={16} className="text-rose-500 shrink-0" />
             ) : (

@@ -107,7 +107,6 @@ export const ProductPage = ({ productId, onBackToStore }) => {
     addToCart(product, selectedSize, colorName, quantity);
     setAddedAnimation(true);
     setTimeout(() => setAddedAnimation(false), 2200);
-    showToast(language === 'ar' ? `تمت إضافة "${productName}" إلى السلة! 🛍️` : `Added "${productName}" to cart! 🛍️`, 'success');
   };
 
   const handleBuyNow = () => {
@@ -651,7 +650,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
       </div>
 
       {/* 5. Mobile Sticky Bottom Action Bar */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-[#dedcd4] p-3 z-40 flex items-center justify-between gap-3 shadow-2xl">
+      <div className="sm:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-[#dedcd4] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] z-40 flex items-center justify-between gap-3 shadow-2xl">
         <div className="min-w-0">
           <span className="block text-[11px] font-bold text-neutral-500 truncate max-w-[120px]">
             {productName}
@@ -665,7 +664,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
           <button
             onClick={handleAddToCart}
             disabled={product.inStock === false}
-            className={`py-2 px-3 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer ${
+            className={`py-2 px-3 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer touch-manipulation ${
               addedAnimation ? 'bg-emerald-600 text-white' : 'bg-black text-white'
             }`}
           >
@@ -676,9 +675,9 @@ export const ProductPage = ({ productId, onBackToStore }) => {
           <button
             onClick={handleBuyNow}
             disabled={product.inStock === false}
-            className="py-2 px-3 text-xs font-black uppercase tracking-wider bg-white border border-black text-black hover:bg-neutral-100 transition-all shadow-xs active:scale-95 cursor-pointer"
+            className="py-2 px-3 text-xs font-black uppercase tracking-wider bg-white border border-black text-black hover:bg-neutral-100 transition-all shadow-xs active:scale-95 cursor-pointer touch-manipulation"
           >
-            <span>اشتري الآن</span>
+            <span>{language === 'ar' ? 'اشتري الآن' : 'Buy Now'}</span>
           </button>
         </div>
       </div>
