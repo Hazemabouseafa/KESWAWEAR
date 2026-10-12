@@ -348,6 +348,23 @@ export class GlobalErrorBoundary extends React.Component {
                 {this.state.error.message || String(this.state.error)}
               </p>
             )}
+            {this.state.error && (this.state.error.message?.includes('quota') || this.state.error.message?.includes('Storage')) && (
+              <button
+                onClick={() => {
+                  try {
+                    localStorage.removeItem('keswa_cart_v3');
+                    for (let i = localStorage.length - 1; i >= 0; i--) {
+                      const k = localStorage.key(i);
+                      if (k && !k.endsWith('_v3')) localStorage.removeItem(k);
+                    }
+                  } catch(e) {}
+                  window.location.reload();
+                }}
+                className="w-full py-2 px-3 bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs rounded hover:bg-amber-500/30 transition-all cursor-pointer"
+              >
+                🧹 تحرير ذاكرة المتصفح المؤقتة وإعادة المحاولة
+              </button>
+            )}
             <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
               <button 
                 onClick={() => { window.location.href = '/'; }}

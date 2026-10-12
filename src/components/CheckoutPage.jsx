@@ -49,7 +49,8 @@ export const CheckoutPage = ({ onBackToStore }) => {
     t,
     navigateToHome,
     navigateToProduct,
-    getLocalized
+    getLocalized,
+    products
   } = useStore();
 
   const [formData, setFormData] = useState({
@@ -577,7 +578,12 @@ export const CheckoutPage = ({ onBackToStore }) => {
                 {cart.map((item) => {
                   const itemPrice = Number(item.price) || 0;
                   const itemQty = Number(item.quantity) || 1;
-                  const itemImg = item.image || item.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
+                  const prod = products?.find(p => p.id === item.id);
+                  const colorObj = item.color ? prod?.colors?.find(c => {
+                    const cName = getLocalized(c, 'name');
+                    return cName === item.color || c.name === item.color || c.name_ar === item.color || c.name_en === item.color;
+                  }) : null;
+                  const itemImg = item.image || colorObj?.images?.[0] || prod?.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
                   return (
                     <div key={item.cartItemId || item.id} className="py-3 flex items-center gap-3">
                       <img 

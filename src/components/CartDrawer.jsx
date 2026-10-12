@@ -18,7 +18,8 @@ export const CartDrawer = () => {
     language,
     t,
     getLocalized,
-    navigateToProduct
+    navigateToProduct,
+    products
   } = useStore();
 
   const [promoInput, setPromoInput] = useState('');
@@ -116,17 +117,23 @@ export const CartDrawer = () => {
             ) : (
               cart.map(item => {
                 const displayName = language === 'ar' ? (item.name_ar || item.name) : (item.name_en || item.name);
-                return (
-                  <div key={item.cartItemId} className="flex gap-4 p-3 bg-neutral-900/60 border border-white/5 rounded-sm">
-                    <img 
-                      src={item.image} 
-                      alt="" 
-                      onClick={() => {
-                        setIsCartOpen(false);
-                        if (navigateToProduct) navigateToProduct(item.id);
-                      }}
-                      className="w-20 h-24 object-cover object-top rounded-none border border-white/5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity" 
-                    />
+                  const prod = products?.find(p => p.id === item.id);
+                  const colorObj = item.color ? prod?.colors?.find(c => {
+                    const cName = getLocalized(c, 'name');
+                    return cName === item.color || c.name === item.color || c.name_ar === item.color || c.name_en === item.color;
+                  }) : null;
+                  const itemImg = item.image || colorObj?.images?.[0] || prod?.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
+                  return (
+                    <div key={item.cartItemId} className="flex gap-4 p-3 bg-neutral-900/60 border border-white/5 rounded-sm">
+                      <img 
+                        src={itemImg} 
+                        alt="" 
+                        onClick={() => {
+                          setIsCartOpen(false);
+                          if (navigateToProduct) navigateToProduct(item.id);
+                        }}
+                        className="w-20 h-24 object-cover object-top rounded-none border border-white/5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity" 
+                      />
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <div className="flex justify-between items-start gap-2">

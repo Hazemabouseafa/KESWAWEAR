@@ -16,9 +16,66 @@ const STORAGE_KEYS = {
   DELETED_CATEGORIES: 'keswa_deleted_categories_v3'
 };
 
+export const safeSetStorage = (key, value) => {
+  try {
+    const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+    localStorage.setItem(key, serialized);
+  } catch (err) {
+    console.warn(`[Storage] localStorage.setItem exceeded quota for "${key}". Falling back to sessionStorage.`, err);
+    try {
+      const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+      sessionStorage.setItem(key, serialized);
+    } catch (sessionErr) {}
+  }
+};
+
+export const safeGetStorage = (key) => {
+  try {
+    const localVal = localStorage.getItem(key);
+    if (localVal !== null) return localVal;
+  } catch (e) {}
+  try {
+    const sessionVal = sessionStorage.getItem(key);
+    if (sessionVal !== null) return sessionVal;
+  } catch (e) {}
+  return null;
+};
+
+// Automatic cleanup of legacy storage keys to reclaim browser quota
+export const cleanupLegacyStorage = () => {
+  if (typeof window === 'undefined') return;
+  try {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('keswa_') && !k.endsWith('_v3')) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (e) {}
+};
+cleanupLegacyStorage();
+
+// Sanitize cart items before saving to storage: omit huge base64 data URIs (>2KB)
+export const sanitizeCartForStorage = (cartItems) => {
+  if (!Array.isArray(cartItems)) return [];
+  return cartItems.map(item => ({
+    cartItemId: item.cartItemId,
+    id: item.id,
+    name: item.name,
+    name_ar: item.name_ar,
+    name_en: item.name_en,
+    price: item.price,
+    // Keep remote URLs or short relative paths; omit large data URLs (>2KB) from localStorage to save quota
+    image: (typeof item.image === 'string' && !item.image.startsWith('data:')) ? item.image : undefined,
+    size: item.size,
+    color: item.color,
+    quantity: item.quantity
+  }));
+};
+
 const getDeletedIds = (key) => {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = safeGetStorage(key);
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     return [];
@@ -30,7 +87,7 @@ const addDeletedId = (key, id) => {
     const current = getDeletedIds(key);
     if (!current.includes(id)) {
       const updated = [...current, id];
-      localStorage.setItem(key, JSON.stringify(updated));
+      safeSetStorage(key, updated);
     }
   } catch (e) {}
 };
@@ -40,7 +97,7 @@ const removeDeletedId = (key, id) => {
     const current = getDeletedIds(key);
     if (current.includes(id)) {
       const updated = current.filter(x => x !== id);
-      localStorage.setItem(key, JSON.stringify(updated));
+      safeSetStorage(key, updated);
     }
   } catch (e) {}
 };
@@ -49,7 +106,7 @@ export const StoreProvider = ({ children }) => {
   // 0. Language State ('ar' by default, togglable to 'en')
   const [language, setLanguage] = useState(() => {
     try {
-      const savedLang = localStorage.getItem(STORAGE_KEYS.LANG);
+      const savedLang = safeGetStorage(STORAGE_KEYS.LANG);
       return savedLang ? savedLang : 'ar';
     } catch (e) {
       return 'ar';
@@ -59,7 +116,7 @@ export const StoreProvider = ({ children }) => {
   // 1. Site Content with full sectionsVisibility fallback & no discounts
   const [siteContent, setSiteContent] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEYS.CONTENT);
+      const saved = safeGetStorage(STORAGE_KEYS.CONTENT);
       if (saved) {
         const parsed = JSON.parse(saved);
         const nav = (parsed.navigation || initialSiteContent.navigation).filter(n => n.id !== 'sale');
@@ -126,7 +183,7 @@ export const StoreProvider = ({ children }) => {
   // 2. Products Catalog (with no discounts / oldPrice)
   const [products, setProducts] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+      const saved = safeGetStorage(STORAGE_KEYS.PRODUCTS);
       const deletedIds = getDeletedIds(STORAGE_KEYS.DELETED_PRODUCTS);
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -143,7 +200,7 @@ export const StoreProvider = ({ children }) => {
   // 3. Orders List
   const [orders, setOrders] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEYS.ORDERS);
+      const saved = safeGetStorage(STORAGE_KEYS.ORDERS);
       const deletedIds = getDeletedIds(STORAGE_KEYS.DELETED_ORDERS);
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -160,7 +217,7 @@ export const StoreProvider = ({ children }) => {
   // 4. Cart
   const [cart, setCart] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEYS.CART);
+      const saved = safeGetStorage(STORAGE_KEYS.CART);
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
       return [];
@@ -170,7 +227,7 @@ export const StoreProvider = ({ children }) => {
   // 5. Wishlist
   const [wishlist, setWishlist] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEYS.WISHLIST);
+      const saved = safeGetStorage(STORAGE_KEYS.WISHLIST);
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
       return [];
@@ -280,7 +337,7 @@ export const StoreProvider = ({ children }) => {
 
   // Sync Language and Direction
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.LANG, language);
+    safeSetStorage(STORAGE_KEYS.LANG, language);
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }, [language]);
@@ -312,25 +369,26 @@ export const StoreProvider = ({ children }) => {
     return obj[`${field}_en`] || obj[`${field}`] || obj[`${field}_ar`] || '';
   };
 
-  // Sync to LocalStorage (Immediate offline cache)
+  // Sync to LocalStorage (Immediate offline cache with safe fallback & quota protection)
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.CONTENT, JSON.stringify(siteContent));
+    safeSetStorage(STORAGE_KEYS.CONTENT, siteContent);
   }, [siteContent]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+    safeSetStorage(STORAGE_KEYS.PRODUCTS, products);
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+    safeSetStorage(STORAGE_KEYS.ORDERS, orders);
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
+    const sanitizedCart = sanitizeCartForStorage(cart);
+    safeSetStorage(STORAGE_KEYS.CART, sanitizedCart);
   }, [cart]);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.WISHLIST, JSON.stringify(wishlist));
+    safeSetStorage(STORAGE_KEYS.WISHLIST, wishlist);
   }, [wishlist]);
 
   // Notifications
