@@ -318,6 +318,22 @@ if (
   throw new Error("Failed 20: Missing DELETED_PRODUCTS or DELETED_CATEGORIES tracking");
 }
 
+// 21. Test Product Edit/Add Inline View (No Popup Modal in Admin)
+const currentProductsMgrSrc = fs.readFileSync('./src/admin/ProductsManager.jsx', 'utf8');
+if (
+  !currentProductsMgrSrc.includes('fixed inset-0') &&
+  currentProductsMgrSrc.includes('isFormActive') &&
+  currentProductsMgrSrc.includes('COMMON_PANTS_SIZES') &&
+  currentProductsMgrSrc.includes('العودة للمنتجات') &&
+  currentProductsMgrSrc.includes('productForm.images.map')
+) {
+  console.log("✅ 21. Product add/edit in admin panel converted to dedicated inline view (zero popup modals, supporting shirts & pants sizes and multi-images)");
+} else {
+  throw new Error("Failed 21: ProductsManager still contains popup modal or lacks inline form");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 20 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 21 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");
+
+
