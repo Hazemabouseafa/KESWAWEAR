@@ -239,10 +239,20 @@ export const CartDrawer = () => {
               <button 
                 onClick={() => {
                   setIsCartOpen(false);
+                  setIsCheckoutOpen(false);
                   if (navigateToCheckout) {
                     navigateToCheckout();
-                  } else {
-                    setIsCheckoutOpen(true);
+                  } else if (typeof window !== 'undefined') {
+                    const targetPath = '/checkout';
+                    if (window.location.pathname !== targetPath) {
+                      window.history.pushState(null, '', targetPath);
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
+                    try {
+                      window.scrollTo({ top: 0, behavior: 'instant' });
+                    } catch (e) {
+                      window.scrollTo(0, 0);
+                    }
                   }
                 }}
                 className="w-full bg-white hover:bg-neutral-200 text-black font-black text-xs tracking-wider uppercase py-4 flex items-center justify-center gap-2 transition-all shadow-xl font-sans"

@@ -226,28 +226,52 @@ export const StoreProvider = ({ children }) => {
   const navigateToProduct = (productId) => {
     if (typeof window !== 'undefined') {
       const targetPath = `/product/${productId}`;
-      window.history.pushState(null, '', targetPath);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+      try {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
     }
+    setIsCartOpen(false);
+    setIsCheckoutOpen(false);
   };
 
   const navigateToCheckout = () => {
     if (typeof window !== 'undefined') {
       const targetPath = '/checkout';
-      window.history.pushState(null, '', targetPath);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+      try {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
     }
-    setIsCheckoutOpen(true);
+    setIsCartOpen(false);
+    setIsCheckoutOpen(false);
   };
 
   const navigateToHome = () => {
     if (typeof window !== 'undefined') {
-      window.history.pushState(null, '', '/');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      const targetPath = '/';
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+      try {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
     }
+    setIsCartOpen(false);
+    setIsCheckoutOpen(false);
   };
 
   // Neon PostgreSQL Database State ('checking' | 'connected' | 'local' | 'error')

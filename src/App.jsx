@@ -13,7 +13,6 @@ import {
 import { ProductSection } from './components/ProductSection';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
-import { CheckoutModal } from './components/CheckoutModal';
 import { CheckoutPage } from './components/CheckoutPage';
 import { QuickViewModal } from './components/QuickViewModal';
 import { ProductPage } from './components/ProductPage';
@@ -300,7 +299,6 @@ export default function App() {
 
       {/* 4. Drawers & Modals */}
       <CartDrawer />
-      <CheckoutModal />
       <QuickViewModal />
       <TrackOrderModal />
 
@@ -345,12 +343,25 @@ export class GlobalErrorBoundary extends React.Component {
             <p className="text-xs text-gray-300 leading-relaxed">
               حدث خطأ غير متوقع أثناء تحميل الصفحة. تم تفعيل استرداد النظام التلقائي.
             </p>
-            <button 
-              onClick={() => { localStorage.clear(); window.location.href = '/'; }}
-              className="px-6 py-2.5 bg-white text-black font-black text-xs rounded hover:bg-neutral-200 transition-all shadow-lg"
-            >
-              إعادة تهيئة وتحميل الصفحة (Reload Store)
-            </button>
+            {this.state.error && (
+              <p className="text-[11px] text-rose-400/80 font-mono bg-black/40 p-2 rounded text-start overflow-x-auto max-h-24">
+                {this.state.error.message || String(this.state.error)}
+              </p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
+              <button 
+                onClick={() => { window.location.href = '/'; }}
+                className="px-6 py-2.5 bg-white text-black font-black text-xs rounded hover:bg-neutral-200 transition-all shadow-lg cursor-pointer"
+              >
+                العودة إلى المتجر الرئيسي (Return to Store)
+              </button>
+              <button 
+                onClick={() => { window.location.reload(); }}
+                className="px-4 py-2.5 bg-neutral-800 text-white font-bold text-xs rounded hover:bg-neutral-700 transition-all border border-white/20 cursor-pointer"
+              >
+                إعادة المحاولة (Retry)
+              </button>
+            </div>
           </div>
         </div>
       );

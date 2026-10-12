@@ -67,10 +67,14 @@ export const CheckoutPage = ({ onBackToStore }) => {
 
   const currency = t('actions.egp');
   const storeSettings = siteContent?.storeSettings || {};
-  const whatsappSettings = siteContent?.socialMedia?.whatsapp || {};
+  const whatsappSettings = siteContent?.whatsapp || siteContent?.socialMedia?.whatsapp || siteContent?.footer || {};
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    try {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } catch (e) {
+      window.scrollTo(0, 0);
+    }
   }, [completedOrder]);
 
   const handleChange = (e) => {
@@ -128,9 +132,10 @@ export const CheckoutPage = ({ onBackToStore }) => {
   // WhatsApp Order Confirmation Link
   const getWhatsAppOrderUrl = () => {
     if (!completedOrder) return '';
-    const phone = whatsappSettings.phoneNumber?.replace(/[^0-9]/g, '') || '201000000000';
+    const rawPhone = whatsappSettings.phone || whatsappSettings.phoneNumber || siteContent?.footer?.whatsapp || '01023456789';
+    const phone = rawPhone.replace(/[^0-9]/g, '') || '201023456789';
     const itemsText = (completedOrder.items || [])
-      .map(item => `• ${item.name} (${item.size || ''} ${item.color || ''}) x${item.quantity}`)
+      .map(item => `• ${item.name || item.name_ar || 'منتج'} (${item.size || ''} ${typeof item.color === 'string' ? item.color : item.color?.name_ar || ''}) x${item.quantity}`)
       .join('\n');
 
     const msg = `مرحباً KESWA WEAR 👋\nأود تأكيد طلبي رقم #${completedOrder.id}\n\nالاسم: ${completedOrder.customer.name}\nالهاتف: ${completedOrder.customer.phone}\nالمحافظة: ${completedOrder.customer.city}\nالعنوان: ${completedOrder.customer.address}\n\nالمنتجات:\n${itemsText}\n\nالإجمالي المطلوب: ${completedOrder.total} ج.م\nطريقة الدفع: ${completedOrder.paymentMethod}`;
@@ -207,15 +212,15 @@ export const CheckoutPage = ({ onBackToStore }) => {
                           {item.quantity}
                         </span>
                         <div>
-                          <span className="font-bold text-black">{item.name}</span>
+                          <span className="font-bold text-black">{item.name || item.name_ar || 'منتج'}</span>
                           {(item.size || item.color) && (
                             <span className="text-neutral-500 text-[11px] block font-mono">
-                              {[item.size, item.color].filter(Boolean).join(' • ')}
+                              {[item.size && `مقاس ${item.size}`, typeof item.color === 'string' ? item.color : item.color?.name_ar || item.color?.name_en].filter(Boolean).join(' • ')}
                             </span>
                           )}
                         </div>
                       </div>
-                      <span className="font-mono font-bold text-black">{item.price * item.quantity} {currency}</span>
+                      <span className="font-mono font-bold text-black">{(Number(item.price) || 0) * (Number(item.quantity) || 1)} {currency}</span>
                     </div>
                   ))}
                 </div>
@@ -569,25 +574,30 @@ export const CheckoutPage = ({ onBackToStore }) => {
 
               {/* Items List */}
               <div className="divide-y divide-[#eceae3] max-h-72 overflow-y-auto pr-1">
-                {cart.map((item) => (
-                  <div key={item.cartItemId || item.id} className="py-3 flex items-center gap-3">
-                    <img 
-                      src={item.image || item.images?.[0]} 
-                      alt={item.name}
-                      className="w-14 h-18 object-cover rounded-none border border-[#e6e4dc] bg-[#faf9f5] shrink-0" 
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-bold text-black truncate">{item.name}</h4>
-                      <p className="text-[11px] text-neutral-500 font-mono">
-                        {[item.size && `مقاس ${item.size}`, item.color].filter(Boolean).join(' • ')}
-                      </p>
-                      <div className="flex items-center justify-between mt-1">
-                        <span className="text-[11px] text-neutral-600 font-sans">الكمية: {item.quantity}</span>
-                        <span className="text-xs font-mono font-bold text-black">{item.price * item.quantity} {currency}</span>
+                {cart.map((item) => {
+                  const itemPrice = Number(item.price) || 0;
+                  const itemQty = Number(item.quantity) || 1;
+                  const itemImg = item.image || item.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
+                  return (
+                    <div key={item.cartItemId || item.id} className="py-3 flex items-center gap-3">
+                      <img 
+                        src={itemImg} 
+                        alt={item.name || 'منتج'}
+                        className="w-14 h-18 object-cover rounded-none border border-[#e6e4dc] bg-[#faf9f5] shrink-0" 
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-xs font-bold text-black truncate">{item.name || item.name_ar || item.name_en}</h4>
+                        <p className="text-[11px] text-neutral-500 font-mono">
+                          {[item.size && `مقاس ${item.size}`, typeof item.color === 'string' ? item.color : item.color?.name_ar || item.color?.name_en].filter(Boolean).join(' • ')}
+                        </p>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="text-[11px] text-neutral-600 font-sans">الكمية: {itemQty}</span>
+                          <span className="text-xs font-mono font-bold text-black">{itemPrice * itemQty} {currency}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Price Breakdown */}
@@ -624,17 +634,21 @@ export const CheckoutPage = ({ onBackToStore }) => {
               <p className="text-[11px] leading-relaxed">
                 فريق خدمة العملاء متواجد للمساعدة وتأكيد مقاسك واختيار الأنسب لك فوراً.
               </p>
-              {whatsappSettings.enabled !== false && (
-                <a
-                  href={`https://wa.me/${whatsappSettings.phoneNumber?.replace(/[^0-9]/g, '') || '201000000000'}?text=${encodeURIComponent('مرحباً KESWA WEAR، أحتاج مساعدة في إتمام الشراء.')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-bold underline pt-1"
-                >
-                  <MessageCircle size={14} />
-                  <span>تواصل مع الدعم الفني عبر واتساب</span>
-                </a>
-              )}
+              {whatsappSettings.enabled !== false && (() => {
+                const rawPhone = whatsappSettings.phone || whatsappSettings.phoneNumber || siteContent?.footer?.whatsapp || '01023456789';
+                const supportPhone = rawPhone.replace(/[^0-9]/g, '') || '201023456789';
+                return (
+                  <a
+                    href={`https://wa.me/${supportPhone}?text=${encodeURIComponent('مرحباً KESWA WEAR، أحتاج مساعدة في إتمام الشراء.')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-bold underline pt-1"
+                  >
+                    <MessageCircle size={14} />
+                    <span>تواصل مع الدعم الفني عبر واتساب</span>
+                  </a>
+                );
+              })()}
             </div>
 
           </div>

@@ -113,10 +113,21 @@ export const ProductPage = ({ productId, onBackToStore }) => {
   const handleBuyNow = () => {
     const colorName = selectedColor ? getLocalized(selectedColor, 'name') : null;
     addToCart(product, selectedSize, colorName, quantity);
+    setIsCartOpen(false);
+    setIsCheckoutOpen(false);
     if (navigateToCheckout) {
       navigateToCheckout();
-    } else {
-      setIsCheckoutOpen(true);
+    } else if (typeof window !== 'undefined') {
+      const targetPath = '/checkout';
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+      try {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
     }
   };
 
