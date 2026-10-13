@@ -412,6 +412,36 @@ if (
   throw new Error("Failed 25: Root persistence engine missing or incomplete");
 }
 
+// 26. Test Mobile Responsiveness, Viewport Meta, Touch Gestures, and iOS Zoom Prevention
+const indexHtmlContent = fs.readFileSync('./index.html', 'utf8');
+const heroBannersSrcCurrent = fs.readFileSync('./src/components/HeroBanners.jsx', 'utf8');
+const floatingWhatsAppSrcCurrent = fs.readFileSync('./src/components/FloatingWhatsApp.jsx', 'utf8');
+const productSectionSrcCurrent = fs.readFileSync('./src/components/ProductSection.jsx', 'utf8');
+
+if (
+  indexHtmlContent.includes('viewport-fit=cover') &&
+  indexHtmlContent.includes('theme-color') &&
+  indexHtmlContent.includes('apple-mobile-web-app-capable') &&
+  indexCssCurrent.includes('touch-action: manipulation') &&
+  indexCssCurrent.includes('-webkit-tap-highlight-color: transparent') &&
+  indexCssCurrent.includes('font-size: 16px !important') &&
+  heroBannersSrcCurrent.includes('75dvh') &&
+  productPageSrcCurrent.includes('onTouchStart') &&
+  productPageSrcCurrent.includes('onTouchMove') &&
+  productPageSrcCurrent.includes('onTouchEnd') &&
+  productPageSrcCurrent.includes('pb-28') &&
+  productPageSrcCurrent.includes('min-h-[42px]') &&
+  floatingWhatsAppSrcCurrent.includes('bottom-[76px]') &&
+  floatingWhatsAppSrcCurrent.includes('/checkout') &&
+  productCardSrcCurrent.includes('touch-manipulation') &&
+  productSectionSrcCurrent.includes('gap-2.5 sm:gap-4')
+) {
+  console.log("✅ 26. Comprehensive Mobile UX & Responsiveness verified: viewport-fit=cover, iOS auto-zoom prevention (16px), touch-action manipulation, swipe gestures, 42px touch targets, dynamic dvh banners, safe-area clearance, and intelligent WhatsApp positioning");
+} else {
+  throw new Error("Failed 26: Mobile responsiveness assertions failed");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 25 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 26 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");
+

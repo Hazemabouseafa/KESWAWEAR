@@ -153,18 +153,19 @@ export const Navbar = () => {
               {/* Search Toggle / Input */}
               <div className="relative flex items-center">
                 {showSearchInput ? (
-                  <div className="flex items-center bg-white border border-[#dedcd4] rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5 shadow-sm">
+                  <div className="flex items-center bg-white border border-[#dedcd4] rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5 shadow-sm max-w-[130px] sm:max-w-none">
                     <input 
                       type="text"
                       placeholder={t('nav.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-transparent text-xs text-neutral-800 placeholder-neutral-400 outline-none w-24 sm:w-44 font-sans"
+                      className="bg-transparent text-xs text-neutral-800 placeholder-neutral-400 outline-none w-20 sm:w-44 font-sans"
                       autoFocus
                     />
                     <button 
                       onClick={() => setShowSearchInput(false)}
-                      className="text-neutral-400 hover:text-neutral-700 ml-1 text-xs p-0.5"
+                      className="text-neutral-400 hover:text-neutral-700 ml-1 text-xs p-1 touch-manipulation"
+                      aria-label="Close search"
                     >
                       ✕
                     </button>
@@ -172,8 +173,9 @@ export const Navbar = () => {
                 ) : (
                   <button 
                     onClick={() => setShowSearchInput(true)}
-                    className="p-1.5 sm:p-2 text-neutral-700 hover:text-black transition-colors touch-manipulation"
+                    className="p-1.5 sm:p-2 text-neutral-700 hover:text-black transition-colors touch-manipulation min-w-[38px] min-h-[38px] flex items-center justify-center rounded-full hover:bg-black/5"
                     title={t('nav.searchPlaceholder')}
+                    aria-label={t('nav.searchPlaceholder')}
                   >
                     <Search size={19} />
                   </button>
@@ -227,6 +229,18 @@ export const Navbar = () => {
             />
 
             <div className="lg:hidden relative z-40 bg-[#f8f7f4] border-b border-[#dedcd4] px-4 pt-3 pb-6 space-y-4 shadow-xl animate-fadeIn">
+              {/* Mobile Search Input */}
+              <div className="relative">
+                <input 
+                  type="text"
+                  placeholder={t('nav.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white border border-[#dedcd4] rounded-full px-4 py-2.5 text-xs text-neutral-800 placeholder-neutral-400 outline-none shadow-xs font-sans focus:border-black"
+                />
+                <Search size={16} className="absolute end-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+              </div>
+
               {/* Category Links */}
               <div className="space-y-1">
                 {navigation?.map((item) => (

@@ -144,12 +144,40 @@ export const ProductPage = ({ productId, onBackToStore }) => {
     }
   };
 
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
+
   const handlePrevImage = () => {
     setSelectedImageIdx(prev => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
   const handleNextImage = () => {
     setSelectedImageIdx(prev => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    const isLeftSwipe = distance > 40;
+    const isRightSwipe = distance < -40;
+
+    if (language === 'ar') {
+      if (isLeftSwipe) handlePrevImage();
+      if (isRightSwipe) handleNextImage();
+    } else {
+      if (isLeftSwipe) handleNextImage();
+      if (isRightSwipe) handlePrevImage();
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
   };
 
   return (
@@ -183,7 +211,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
           {/* Back button */}
           <button
             onClick={onBackToStore}
-            className="flex items-center gap-1 text-xs font-bold text-neutral-700 hover:text-black py-1 px-2.5 rounded transition-colors shrink-0 font-sans cursor-pointer"
+            className="flex items-center gap-1 text-xs font-bold text-neutral-700 hover:text-black py-1 px-2.5 rounded transition-colors shrink-0 font-sans cursor-pointer touch-manipulation"
           >
             {language === 'ar' ? <ArrowRight size={14} /> : <ArrowLeft size={14} />}
             <span>{language === 'ar' ? 'العودة للمتجر' : 'Back to Store'}</span>
@@ -191,19 +219,24 @@ export const ProductPage = ({ productId, onBackToStore }) => {
         </div>
       </div>
 
-      {/* 2. Main Product Showcase Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      {/* 2. Main Product Showcase Section (pb-28 on mobile for sticky bar clearance) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 pb-28 sm:pb-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           
           {/* Left Column: Image Gallery (5 cols on lg) */}
           <div className="lg:col-span-6 space-y-4">
-            <div className="relative aspect-[3/4] bg-[#f1efe9] border border-[#e6e4dc] rounded-sm overflow-hidden group shadow-sm">
+            <div 
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="relative aspect-[3/4] bg-[#f1efe9] border border-[#e6e4dc] rounded-sm overflow-hidden group shadow-sm touch-pan-y"
+            >
               
               {/* Main Image */}
               <img 
                 src={images[selectedImageIdx] || images[0]} 
                 alt={productName}
-                className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 select-none"
               />
 
               {/* Badge (NEW / Original - Zero discounts) */}
@@ -356,7 +389,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
                             setSelectedColor(c);
                             setSelectedImageIdx(0);
                           }}
-                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer ${
+                          className={`flex items-center gap-2 px-3 py-2 min-h-[38px] rounded-full border text-xs font-medium transition-all cursor-pointer touch-manipulation active:scale-95 ${
                             active 
                               ? 'border-black bg-black text-white shadow-sm' 
                               : 'border-[#dedcd4] bg-white text-neutral-800 hover:border-black/50'
@@ -399,7 +432,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
                         <button
                           key={size}
                           onClick={() => setSelectedSize(size)}
-                          className={`min-w-11 py-2 px-3.5 text-xs font-mono font-bold uppercase border transition-all cursor-pointer ${
+                          className={`min-w-11 min-h-[42px] py-2 px-3.5 text-xs font-mono font-bold uppercase border transition-all cursor-pointer touch-manipulation active:scale-95 ${
                             active
                               ? 'bg-black text-white border-black shadow-md scale-102'
                               : 'bg-white text-neutral-800 border-[#dedcd4] hover:border-black/60 hover:bg-neutral-50'
@@ -421,17 +454,17 @@ export const ProductPage = ({ productId, onBackToStore }) => {
                 <div className="inline-flex items-center border border-[#dedcd4] bg-white rounded">
                   <button 
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-1.5 text-neutral-600 hover:text-black font-bold text-sm cursor-pointer"
+                    className="w-10 h-10 flex items-center justify-center text-neutral-700 hover:text-black font-bold text-base cursor-pointer touch-manipulation active:bg-neutral-100"
                     aria-label="Decrease quantity"
                   >
                     -
                   </button>
-                  <span className="px-4 py-1.5 text-xs font-mono font-black text-neutral-900 border-x border-[#dedcd4]">
+                  <span className="w-10 h-10 flex items-center justify-center text-xs font-mono font-black text-neutral-900 border-x border-[#dedcd4]">
                     {quantity}
                   </span>
                   <button 
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-1.5 text-neutral-600 hover:text-black font-bold text-sm cursor-pointer"
+                    className="w-10 h-10 flex items-center justify-center text-neutral-700 hover:text-black font-bold text-base cursor-pointer touch-manipulation active:bg-neutral-100"
                     aria-label="Increase quantity"
                   >
                     +
@@ -664,7 +697,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
           <button
             onClick={handleAddToCart}
             disabled={product.inStock === false}
-            className={`py-2 px-3 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer touch-manipulation ${
+            className={`min-h-[42px] px-3.5 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer touch-manipulation rounded-xs ${
               addedAnimation ? 'bg-emerald-600 text-white' : 'bg-black text-white'
             }`}
           >
@@ -675,7 +708,7 @@ export const ProductPage = ({ productId, onBackToStore }) => {
           <button
             onClick={handleBuyNow}
             disabled={product.inStock === false}
-            className="py-2 px-3 text-xs font-black uppercase tracking-wider bg-white border border-black text-black hover:bg-neutral-100 transition-all shadow-xs active:scale-95 cursor-pointer touch-manipulation"
+            className="min-h-[42px] px-3.5 text-xs font-black uppercase tracking-wider bg-white border border-black text-black hover:bg-neutral-100 transition-all shadow-xs active:scale-95 cursor-pointer touch-manipulation rounded-xs"
           >
             <span>{language === 'ar' ? 'اشتري الآن' : 'Buy Now'}</span>
           </button>

@@ -17,7 +17,7 @@ export const HeroHoodies = () => {
   const buttonText = getLocalized(banner, 'buttonText');
 
   return (
-    <section id="hoodies-hero" className="relative w-full h-[75vh] min-h-[440px] sm:min-h-[540px] max-h-[850px] bg-black overflow-hidden flex items-center justify-center">
+    <section id="hoodies-hero" className="relative w-full h-[75dvh] min-h-[440px] sm:min-h-[540px] max-h-[850px] bg-black overflow-hidden flex items-center justify-center">
       {/* Background Image with Streetwear Overlay */}
       <div className="absolute inset-0 z-0">
         <img 

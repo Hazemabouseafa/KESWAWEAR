@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useStore } from '../context/StoreContext';
 
 export const WhatsAppIcon = ({ size = 22, className = "" }) => (
@@ -19,9 +19,22 @@ export const FloatingWhatsApp = () => {
 
   // If in admin mode or admin route, hide the floating widget
   if (isAdminOpen) return null;
-  if (typeof window !== 'undefined' && (window.location.pathname.startsWith('/admin') || window.location.hash === '#admin')) {
-    return null;
+  if (typeof window !== 'undefined') {
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    if (path.startsWith('/admin') || hash === '#admin' || hash.startsWith('#/admin')) {
+      return null;
+    }
+    // Hide on checkout page so it does not distract or overlap checkout action buttons
+    if (path.startsWith('/checkout') || hash === '#checkout' || hash.startsWith('#/checkout')) {
+      return null;
+    }
   }
+
+  const isProduct = typeof window !== 'undefined' && (
+    window.location.pathname.startsWith('/product') || 
+    window.location.hash.includes('product')
+  );
 
   const whatsappConfig = siteContent?.whatsapp || {
     enabled: true,
@@ -48,7 +61,7 @@ export const FloatingWhatsApp = () => {
   return (
     <aside 
       aria-label={language === 'ar' ? 'تواصل عبر واتساب' : 'WhatsApp Support'} 
-      className="fixed bottom-5 start-5 sm:bottom-6 sm:start-6 z-40 animate-fadeIn select-none"
+      className={`fixed ${isProduct ? 'bottom-[76px]' : 'bottom-5'} start-5 sm:bottom-6 sm:start-6 z-40 animate-fadeIn select-none`}
     >
       <div className="relative group">
         {/* Pulse animated ring */}

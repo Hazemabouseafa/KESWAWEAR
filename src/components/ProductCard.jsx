@@ -98,14 +98,15 @@ export const ProductCard = ({ product }) => {
       </div>
 
       {/* Product Details */}
-      <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between bg-white">
+      <div className="p-2.5 sm:p-4 flex flex-col flex-1 justify-between bg-white">
         
         <div>
-          {/* Color Dots */}
+          {/* Color Dots with Touch-Friendly Hit Targets */}
           {product.colors && product.colors.length > 0 && (
-            <div className="flex items-center gap-1.5 mb-2">
+            <div className="flex items-center gap-1 mb-1.5 overflow-x-auto scrollbar-none py-0.5">
               {product.colors.map((c, i) => {
                 const colorTitle = getLocalized(c, 'name');
+                const isSelected = selectedColor?.hex === c.hex;
                 return (
                   <button
                     key={i}
@@ -113,30 +114,35 @@ export const ProductCard = ({ product }) => {
                       e.stopPropagation();
                       setSelectedColor(c);
                     }}
-                    className={`w-3.5 h-3.5 rounded-full border transition-all ${
-                      selectedColor?.hex === c.hex ? 'border-black scale-110 shadow-sm' : 'border-neutral-300 opacity-80'
-                    }`}
-                    style={{ backgroundColor: c.hex }}
+                    className="p-1 min-w-[26px] min-h-[26px] sm:min-w-0 sm:min-h-0 flex items-center justify-center touch-manipulation cursor-pointer"
                     title={colorTitle}
-                  />
+                    aria-label={colorTitle}
+                  >
+                    <span
+                      className={`w-4 h-4 sm:w-3.5 sm:h-3.5 rounded-full border transition-transform ${
+                        isSelected ? 'border-black scale-125 ring-1 ring-black/40 shadow-xs' : 'border-neutral-300 opacity-80'
+                      }`}
+                      style={{ backgroundColor: c.hex }}
+                    />
+                  </button>
                 );
               })}
-              <span className="text-[10px] text-neutral-500 font-sans mx-1">
+              <span className="text-[10px] text-neutral-500 font-sans mx-1 truncate max-w-[70px] sm:max-w-none">
                 {selectedColor ? getLocalized(selectedColor, 'name') : ''}
               </span>
             </div>
           )}
 
           {/* Product Name */}
-          <h3 className="text-xs sm:text-sm font-bold text-neutral-800 group-hover:text-black transition-colors line-clamp-1 mb-1.5 font-sans">
+          <h3 className="text-xs sm:text-sm font-bold text-neutral-800 group-hover:text-black transition-colors line-clamp-1 mb-1.5 font-sans leading-snug">
             {productName}
           </h3>
         </div>
 
         {/* Price & Sizes */}
-        <div className="flex items-baseline justify-between mt-2 pt-2 border-t border-[#f1efe9]">
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm sm:text-base font-black font-mono text-black">
+        <div className="flex items-baseline justify-between mt-1.5 pt-1.5 sm:mt-2 sm:pt-2 border-t border-[#f1efe9]">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xs sm:text-base font-black font-mono text-black">
               {product.price} {currency}
             </span>
           </div>
@@ -151,12 +157,13 @@ export const ProductCard = ({ product }) => {
           </div>
         </div>
 
-        {/* Mobile Direct Add to Cart Action */}
+        {/* Mobile Direct Add to Cart Action (Min 38px Touch Area) */}
         <button
           onClick={handleQuickAdd}
-          className="sm:hidden mt-2.5 w-full bg-black active:bg-neutral-800 text-white font-extrabold text-[11px] py-2 px-2 flex items-center justify-center gap-1.5 transition-transform active:scale-95 font-sans touch-manipulation shadow-xs"
+          className="sm:hidden mt-2 w-full min-h-[38px] bg-black active:bg-neutral-800 text-white font-black text-xs py-2 px-2 flex items-center justify-center gap-1.5 transition-all active:scale-98 font-sans touch-manipulation shadow-xs cursor-pointer"
+          aria-label={`${t('actions.addToCart')} - ${productName}`}
         >
-          <ShoppingBag size={12} />
+          <ShoppingBag size={13} className="shrink-0" />
           <span>{t('actions.addToCart')}</span>
         </button>
 

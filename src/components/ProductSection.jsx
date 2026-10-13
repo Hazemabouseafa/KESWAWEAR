@@ -38,15 +38,15 @@ export const ProductSection = ({
   const displayViewAll = viewAllText || t('actions.viewAll');
 
   return (
-    <section id={id} className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-24">
+    <section id={id} className="py-8 sm:py-12 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto scroll-mt-20">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 pb-4 border-b border-[#e5e3db] gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-5 sm:mb-8 pb-3 sm:pb-4 border-b border-[#e5e3db] gap-3 sm:gap-4">
         <div>
-          <h2 className="text-2xl sm:text-4xl font-black uppercase font-display tracking-tight text-neutral-900">
+          <h2 className="text-xl sm:text-3xl lg:text-4xl font-black uppercase font-display tracking-tight text-neutral-900 leading-tight">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-xs sm:text-sm font-sans text-neutral-500 mt-1">
+            <p className="text-xs sm:text-sm font-sans text-neutral-500 mt-0.5 sm:mt-1">
               {subtitle}
             </p>
           )}
@@ -59,7 +59,7 @@ export const ProductSection = ({
               const shopTarget = document.querySelector('#shop');
               if (shopTarget) shopTarget.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors group self-start sm:self-auto font-sans"
+            className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-black transition-colors group self-start sm:self-auto font-sans touch-manipulation py-1"
           >
             <span>{displayViewAll}</span>
             {language === 'ar' ? (
@@ -73,7 +73,7 @@ export const ProductSection = ({
 
       {/* Product Grid or Empty State */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-6">
           {filtered.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
