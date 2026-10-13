@@ -9,6 +9,7 @@ export const CartDrawer = () => {
     cart, 
     updateCartQuantity, 
     removeFromCart, 
+    clearCart,
     cartSubtotal, 
     shippingCost, 
     cartTotal,
@@ -96,6 +97,19 @@ export const CartDrawer = () => {
               <h2 id="cart-drawer-title" className="font-display font-black text-base sm:text-lg uppercase tracking-wider text-white">
                 {t('cart.title')} ({cart.length})
               </h2>
+              {cart.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm(language === 'ar' ? 'هل تود تفريغ سلة المشتريات بالكامل؟' : 'Clear all items from your cart?')) {
+                      clearCart();
+                    }
+                  }}
+                  className="text-[11px] font-sans text-rose-400 hover:text-rose-300 hover:underline px-2 py-0.5 rounded border border-rose-500/20 bg-rose-500/10 cursor-pointer touch-manipulation transition-colors"
+                >
+                  {language === 'ar' ? 'تفريغ السلة' : 'Clear cart'}
+                </button>
+              )}
             </div>
             <button 
               onClick={() => setIsCartOpen(false)}
@@ -182,12 +196,16 @@ export const CartDrawer = () => {
                             {displayName}
                           </h4>
                           <button 
-                            onClick={() => removeFromCart(item.cartItemId)}
-                            className="text-gray-400 hover:text-red-400 p-1.5 -m-1 touch-manipulation cursor-pointer transition-colors"
-                            title={t('actions.remove')}
-                            aria-label={`Remove ${displayName} from cart`}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeFromCart(item.cartItemId || item.id);
+                            }}
+                            className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 active:scale-90 transition-all touch-manipulation cursor-pointer border border-white/5 shrink-0"
+                            title={language === 'ar' ? 'حذف من السلة' : 'Remove from cart'}
+                            aria-label={language === 'ar' ? `حذف ${displayName} من السلة` : `Remove ${displayName} from cart`}
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={15} />
                           </button>
                         </div>
                         <div className="flex items-center gap-2 mt-1 text-[11px] font-sans text-gray-400 flex-wrap">
@@ -206,17 +224,20 @@ export const CartDrawer = () => {
                       <div className="flex items-center justify-between mt-3 gap-2">
                         <div className="flex items-center border border-white/10 rounded-none bg-black">
                           <button 
-                            onClick={() => updateCartQuantity(item.cartItemId, item.quantity - 1)}
+                            type="button"
+                            onClick={() => updateCartQuantity(item.cartItemId || item.id, item.quantity - 1)}
                             className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white touch-manipulation cursor-pointer active:bg-neutral-800"
                             aria-label={`Decrease quantity of ${displayName}`}
+                            title={item.quantity === 1 ? (language === 'ar' ? 'حذف من السلة' : 'Remove') : undefined}
                           >
-                            <Minus size={12} />
+                            {item.quantity === 1 ? <Trash2 size={12} className="text-rose-400" /> : <Minus size={12} />}
                           </button>
                           <span className="px-2 text-xs font-mono font-bold text-white min-w-[20px] text-center">
                             {item.quantity}
                           </span>
                           <button 
-                            onClick={() => updateCartQuantity(item.cartItemId, item.quantity + 1)}
+                            type="button"
+                            onClick={() => updateCartQuantity(item.cartItemId || item.id, item.quantity + 1)}
                             className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-white touch-manipulation cursor-pointer active:bg-neutral-800"
                             aria-label={`Increase quantity of ${displayName}`}
                           >

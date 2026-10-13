@@ -3,7 +3,8 @@ import { useStore } from '../context/StoreContext';
 import { 
   CheckCircle, ShieldCheck, MapPin, Phone, User, Truck, 
   CreditCard, ArrowRight, ArrowLeft, ShoppingBag, 
-  MessageCircle, Clock, ChevronRight, PackageCheck, AlertCircle
+  MessageCircle, Clock, ChevronRight, PackageCheck, AlertCircle,
+  Trash2, Plus, Minus, ChevronDown, ChevronUp
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -44,6 +45,9 @@ export const CheckoutPage = ({ onBackToStore }) => {
     shippingCost, 
     cartTotal, 
     createOrder,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
     siteContent,
     language,
     t,
@@ -65,10 +69,85 @@ export const CheckoutPage = ({ onBackToStore }) => {
   const [completedOrder, setCompletedOrder] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false);
 
   const currency = t('actions.egp');
   const storeSettings = siteContent?.storeSettings || {};
   const whatsappSettings = siteContent?.whatsapp || siteContent?.socialMedia?.whatsapp || siteContent?.footer || {};
+
+  const renderCartItem = (item) => {
+    const itemPrice = Number(item.price) || 0;
+    const itemQty = Number(item.quantity) || 1;
+    const prod = products?.find(p => p.id === item.id);
+    const colorObj = item.color ? prod?.colors?.find(c => {
+      const cName = getLocalized(c, 'name');
+      return cName === item.color || c.name === item.color || c.name_ar === item.color || c.name_en === item.color;
+    }) : null;
+    const itemImg = item.image || colorObj?.images?.[0] || prod?.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
+    const itemId = item.cartItemId || item.id;
+    const itemName = item.name_ar || item.name || item.name_en || 'منتج كِسوة';
+
+    return (
+      <div key={itemId} className="py-3 flex items-start gap-3 group">
+        <img 
+          src={itemImg} 
+          alt={itemName}
+          className="w-16 h-20 object-cover rounded-none border border-[#e6e4dc] bg-[#faf9f5] shrink-0" 
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <h4 className="text-xs sm:text-sm font-bold text-black truncate">
+              {language === 'ar' ? (item.name_ar || item.name) : (item.name_en || item.name)}
+            </h4>
+            <button
+              type="button"
+              onClick={() => removeFromCart(itemId)}
+              className="text-neutral-400 hover:text-rose-600 p-1.5 -m-1 rounded hover:bg-rose-50 transition-colors cursor-pointer touch-manipulation shrink-0"
+              title={language === 'ar' ? 'حذف من السلة' : 'Remove from cart'}
+              aria-label={language === 'ar' ? `حذف ${itemName} من السلة` : `Remove ${itemName} from cart`}
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
+          
+          <p className="text-[11px] text-neutral-500 font-mono mt-0.5">
+            {[item.size && `مقاس ${item.size}`, typeof item.color === 'string' ? item.color : item.color?.name_ar || item.color?.name_en].filter(Boolean).join(' • ')}
+          </p>
+
+          <div className="flex items-center justify-between mt-2">
+            {/* Quantity Controls */}
+            <div className="flex items-center border border-[#d6d4cb] bg-[#faf9f5] rounded-none">
+              <button
+                type="button"
+                onClick={() => updateCartQuantity(itemId, itemQty - 1)}
+                className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center text-neutral-600 hover:text-black hover:bg-neutral-200 transition-colors touch-manipulation cursor-pointer"
+                title={itemQty === 1 ? (language === 'ar' ? 'حذف من السلة' : 'Remove') : (language === 'ar' ? 'تقليل الكمية' : 'Decrease')}
+                aria-label="Decrease quantity"
+              >
+                {itemQty === 1 ? <Trash2 size={11} className="text-rose-500" /> : <Minus size={11} />}
+              </button>
+              <span className="px-2 text-xs font-mono font-bold text-black min-w-[22px] text-center">
+                {itemQty}
+              </span>
+              <button
+                type="button"
+                onClick={() => updateCartQuantity(itemId, itemQty + 1)}
+                className="w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center text-neutral-600 hover:text-black hover:bg-neutral-200 transition-colors touch-manipulation cursor-pointer"
+                title={language === 'ar' ? 'زيادة الكمية' : 'Increase quantity'}
+                aria-label="Increase quantity"
+              >
+                <Plus size={11} />
+              </button>
+            </div>
+
+            <span className="text-xs sm:text-sm font-mono font-bold text-black">
+              {itemPrice * itemQty} {currency}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     try {
@@ -369,6 +448,78 @@ export const CheckoutPage = ({ onBackToStore }) => {
           {/* LEFT/MAIN: Checkout Form (Cols 1-7 in LTR, Right in RTL) */}
           <div className="lg:col-span-7 space-y-6">
             
+            {/* Mobile Collapsible Order Summary Banner (Instant view & item deletion on mobile) */}
+            <div className="lg:hidden bg-white border border-[#e6e4dc] rounded-sm overflow-hidden shadow-sm">
+              <button
+                type="button"
+                onClick={() => setIsMobileSummaryOpen(!isMobileSummaryOpen)}
+                className="w-full p-3.5 sm:p-4 flex items-center justify-between bg-[#faf9f5] hover:bg-neutral-100 transition-colors cursor-pointer touch-manipulation"
+              >
+                <div className="flex items-center gap-2 text-xs font-bold text-black">
+                  <ShoppingBag size={16} className="text-neutral-800 shrink-0" />
+                  <span>{language === 'ar' ? 'ملخص السلة والمنتجات' : 'Order Summary'}</span>
+                  <span className="bg-black text-white text-[10px] px-1.5 py-0.2 rounded-full font-mono">
+                    {cart.length}
+                  </span>
+                  {isMobileSummaryOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-neutral-500 font-sans">{language === 'ar' ? 'الإجمالي:' : 'Total:'}</span>
+                  <span className="text-sm font-mono font-bold text-black">
+                    {cartTotal} {currency}
+                  </span>
+                </div>
+              </button>
+
+              {isMobileSummaryOpen && (
+                <div className="p-4 border-t border-[#eceae3] space-y-3 bg-white animate-fadeIn">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#eceae3]">
+                    <span className="text-[11px] text-neutral-500 font-sans">
+                      {language === 'ar' ? 'يمكنك تعديل الكميات أو حذف أي منتج من هنا:' : 'You can modify or delete items here:'}
+                    </span>
+                    {cart.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm(language === 'ar' ? 'هل تريد تفريغ سلة المشتريات بالكامل؟' : 'Clear all items from your cart?')) {
+                            clearCart();
+                          }
+                        }}
+                        className="text-[11px] font-sans text-rose-600 hover:underline px-1.5 py-0.5 rounded border border-rose-200 bg-rose-50 cursor-pointer touch-manipulation"
+                      >
+                        {language === 'ar' ? 'تفريغ السلة' : 'Clear all'}
+                      </button>
+                    )}
+                  </div>
+                  <div className="divide-y divide-[#eceae3] max-h-72 overflow-y-auto pr-1">
+                    {cart.map(renderCartItem)}
+                  </div>
+                  <div className="border-t border-[#eceae3] pt-3 space-y-1.5 text-xs font-sans">
+                    <div className="flex justify-between text-neutral-600">
+                      <span>{t('cart.subtotal')}:</span>
+                      <span className="font-mono font-bold text-black">{cartSubtotal} {currency}</span>
+                    </div>
+                    <div className="flex justify-between text-neutral-600">
+                      <span>{t('cart.shipping')}:</span>
+                      <span className="font-mono font-bold">
+                        {shippingCost === 0 ? (
+                          <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                            {t('actions.freeShipping')}
+                          </span>
+                        ) : (
+                          <span className="text-black">{shippingCost} {currency}</span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm font-black text-black border-t border-[#eceae3] pt-2">
+                      <span>{t('cart.total')}:</span>
+                      <span className="font-mono text-base text-black">{cartTotal} {currency}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-6">
               
               {/* Card 1: Customer Contact Info */}
@@ -565,45 +716,32 @@ export const CheckoutPage = ({ onBackToStore }) => {
             
             <div className="bg-white border border-[#e6e4dc] p-5 sm:p-6 rounded-sm shadow-sm space-y-4">
               <div className="border-b border-[#eceae3] pb-3 flex items-center justify-between">
-                <h3 className="font-display font-black text-sm uppercase tracking-wider text-black">
-                  {language === 'ar' ? 'سلة المشتريات' : 'Order Items'} ({cart.length})
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-display font-black text-sm uppercase tracking-wider text-black">
+                    {language === 'ar' ? 'سلة المشتريات' : 'Order Items'} ({cart.length})
+                  </h3>
+                  {cart.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (window.confirm(language === 'ar' ? 'هل تود تفريغ سلة المشتريات بالكامل؟' : 'Clear all items from your cart?')) {
+                          clearCart();
+                        }
+                      }}
+                      className="text-[11px] font-sans text-rose-600 hover:underline px-1.5 py-0.5 rounded border border-rose-200 bg-rose-50 cursor-pointer touch-manipulation transition-colors"
+                    >
+                      {language === 'ar' ? 'تفريغ السلة' : 'Clear all'}
+                    </button>
+                  )}
+                </div>
                 <span className="text-xs font-mono text-neutral-500 font-bold">
                   {cartSubtotal} {currency}
                 </span>
               </div>
 
-              {/* Items List */}
-              <div className="divide-y divide-[#eceae3] max-h-72 overflow-y-auto pr-1">
-                {cart.map((item) => {
-                  const itemPrice = Number(item.price) || 0;
-                  const itemQty = Number(item.quantity) || 1;
-                  const prod = products?.find(p => p.id === item.id);
-                  const colorObj = item.color ? prod?.colors?.find(c => {
-                    const cName = getLocalized(c, 'name');
-                    return cName === item.color || c.name === item.color || c.name_ar === item.color || c.name_en === item.color;
-                  }) : null;
-                  const itemImg = item.image || colorObj?.images?.[0] || prod?.images?.[0] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop';
-                  return (
-                    <div key={item.cartItemId || item.id} className="py-3 flex items-center gap-3">
-                      <img 
-                        src={itemImg} 
-                        alt={item.name || 'منتج'}
-                        className="w-14 h-18 object-cover rounded-none border border-[#e6e4dc] bg-[#faf9f5] shrink-0" 
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-xs font-bold text-black truncate">{item.name || item.name_ar || item.name_en}</h4>
-                        <p className="text-[11px] text-neutral-500 font-mono">
-                          {[item.size && `مقاس ${item.size}`, typeof item.color === 'string' ? item.color : item.color?.name_ar || item.color?.name_en].filter(Boolean).join(' • ')}
-                        </p>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-[11px] text-neutral-600 font-sans">الكمية: {itemQty}</span>
-                          <span className="text-xs font-mono font-bold text-black">{itemPrice * itemQty} {currency}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Items List (With instant delete and quantity controls) */}
+              <div className="divide-y divide-[#eceae3] max-h-80 overflow-y-auto pr-1">
+                {cart.map(renderCartItem)}
               </div>
 
               {/* Price Breakdown */}

@@ -36,8 +36,8 @@ cleanupLegacyStorage();
 // Sanitize cart items before saving to storage: omit huge base64 data URIs (>2KB)
 export const sanitizeCartForStorage = (cartItems) => {
   if (!Array.isArray(cartItems)) return [];
-  return cartItems.map(item => ({
-    cartItemId: item.cartItemId,
+  return cartItems.map((item, idx) => ({
+    cartItemId: item.cartItemId || `${item.id || 'item'}-${item.size || 'std'}-${item.color || 'std'}-${idx}`,
     id: item.id,
     name: item.name,
     name_ar: item.name_ar,
@@ -182,7 +182,13 @@ export const StoreProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
     try {
       const saved = safeGetStorage(STORAGE_KEYS.CART);
-      return saved ? JSON.parse(saved) : [];
+      if (!saved) return [];
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((item, idx) => ({
+        ...item,
+        cartItemId: item.cartItemId || `${item.id || 'item'}-${item.size || 'std'}-${item.color || 'std'}-${idx}`
+      }));
     } catch (e) {
       return [];
     }
@@ -1158,19 +1164,40 @@ export const StoreProvider = ({ children }) => {
   };
 
   const updateCartQuantity = (cartItemId, newQty) => {
+    if (!cartItemId) return;
     if (newQty <= 0) {
       removeFromCart(cartItemId);
       return;
     }
-    setCart(prev => prev.map(item => item.cartItemId === cartItemId ? { ...item, quantity: newQty } : item));
+    setCart(prev => prev.map(item => (item.cartItemId === cartItemId || item.id === cartItemId) ? { ...item, quantity: newQty } : item));
   };
 
-  const removeFromCart = (cartItemId) => {
-    setCart(prev => prev.filter(item => item.cartItemId !== cartItemId));
+  const removeFromCart = (cartItemIdOrId) => {
+    if (!cartItemIdOrId) return;
+    let removedItemName = null;
+    setCart(prev => {
+      const itemToRemove = prev.find(item => item.cartItemId === cartItemIdOrId || item.id === cartItemIdOrId);
+      if (!itemToRemove) return prev;
+      removedItemName = itemToRemove.name_ar || itemToRemove.name || itemToRemove.name_en;
+      if (itemToRemove.cartItemId) {
+        return prev.filter(item => item.cartItemId !== itemToRemove.cartItemId);
+      }
+      return prev.filter(item => item.id !== itemToRemove.id);
+    });
+    showToast(
+      language === 'ar' 
+        ? (removedItemName ? `تم حذف "${removedItemName}" من السلة 🗑️` : 'تم حذف المنتج من السلة 🗑️') 
+        : 'Item removed from cart 🗑️',
+      "info"
+    );
   };
 
   const clearCart = () => {
     setCart([]);
+    showToast(
+      language === 'ar' ? 'تم إفراغ سلة المشتريات بالكامل 🗑️' : 'Cart cleared 🗑️',
+      "info"
+    );
   };
 
   // Checkout & Orders Management (FIXED & PERSISTED)
