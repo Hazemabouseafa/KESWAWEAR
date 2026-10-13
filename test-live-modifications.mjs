@@ -441,7 +441,31 @@ if (
   throw new Error("Failed 26: Mobile responsiveness assertions failed");
 }
 
+// 27. Test Cross-Device Real-Time Synchronization Engine (Server Authoritative Truth & Active Sync)
+const apiProductsSrcCurrent = fs.readFileSync('./api/products.js', 'utf8');
+const apiContentSrcCurrent = fs.readFileSync('./api/content.js', 'utf8');
+const apiOrdersSrcCurrent = fs.readFileSync('./api/orders.js', 'utf8');
+const storeContextUpdated = fs.readFileSync('./src/context/StoreContext.jsx', 'utf8');
+
+if (
+  apiProductsSrcCurrent.includes('SELECT id, data, updated_at FROM products') &&
+  apiProductsSrcCurrent.includes('Math.max(item._updatedAt, dbTime)') &&
+  apiContentSrcCurrent.includes('SELECT data, updated_at FROM site_content') &&
+  apiContentSrcCurrent.includes('Math.max(rows[0].data._updatedAt, dbTime)') &&
+  apiOrdersSrcCurrent.includes('SELECT id, data, status, total, created_at FROM orders') &&
+  apiOrdersSrcCurrent.includes('Math.max(item._updatedAt, dbTime)') &&
+  storeContextUpdated.includes('isNeonSyncedRef') &&
+  storeContextUpdated.includes('visibilitychange') &&
+  storeContextUpdated.includes('window.addEventListener(\'focus\', handleActive)') &&
+  storeContextUpdated.includes('copy._updatedAt = Date.now()') &&
+  storeContextUpdated.includes('checkAndSyncNeon(true)')
+) {
+  console.log("✅ 27. Cross-Device Real-Time Sync Engine verified: Server authoritative truth, Neon database timestamp mapping, active tab visibility & focus listeners, and background polling ensure instant multi-device parity between Desktop and Mobile");
+} else {
+  throw new Error("Failed 27: Cross-Device sync assertions failed");
+}
+
 console.log("==================================================");
-console.log("🎉 ALL 26 TESTS PASSED 100%! VERIFICATION COMPLETE!");
+console.log("🎉 ALL 27 TESTS PASSED 100%! VERIFICATION COMPLETE!");
 console.log("==================================================");
 

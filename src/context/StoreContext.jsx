@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { initialSiteContent, initialProducts, initialOrders } from '../data/initialData';
 import { translations } from '../data/translations';
 
@@ -52,6 +52,8 @@ export const sanitizeCartForStorage = (cartItems) => {
 };
 
 export const StoreProvider = ({ children }) => {
+  const isNeonSyncedRef = useRef(false);
+
   // 0. Language State ('ar' by default, togglable to 'en')
   const [language, setLanguage] = useState(() => {
     try {
@@ -359,7 +361,7 @@ export const StoreProvider = ({ children }) => {
           idbGet(STORAGE_KEYS.ORDERS)
         ]);
 
-        if (!isMounted) return;
+        if (!isMounted || isNeonSyncedRef.current) return;
 
         const deletedProds = getDeletedIds(STORAGE_KEYS.DELETED_PRODUCTS);
         if (Array.isArray(idbProds) && idbProds.length > 0) {
@@ -440,170 +442,119 @@ export const StoreProvider = ({ children }) => {
     return () => { isMounted = false; };
   }, []);
 
-  // Neon Database Sync on Mount
+  // Real-Time Multi-Device Cloud Sync Engine (Server Authoritative)
+  const checkAndSyncNeon = useCallback(async (isSilent = false) => {
+    try {
+      const statusRes = await fetch('/api/status').catch(() => null);
+      if (!statusRes || !statusRes.ok) {
+        setNeonStatus('local');
+        return;
+      }
+
+      const statusData = await statusRes.json();
+      if (!statusData.connected) {
+        setNeonStatus('local');
+        return;
+      }
+
+      setNeonStatus('connected');
+      setNeonDetails(statusData);
+
+      // 1. Fetch products from Neon (Server is Single Source of Truth for Catalog)
+      const prodRes = await fetch('/api/products').catch(() => null);
+      if (prodRes && prodRes.ok) {
+        const prodJson = await prodRes.json();
+        if (prodJson.products && Array.isArray(prodJson.products) && prodJson.products.length > 0) {
+          const deletedProducts = getDeletedIds(STORAGE_KEYS.DELETED_PRODUCTS);
+          const validNeonProds = sanitizeProducts(prodJson.products).filter(p => !deletedProducts.includes(p.id));
+          
+          if (validNeonProds.length > 0) {
+            setProducts(validNeonProds);
+            safeSetStorage(STORAGE_KEYS.PRODUCTS, validNeonProds);
+            idbSet(STORAGE_KEYS.PRODUCTS, validNeonProds).catch(() => {});
+          }
+        }
+      }
+
+      // 2. Fetch site content from Neon (Banners, Announcement, Categories, Visibility)
+      const contentRes = await fetch('/api/content').catch(() => null);
+      if (contentRes && contentRes.ok) {
+        const contentJson = await contentRes.json();
+        if (contentJson.data) {
+          const deletedCategories = getDeletedIds(STORAGE_KEYS.DELETED_CATEGORIES);
+          const neonCats = (contentJson.data.categories || []).filter(c => !deletedCategories.includes(c.id));
+          const neonNav = (contentJson.data.navigation || []).filter(n => !deletedCategories.includes(n.id));
+
+          setSiteContent(prev => {
+            const mergedVisibility = {
+              ...initialSiteContent.sectionsVisibility,
+              ...(contentJson.data.sectionsVisibility || {}),
+              superSale: false
+            };
+
+            const mergedContent = {
+              ...initialSiteContent,
+              ...contentJson.data,
+              categories: neonCats.length > 0 ? neonCats : (prev.categories?.length > 0 ? prev.categories : initialSiteContent.categories),
+              navigation: neonNav.length > 0 ? neonNav : (prev.navigation?.length > 0 ? prev.navigation : initialSiteContent.navigation),
+              sectionsVisibility: mergedVisibility
+            };
+
+            safeSetStorage(STORAGE_KEYS.CONTENT, mergedContent);
+            idbSet(STORAGE_KEYS.CONTENT, mergedContent).catch(() => {});
+            return mergedContent;
+          });
+        }
+      }
+
+      // 3. Fetch customer orders from Neon
+      const orderRes = await fetch('/api/orders').catch(() => null);
+      if (orderRes && orderRes.ok) {
+        const orderJson = await orderRes.json();
+        if (orderJson.orders && Array.isArray(orderJson.orders)) {
+          const deletedOrders = getDeletedIds(STORAGE_KEYS.DELETED_ORDERS);
+          const validNeonOrders = orderJson.orders.filter(o => !deletedOrders.includes(o.id));
+          setOrders(validNeonOrders);
+          safeSetStorage(STORAGE_KEYS.ORDERS, validNeonOrders);
+          idbSet(STORAGE_KEYS.ORDERS, validNeonOrders).catch(() => {});
+        }
+      }
+
+      isNeonSyncedRef.current = true;
+    } catch (err) {
+      console.warn('Neon sync warning:', err);
+      setNeonStatus('local');
+    }
+  }, []);
+
+  // Active Multi-Device Sync: Mount, Focus, Visibility Change, and Periodic Polling
   useEffect(() => {
-    let isMounted = true;
-    const checkAndSyncNeon = async () => {
-      try {
-        const statusRes = await fetch('/api/status').catch(() => null);
-        if (!statusRes || !statusRes.ok) {
-          if (isMounted) setNeonStatus('local');
-          return;
-        }
+    checkAndSyncNeon(false);
 
-        const statusData = await statusRes.json();
-        if (statusData.connected) {
-          if (isMounted) {
-            setNeonStatus('connected');
-            setNeonDetails(statusData);
-          }
-
-          // 1. Fetch content from Neon / Backend
-          const contentRes = await fetch('/api/content').catch(() => null);
-          if (contentRes && contentRes.ok) {
-            const contentJson = await contentRes.json();
-            if (contentJson.data && isMounted) {
-              const deletedCategories = getDeletedIds(STORAGE_KEYS.DELETED_CATEGORIES);
-              setSiteContent(prev => {
-                const neonCats = (contentJson.data.categories || []).filter(c => !deletedCategories.includes(c.id));
-                const localCats = (prev.categories || []).filter(c => !deletedCategories.includes(c.id));
-
-                // Smart Merge: Preserve both Neon and local custom categories, local edits take precedence
-                const catMap = new Map();
-                neonCats.forEach(c => catMap.set(c.id, c));
-                localCats.forEach(lc => {
-                  const nc = catMap.get(lc.id);
-                  if (!nc || (lc._updatedAt && (!nc._updatedAt || lc._updatedAt >= nc._updatedAt))) {
-                    catMap.set(lc.id, lc);
-                  }
-                });
-                const mergedCategories = Array.from(catMap.values());
-
-                // Smart Merge navigation
-                const neonNav = (contentJson.data.navigation || []).filter(n => !deletedCategories.includes(n.id));
-                const localNav = (prev.navigation || []).filter(n => !deletedCategories.includes(n.id));
-                const navMap = new Map();
-                neonNav.forEach(n => navMap.set(n.id, n));
-                localNav.forEach(ln => {
-                  navMap.set(ln.id, ln);
-                });
-                const mergedNav = Array.from(navMap.values());
-
-                const mergedVisibility = {
-                  ...initialSiteContent.sectionsVisibility,
-                  ...(prev.sectionsVisibility || {}),
-                  ...(contentJson.data.sectionsVisibility || {}),
-                  superSale: false
-                };
-
-                const mergedContent = {
-                  ...initialSiteContent,
-                  ...prev,
-                  ...contentJson.data,
-                  categories: mergedCategories.length > 0 ? mergedCategories : initialSiteContent.categories,
-                  navigation: mergedNav.length > 0 ? mergedNav : initialSiteContent.navigation,
-                  sectionsVisibility: mergedVisibility
-                };
-
-                // If local had custom categories that Neon was missing, push merged to Neon!
-                const hasLocalNewCats = localCats.some(lc => !neonCats.some(nc => nc.id === lc.id));
-                if (hasLocalNewCats) {
-                  fetch('/api/content', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(mergedContent)
-                  }).catch(() => {});
-                }
-
-                safeSetStorage(STORAGE_KEYS.CONTENT, mergedContent);
-                idbSet(STORAGE_KEYS.CONTENT, mergedContent).catch(() => {});
-
-                return mergedContent;
-              });
-            }
-          }
-
-          // 2. Fetch products from Neon / Backend
-          const prodRes = await fetch('/api/products').catch(() => null);
-          if (prodRes && prodRes.ok) {
-            const prodJson = await prodRes.json();
-            if (prodJson.products && Array.isArray(prodJson.products) && prodJson.products.length > 0 && isMounted) {
-              const deletedProducts = getDeletedIds(STORAGE_KEYS.DELETED_PRODUCTS);
-              setProducts(prev => {
-                const neonProds = sanitizeProducts(prodJson.products).filter(p => !deletedProducts.includes(p.id));
-                const localProds = (prev || []).filter(p => !deletedProducts.includes(p.id));
-                const prodMap = new Map();
-                neonProds.forEach(p => prodMap.set(p.id, p));
-
-                // Local products with newer _updatedAt or not in neon take precedence
-                localProds.forEach(lp => {
-                  const np = prodMap.get(lp.id);
-                  if (!np || (lp._updatedAt && (!np._updatedAt || lp._updatedAt >= np._updatedAt))) {
-                    prodMap.set(lp.id, lp);
-                  }
-                });
-                const mergedProds = Array.from(prodMap.values());
-
-                // If local has new/updated products not yet matching Neon, push them to Neon!
-                const prodsToPush = localProds.filter(lp => {
-                  const np = neonProds.find(p => p.id === lp.id);
-                  return !np || (lp._updatedAt && (!np._updatedAt || lp._updatedAt > np._updatedAt));
-                });
-                if (prodsToPush.length > 0) {
-                  prodsToPush.forEach(p => persistProduct(p, 'POST'));
-                }
-
-                safeSetStorage(STORAGE_KEYS.PRODUCTS, mergedProds);
-                idbSet(STORAGE_KEYS.PRODUCTS, mergedProds).catch(() => {});
-
-                return mergedProds;
-              });
-            }
-          }
-
-          // 3. Fetch orders from Neon / Backend
-          const orderRes = await fetch('/api/orders').catch(() => null);
-          if (orderRes && orderRes.ok) {
-            const orderJson = await orderRes.json();
-            if (orderJson.orders && Array.isArray(orderJson.orders) && isMounted) {
-              const deletedOrders = getDeletedIds(STORAGE_KEYS.DELETED_ORDERS);
-              const validNeonOrders = orderJson.orders.filter(o => !deletedOrders.includes(o.id));
-              setOrders(prev => {
-                const localOrders = (prev || []).filter(o => !deletedOrders.includes(o.id));
-                const orderMap = new Map();
-                validNeonOrders.forEach(o => orderMap.set(o.id, o));
-                localOrders.forEach(lo => {
-                  const no = orderMap.get(lo.id);
-                  if (!no || (lo._updatedAt && (!no._updatedAt || lo._updatedAt >= no._updatedAt))) {
-                    orderMap.set(lo.id, lo);
-                  }
-                });
-                const mergedOrders = Array.from(orderMap.values());
-
-                // If local has new orders not in Neon, push them!
-                const hasLocalNewOrders = localOrders.filter(lo => !validNeonOrders.some(no => no.id === lo.id));
-                if (hasLocalNewOrders.length > 0) {
-                  hasLocalNewOrders.forEach(o => persistOrder(o, 'POST'));
-                }
-
-                safeSetStorage(STORAGE_KEYS.ORDERS, mergedOrders);
-                idbSet(STORAGE_KEYS.ORDERS, mergedOrders).catch(() => {});
-
-                return mergedOrders;
-              });
-            }
-          }
-        } else {
-          if (isMounted) setNeonStatus('local');
-        }
-      } catch (err) {
-        if (isMounted) setNeonStatus('local');
+    // Instant Sync when user switches back to this tab or unlocks mobile screen
+    const handleActive = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        checkAndSyncNeon(true);
       }
     };
 
-    checkAndSyncNeon();
-    return () => { isMounted = false; };
-  }, []);
+    window.addEventListener('focus', handleActive);
+    document.addEventListener('visibilitychange', handleActive);
+
+    // Periodic Polling: Every 10s in Admin, every 20s in Storefront
+    const intervalTime = isAdminOpen ? 10000 : 20000;
+    const timer = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        checkAndSyncNeon(true);
+      }
+    }, intervalTime);
+
+    return () => {
+      window.removeEventListener('focus', handleActive);
+      document.removeEventListener('visibilitychange', handleActive);
+      clearInterval(timer);
+    };
+  }, [checkAndSyncNeon, isAdminOpen]);
 
   const syncAllToNeon = async () => {
     try {
@@ -637,6 +588,9 @@ export const StoreProvider = ({ children }) => {
         const data = await res.json();
         setNeonDetails(data);
         setNeonStatus(data.connected ? 'connected' : 'local');
+        if (data.connected) {
+          await checkAndSyncNeon(false);
+        }
         return data;
       }
       setNeonStatus('local');
@@ -650,10 +604,15 @@ export const StoreProvider = ({ children }) => {
   // Centralized async persistence to Backend / Neon / Serverless cache on Vercel
   const persistSiteContent = async (contentToSave) => {
     try {
+      const now = Date.now();
+      const payload = {
+        ...contentToSave,
+        _updatedAt: contentToSave?._updatedAt || now
+      };
       await fetch('/api/content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(contentToSave)
+        body: JSON.stringify(payload)
       });
     } catch (e) {
       console.warn('Backend sync failed, saved in local storage:', e);
@@ -722,6 +681,10 @@ export const StoreProvider = ({ children }) => {
         current = current[keys[i]];
       }
       current[keys[keys.length - 1]] = value;
+      copy._updatedAt = Date.now();
+      persistSiteContent(copy);
+      safeSetStorage(STORAGE_KEYS.CONTENT, copy);
+      idbSet(STORAGE_KEYS.CONTENT, copy).catch(() => {});
       return copy;
     });
     showToast(language === 'ar' ? "تم حفظ التعديل فورياً!" : "Changes saved in real-time!", "success");

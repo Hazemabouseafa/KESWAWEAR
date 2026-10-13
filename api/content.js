@@ -51,13 +51,18 @@ export default async function handler(req, res) {
     await ensureTables(sql);
 
     if (req.method === 'GET') {
-      const rows = await sql`SELECT data FROM site_content WHERE id = 'current' LIMIT 1;`;
+      const rows = await sql`SELECT data, updated_at FROM site_content WHERE id = 'current' LIMIT 1;`;
       if (rows.length > 0 && rows[0].data) {
-        memoryContentCache = rows[0].data;
+        const dbTime = rows[0].updated_at ? new Date(rows[0].updated_at).getTime() : Date.now();
+        const contentData = {
+          ...rows[0].data,
+          _updatedAt: rows[0].data._updatedAt ? Math.max(rows[0].data._updatedAt, dbTime) : dbTime
+        };
+        memoryContentCache = contentData;
         return res.status(200).json({
           success: true,
           connected: true,
-          data: rows[0].data
+          data: contentData
         });
       }
       return res.status(200).json({
@@ -68,7 +73,12 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST' || req.method === 'PUT') {
-      const contentData = body?.data || body;
+      const rawContentData = body?.data || body;
+      const now = Date.now();
+      const contentData = {
+        ...rawContentData,
+        _updatedAt: rawContentData?._updatedAt || now
+      };
       memoryContentCache = contentData;
 
       await sql`

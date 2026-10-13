@@ -85,9 +85,19 @@ export default async function handler(req, res) {
     // GET: Fetch all orders
     if (req.method === 'GET') {
       const rows = await sql`
-        SELECT data FROM orders ORDER BY created_at DESC;
+        SELECT id, data, status, total, created_at FROM orders ORDER BY created_at DESC;
       `;
-      const orders = rows.map(r => r.data);
+      const orders = rows.map(r => {
+        const item = r.data || {};
+        const dbTime = r.created_at ? new Date(r.created_at).getTime() : Date.now();
+        return {
+          ...item,
+          id: r.id || item.id,
+          status: r.status || item.status,
+          total: r.total || item.total,
+          _updatedAt: item._updatedAt ? Math.max(item._updatedAt, dbTime) : dbTime
+        };
+      });
       return res.status(200).json({
         success: true,
         orders
@@ -97,11 +107,13 @@ export default async function handler(req, res) {
     // POST / PUT: Upsert order or batch
     if (req.method === 'POST' || req.method === 'PUT') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      const now = Date.now();
 
       // Batch sync
       if (Array.isArray(body)) {
-        for (const item of body) {
-          if (item && item.id) {
+        for (const rawItem of body) {
+          if (rawItem && rawItem.id) {
+            const item = { ...rawItem, _updatedAt: rawItem._updatedAt || now };
             await sql`
               INSERT INTO orders (id, data, status, total, created_at)
               VALUES (
@@ -113,9 +125,9 @@ export default async function handler(req, res) {
               )
               ON CONFLICT (id)
               DO UPDATE SET 
-                data = ${JSON.stringify(item)}::jsonb, 
-                status = ${item.status || 'Pending'}, 
-                total = ${Number(item.total) || 0};
+                data = EXCLUDED.data, 
+                status = EXCLUDED.status, 
+                total = EXCLUDED.total;
             `;
           }
         }
@@ -123,10 +135,15 @@ export default async function handler(req, res) {
       }
 
       // Single order
-      const order = body.order || body;
-      if (!order || !order.id) {
+      const rawOrder = body.order || body;
+      if (!rawOrder || !rawOrder.id) {
         return res.status(400).json({ error: 'Order ID is required' });
       }
+
+      const order = {
+        ...rawOrder,
+        _updatedAt: rawOrder._updatedAt || now
+      };
 
       await sql`
         INSERT INTO orders (id, data, status, total, created_at)
@@ -139,9 +156,9 @@ export default async function handler(req, res) {
         )
         ON CONFLICT (id)
         DO UPDATE SET 
-          data = ${JSON.stringify(order)}::jsonb, 
-          status = ${order.status || 'Pending'}, 
-          total = ${Number(order.total) || 0};
+          data = EXCLUDED.data, 
+          status = EXCLUDED.status, 
+          total = EXCLUDED.total;
       `;
 
       return res.status(200).json({

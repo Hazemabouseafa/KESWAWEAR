@@ -67,9 +67,17 @@ export default async function handler(req, res) {
     // GET: Fetch all products
     if (req.method === 'GET') {
       const rows = await sql`
-        SELECT data FROM products ORDER BY updated_at DESC;
+        SELECT id, data, updated_at FROM products ORDER BY updated_at DESC;
       `;
-      const products = rows.map(r => r.data);
+      const products = rows.map(r => {
+        const item = r.data || {};
+        const dbTime = r.updated_at ? new Date(r.updated_at).getTime() : Date.now();
+        return {
+          ...item,
+          id: r.id || item.id,
+          _updatedAt: item._updatedAt ? Math.max(item._updatedAt, dbTime) : dbTime
+        };
+      });
       memoryProductsCache = products;
       return res.status(200).json({
         success: true,
@@ -80,10 +88,13 @@ export default async function handler(req, res) {
 
     // POST / PUT: Upsert product or batch
     if (req.method === 'POST' || req.method === 'PUT') {
+      const now = Date.now();
+
       // Batch sync
       if (Array.isArray(body)) {
-        for (const item of body) {
-          if (item && item.id) {
+        for (const rawItem of body) {
+          if (rawItem && rawItem.id) {
+            const item = { ...rawItem, _updatedAt: rawItem._updatedAt || now };
             await sql`
               INSERT INTO products (id, data, updated_at)
               VALUES (${item.id}, ${JSON.stringify(item)}::jsonb, CURRENT_TIMESTAMP)
@@ -97,10 +108,15 @@ export default async function handler(req, res) {
       }
 
       // Single product
-      const product = body.product || body;
-      if (!product || !product.id) {
+      const rawProduct = body.product || body;
+      if (!rawProduct || !rawProduct.id) {
         return res.status(400).json({ error: 'Product ID is required' });
       }
+
+      const product = {
+        ...rawProduct,
+        _updatedAt: rawProduct._updatedAt || now
+      };
 
       await sql`
         INSERT INTO products (id, data, updated_at)
