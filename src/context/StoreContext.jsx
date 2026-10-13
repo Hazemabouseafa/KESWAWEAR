@@ -117,13 +117,26 @@ export const StoreProvider = ({ children }) => {
   });
 
   // Helper to remove any oldPrice or discount markings
+  // Helper to remove any oldPrice, discount markings, and default template unsplash images
   const sanitizeProducts = (list) => {
     return (list || [])
       .filter(p => p.id !== 'h-07' && p.id !== 'h-08')
+      .filter(p => {
+        // Exclude products that ONLY have default unsplash images and no admin photos
+        const hasAdminImage = (p.images || []).some(img => img && !img.includes('unsplash.com'));
+        return hasAdminImage;
+      })
       .map(p => {
         const isDiscount = p.badge_ar && (p.badge_ar.includes('خصم') || p.badge_ar.includes('%'));
+        const nonUnsplashImages = (p.images || []).filter(img => img && !img.includes('unsplash.com'));
+        const cleanedColors = (p.colors || []).map(c => ({
+          ...c,
+          images: (c.images || []).filter(img => img && !img.includes('unsplash.com'))
+        }));
         return {
           ...p,
+          images: nonUnsplashImages.length > 0 ? nonUnsplashImages : (p.images || []),
+          colors: cleanedColors,
           oldPrice: null,
           badge_ar: isDiscount ? 'جديد' : (p.badge_ar || 'جديد'),
           badge_en: isDiscount ? 'NEW' : (p.badge_en || 'NEW')
