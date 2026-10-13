@@ -17,6 +17,17 @@ export const ImageLibraryManager = () => {
 
   const [savedBanner, setSavedBanner] = useState(null);
 
+  React.useEffect(() => {
+    if (banners) {
+      setHoodiesBg(banners.heroHoodies?.image || banners.heroHoodies?.bgImage || '');
+      setTshirtsBg(banners.heroTshirts?.image || banners.heroTshirts?.bgImage || '');
+      setSweatpantsBg(banners.heroSweatpants?.image || banners.heroSweatpants?.bgImage || '');
+      setCard1Img(banners.categoryGrid?.card1?.image || banners.categoryGrid?.card1?.bgImage || '');
+      setCard2Img(banners.categoryGrid?.card2?.image || banners.categoryGrid?.card2?.bgImage || '');
+      setCard3Img(banners.categoryGrid?.card3?.image || banners.categoryGrid?.card3?.bgImage || '');
+    }
+  }, [banners]);
+
   const handleSaveHeroBanner = (bannerKey, imgUrl) => {
     if (bannerKey === 'heroHoodies') setHoodiesBg(imgUrl);
     if (bannerKey === 'heroTshirts') setTshirtsBg(imgUrl);

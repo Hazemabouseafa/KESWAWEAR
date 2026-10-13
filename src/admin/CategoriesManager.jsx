@@ -25,14 +25,12 @@ export const CategoriesManager = () => {
     return map;
   });
 
-  // Keep editingCats updated when categories change
+  // Keep editingCats updated when categories change and prune deleted categories
   React.useEffect(() => {
     setEditingCats(prev => {
-      const nextMap = { ...prev };
+      const nextMap = {};
       categories.forEach(c => {
-        if (!nextMap[c.id]) {
-          nextMap[c.id] = { ...c };
-        }
+        nextMap[c.id] = prev[c.id] ? { ...c, ...prev[c.id] } : { ...c };
       });
       return nextMap;
     });
@@ -289,6 +287,11 @@ export const CategoriesManager = () => {
                         onClick={() => {
                           if (window.confirm(`هل أنت متأكد من حذف قسم "${cat.name_ar}" من المتجر؟`)) {
                             deleteCategory(cat.id);
+                            setEditingCats(prev => {
+                              const copy = { ...prev };
+                              delete copy[cat.id];
+                              return copy;
+                            });
                           }
                         }}
                         className="text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 text-xs px-3 py-2 rounded flex items-center justify-center gap-1 border border-rose-500/20 transition-colors touch-manipulation"

@@ -9,6 +9,10 @@ export const RowsVisibilityManager = () => {
   const [visibility, setVisibility] = useState({ ...sectionsVisibility });
   const [isSaved, setIsSaved] = useState(false);
 
+  React.useEffect(() => {
+    setVisibility({ ...sectionsVisibility });
+  }, [sectionsVisibility]);
+
   const customCategories = categories.filter(c => c.id !== 'hoodies' && c.id !== 'tshirts' && c.id !== 'sweatpants');
 
   const coreRowsList = [

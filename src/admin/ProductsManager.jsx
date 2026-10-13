@@ -146,16 +146,21 @@ export const ProductsManager = () => {
           ? [colorImages[0]] 
           : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=900&auto=format&fit=crop']);
 
+    const finalSizes = productForm.sizes && productForm.sizes.length > 0 
+      ? productForm.sizes 
+      : ['S', 'M', 'L', 'XL'];
+
     const payload = {
       ...productForm,
       name: productForm.name_ar || productForm.name_en,
       price: Number(productForm.price),
       oldPrice: null, // Zero discounts
       images: finalImages,
+      sizes: finalSizes,
       colors: productForm.colors.map(c => ({
-        name_ar: c.name_ar,
-        name_en: c.name_en,
-        hex: c.hex,
+        name_ar: c.name_ar || 'لون',
+        name_en: c.name_en || 'Color',
+        hex: c.hex || '#111111',
         images: (c.images || []).filter(img => img && img.trim().length > 0)
       }))
     };
@@ -274,8 +279,9 @@ export const ProductsManager = () => {
       const q = productSearchQuery.toLowerCase();
       const matchNameAr = (p.name_ar || '').toLowerCase().includes(q);
       const matchNameEn = (p.name_en || '').toLowerCase().includes(q);
+      const matchName = (p.name || '').toLowerCase().includes(q);
       const matchId = (p.id || '').toLowerCase().includes(q);
-      return matchNameAr || matchNameEn || matchId;
+      return matchNameAr || matchNameEn || matchName || matchId;
     }
     return true;
   });

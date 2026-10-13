@@ -61,7 +61,17 @@ export const OrdersManager = () => {
   });
 
   const getCleanPhone = (phone) => {
-    return String(phone || '').replace(/[^0-9]/g, '');
+    let clean = String(phone || '').replace(/[^0-9]/g, '');
+    if (clean.startsWith('20') && clean.length >= 12) {
+      return clean;
+    }
+    if (clean.startsWith('0')) {
+      return '2' + clean;
+    }
+    if (clean.length === 10) {
+      return '20' + clean;
+    }
+    return clean.startsWith('2') ? clean : '2' + clean;
   };
 
   const handleSaveManualOrder = (e) => {
@@ -285,7 +295,7 @@ export const OrdersManager = () => {
                   {/* WhatsApp Chat Shortcut (Safe phone string) */}
                   {order.customer?.phone && (
                     <a
-                      href={`https://wa.me/2${getCleanPhone(order.customer.phone)}?text=${encodeURIComponent(`مرحباً ${order.customer.name || ''}، بخصوص طلبك رقم ${order.id} من متجر KESWA WEAR`)}`}
+                      href={`https://wa.me/${getCleanPhone(order.customer.phone)}?text=${encodeURIComponent(`مرحباً ${order.customer.name || ''}، بخصوص طلبك رقم ${order.id} من متجر KESWA WEAR`)}`}
                       target="_blank"
                       rel="noreferrer"
                       className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2.5 py-1.5 rounded flex items-center justify-center gap-1 transition-colors shadow touch-manipulation"

@@ -18,6 +18,10 @@ export const ImageUploader = ({
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
+  React.useEffect(() => {
+    setUrlDraft(value || '');
+  }, [value]);
+
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;

@@ -1314,15 +1314,16 @@ export const StoreProvider = ({ children }) => {
     const subtotal = Number(orderData.subtotal) || 0;
     const shipping = Number(orderData.shipping) || 0;
     const total = Number(orderData.total) || (subtotal + shipping);
+    const cust = orderData.customer || {};
 
     const newOrder = {
       id: orderData.id || `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
       customer: {
-        name: orderData.name || "عميل المتجر",
-        phone: orderData.phone || "",
-        address: orderData.address || "",
-        city: orderData.city || "Alexandria",
-        notes: orderData.notes || ""
+        name: cust.name || orderData.name || "عميل المتجر",
+        phone: cust.phone || orderData.phone || "",
+        address: cust.address || orderData.address || "",
+        city: cust.city || orderData.city || "Alexandria",
+        notes: cust.notes || orderData.notes || ""
       },
       items: orderData.items || [],
       subtotal,
@@ -1515,7 +1516,8 @@ export const StoreProvider = ({ children }) => {
       neonStatus,
       neonDetails,
       syncAllToNeon,
-      checkNeonConnection
+      checkNeonConnection,
+      syncNow: () => checkAndSyncNeon(false)
     }}>
       {children}
     </StoreContext.Provider>

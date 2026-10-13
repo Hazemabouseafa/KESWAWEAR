@@ -166,103 +166,120 @@ export const TextContentManager = () => {
     }
   }, [siteContent.whatsapp]);
 
+  // Synchronize fields from siteContent based on active language tab
+  const syncFromContent = (content, tab) => {
+    if (!content) return;
+    if (tab === 'ar') {
+      setAnnouncementText(content.announcement?.text_ar || '');
+      setBrandName(content.brand?.name || 'KESWA');
+      setBrandTagline(content.brand?.tagline_ar || '');
+      setHeroHoodiesTitle(content.banners?.heroHoodies?.title_ar || '');
+      setHeroHoodiesSubtitle(content.banners?.heroHoodies?.subtitle_ar || '');
+      setHeroHoodiesBadge(content.banners?.heroHoodies?.badge_ar || '');
+      setHeroHoodiesBtn(content.banners?.heroHoodies?.buttonText_ar || '');
+
+      setGridCard1Title(content.banners?.categoryGrid?.card1?.title_ar || '');
+      setGridCard1Subtitle(content.banners?.categoryGrid?.card1?.subtitle_ar || '');
+      setGridCard1Btn(content.banners?.categoryGrid?.card1?.buttonText_ar || '');
+
+      setGridCard2Title(content.banners?.categoryGrid?.card2?.title_ar || '');
+      setGridCard2Subtitle(content.banners?.categoryGrid?.card2?.subtitle_ar || '');
+      setGridCard2Btn(content.banners?.categoryGrid?.card2?.buttonText_ar || '');
+
+      setGridCard3Title(content.banners?.categoryGrid?.card3?.title_ar || '');
+      setGridCard3Subtitle(content.banners?.categoryGrid?.card3?.subtitle_ar || '');
+      setGridCard3Btn(content.banners?.categoryGrid?.card3?.buttonText_ar || '');
+
+      setSecHoodiesTitle(content.sectionHeaders?.hoodies?.title_ar || '');
+      setSecHoodiesSubtitle(content.sectionHeaders?.hoodies?.subtitle_ar || '');
+      setSecHoodiesViewAll(content.sectionHeaders?.hoodies?.viewAllText_ar || '');
+
+      setSecTshirtsTitle(content.sectionHeaders?.tshirts?.title_ar || '');
+      setSecTshirtsSubtitle(content.sectionHeaders?.tshirts?.subtitle_ar || '');
+      setSecTshirtsViewAll(content.sectionHeaders?.tshirts?.viewAllText_ar || '');
+
+      setSecSweatsTitle(content.sectionHeaders?.sweatpants?.title_ar || '');
+      setSecSweatsSubtitle(content.sectionHeaders?.sweatpants?.subtitle_ar || '');
+      setSecSweatsViewAll(content.sectionHeaders?.sweatpants?.viewAllText_ar || '');
+
+      setHeroTshirtsTitle(content.banners?.heroTshirts?.title_ar || '');
+      setHeroTshirtsSubtitle(content.banners?.heroTshirts?.subtitle_ar || '');
+      setHeroTshirtsBtn(content.banners?.heroTshirts?.buttonText_ar || '');
+
+      setHeroSweatsTitle(content.banners?.heroSweatpants?.title_ar || '');
+      setHeroSweatsSubtitle(content.banners?.heroSweatpants?.subtitle_ar || '');
+      setHeroSweatsBtn(content.banners?.heroSweatpants?.buttonText_ar || '');
+
+      setNlTitle(content.banners?.newsletter?.title_ar || '');
+      setNlSubtitle(content.banners?.newsletter?.subtitle_ar || '');
+      setNlBtn(content.banners?.newsletter?.buttonText_ar || '');
+
+      setFooterAbout(content.footer?.about_ar || '');
+      setFooterAddress(content.footer?.address_ar || '');
+      setFooterPhone(content.footer?.phone || '');
+      setFooterEmail(content.footer?.email || '');
+    } else {
+      setAnnouncementText(content.announcement?.text_en || '');
+      setBrandName(content.brand?.name || 'KESWA');
+      setBrandTagline(content.brand?.tagline_en || '');
+      setHeroHoodiesTitle(content.banners?.heroHoodies?.title_en || '');
+      setHeroHoodiesSubtitle(content.banners?.heroHoodies?.subtitle_en || '');
+      setHeroHoodiesBadge(content.banners?.heroHoodies?.badge_en || '');
+      setHeroHoodiesBtn(content.banners?.heroHoodies?.buttonText_en || '');
+
+      setGridCard1Title(content.banners?.categoryGrid?.card1?.title_en || '');
+      setGridCard1Subtitle(content.banners?.categoryGrid?.card1?.subtitle_en || '');
+      setGridCard1Btn(content.banners?.categoryGrid?.card1?.buttonText_en || '');
+
+      setGridCard2Title(content.banners?.categoryGrid?.card2?.title_en || '');
+      setGridCard2Subtitle(content.banners?.categoryGrid?.card2?.subtitle_en || '');
+      setGridCard2Btn(content.banners?.categoryGrid?.card2?.buttonText_en || '');
+
+      setGridCard3Title(content.banners?.categoryGrid?.card3?.title_en || '');
+      setGridCard3Subtitle(content.banners?.categoryGrid?.card3?.subtitle_en || '');
+      setGridCard3Btn(content.banners?.categoryGrid?.card3?.buttonText_en || '');
+
+      setSecHoodiesTitle(content.sectionHeaders?.hoodies?.title_en || '');
+      setSecHoodiesSubtitle(content.sectionHeaders?.hoodies?.subtitle_en || '');
+      setSecHoodiesViewAll(content.sectionHeaders?.hoodies?.viewAllText_en || '');
+
+      setSecTshirtsTitle(content.sectionHeaders?.tshirts?.title_en || '');
+      setSecTshirtsSubtitle(content.sectionHeaders?.tshirts?.subtitle_en || '');
+      setSecTshirtsViewAll(content.sectionHeaders?.tshirts?.viewAllText_en || '');
+
+      setSecSweatsTitle(content.sectionHeaders?.sweatpants?.title_en || '');
+      setSecSweatsSubtitle(content.sectionHeaders?.sweatpants?.subtitle_en || '');
+      setSecSweatsViewAll(content.sectionHeaders?.sweatpants?.viewAllText_en || '');
+
+      setHeroTshirtsTitle(content.banners?.heroTshirts?.title_en || '');
+      setHeroTshirtsSubtitle(content.banners?.heroTshirts?.subtitle_en || '');
+      setHeroTshirtsBtn(content.banners?.heroTshirts?.buttonText_en || '');
+
+      setHeroSweatsTitle(content.banners?.heroSweatpants?.title_en || '');
+      setHeroSweatsSubtitle(content.banners?.heroSweatpants?.subtitle_en || '');
+      setHeroSweatsBtn(content.banners?.heroSweatpants?.buttonText_en || '');
+
+      setNlTitle(content.banners?.newsletter?.title_en || '');
+      setNlSubtitle(content.banners?.newsletter?.subtitle_en || '');
+      setNlBtn(content.banners?.newsletter?.buttonText_en || '');
+
+      setFooterAbout(content.footer?.about_en || '');
+      setFooterAddress(content.footer?.address_en || '');
+      setFooterPhone(content.footer?.phone || '');
+      setFooterEmail(content.footer?.email || '');
+    }
+  };
+
   // Switch Language subtab
   const handleSwitchTab = (tab) => {
     setTextLangTab(tab);
-    if (tab === 'ar') {
-      setAnnouncementText(siteContent.announcement?.text_ar || '');
-      setBrandTagline(siteContent.brand?.tagline_ar || '');
-      setHeroHoodiesTitle(siteContent.banners?.heroHoodies?.title_ar || '');
-      setHeroHoodiesSubtitle(siteContent.banners?.heroHoodies?.subtitle_ar || '');
-      setHeroHoodiesBadge(siteContent.banners?.heroHoodies?.badge_ar || '');
-      setHeroHoodiesBtn(siteContent.banners?.heroHoodies?.buttonText_ar || '');
-
-      setGridCard1Title(siteContent.banners?.categoryGrid?.card1?.title_ar || '');
-      setGridCard1Subtitle(siteContent.banners?.categoryGrid?.card1?.subtitle_ar || '');
-      setGridCard1Btn(siteContent.banners?.categoryGrid?.card1?.buttonText_ar || '');
-
-      setGridCard2Title(siteContent.banners?.categoryGrid?.card2?.title_ar || '');
-      setGridCard2Subtitle(siteContent.banners?.categoryGrid?.card2?.subtitle_ar || '');
-      setGridCard2Btn(siteContent.banners?.categoryGrid?.card2?.buttonText_ar || '');
-
-      setGridCard3Title(siteContent.banners?.categoryGrid?.card3?.title_ar || '');
-      setGridCard3Subtitle(siteContent.banners?.categoryGrid?.card3?.subtitle_ar || '');
-      setGridCard3Btn(siteContent.banners?.categoryGrid?.card3?.buttonText_ar || '');
-
-      setSecHoodiesTitle(siteContent.sectionHeaders?.hoodies?.title_ar || '');
-      setSecHoodiesSubtitle(siteContent.sectionHeaders?.hoodies?.subtitle_ar || '');
-      setSecHoodiesViewAll(siteContent.sectionHeaders?.hoodies?.viewAllText_ar || '');
-
-      setSecTshirtsTitle(siteContent.sectionHeaders?.tshirts?.title_ar || '');
-      setSecTshirtsSubtitle(siteContent.sectionHeaders?.tshirts?.subtitle_ar || '');
-      setSecTshirtsViewAll(siteContent.sectionHeaders?.tshirts?.viewAllText_ar || '');
-
-      setSecSweatsTitle(siteContent.sectionHeaders?.sweatpants?.title_ar || '');
-      setSecSweatsSubtitle(siteContent.sectionHeaders?.sweatpants?.subtitle_ar || '');
-      setSecSweatsViewAll(siteContent.sectionHeaders?.sweatpants?.viewAllText_ar || '');
-
-      setHeroTshirtsTitle(siteContent.banners?.heroTshirts?.title_ar || '');
-      setHeroTshirtsSubtitle(siteContent.banners?.heroTshirts?.subtitle_ar || '');
-      setHeroTshirtsBtn(siteContent.banners?.heroTshirts?.buttonText_ar || '');
-
-      setHeroSweatsTitle(siteContent.banners?.heroSweatpants?.title_ar || '');
-      setHeroSweatsSubtitle(siteContent.banners?.heroSweatpants?.subtitle_ar || '');
-      setHeroSweatsBtn(siteContent.banners?.heroSweatpants?.buttonText_ar || '');
-
-      setNlTitle(siteContent.banners?.newsletter?.title_ar || '');
-      setNlSubtitle(siteContent.banners?.newsletter?.subtitle_ar || '');
-      setNlBtn(siteContent.banners?.newsletter?.buttonText_ar || '');
-
-      setFooterAbout(siteContent.footer?.about_ar || '');
-      setFooterAddress(siteContent.footer?.address_ar || '');
-    } else {
-      setAnnouncementText(siteContent.announcement?.text_en || '');
-      setBrandTagline(siteContent.brand?.tagline_en || '');
-      setHeroHoodiesTitle(siteContent.banners?.heroHoodies?.title_en || '');
-      setHeroHoodiesSubtitle(siteContent.banners?.heroHoodies?.subtitle_en || '');
-      setHeroHoodiesBadge(siteContent.banners?.heroHoodies?.badge_en || '');
-      setHeroHoodiesBtn(siteContent.banners?.heroHoodies?.buttonText_en || '');
-
-      setGridCard1Title(siteContent.banners?.categoryGrid?.card1?.title_en || '');
-      setGridCard1Subtitle(siteContent.banners?.categoryGrid?.card1?.subtitle_en || '');
-      setGridCard1Btn(siteContent.banners?.categoryGrid?.card1?.buttonText_en || '');
-
-      setGridCard2Title(siteContent.banners?.categoryGrid?.card2?.title_en || '');
-      setGridCard2Subtitle(siteContent.banners?.categoryGrid?.card2?.subtitle_en || '');
-      setGridCard2Btn(siteContent.banners?.categoryGrid?.card2?.buttonText_en || '');
-
-      setGridCard3Title(siteContent.banners?.categoryGrid?.card3?.title_en || '');
-      setGridCard3Subtitle(siteContent.banners?.categoryGrid?.card3?.subtitle_en || '');
-      setGridCard3Btn(siteContent.banners?.categoryGrid?.card3?.buttonText_en || '');
-
-      setSecHoodiesTitle(siteContent.sectionHeaders?.hoodies?.title_en || '');
-      setSecHoodiesSubtitle(siteContent.sectionHeaders?.hoodies?.subtitle_en || '');
-      setSecHoodiesViewAll(siteContent.sectionHeaders?.hoodies?.viewAllText_en || '');
-
-      setSecTshirtsTitle(siteContent.sectionHeaders?.tshirts?.title_en || '');
-      setSecTshirtsSubtitle(siteContent.sectionHeaders?.tshirts?.subtitle_en || '');
-      setSecTshirtsViewAll(siteContent.sectionHeaders?.tshirts?.viewAllText_en || '');
-
-      setSecSweatsTitle(siteContent.sectionHeaders?.sweatpants?.title_en || '');
-      setSecSweatsSubtitle(siteContent.sectionHeaders?.sweatpants?.subtitle_en || '');
-      setSecSweatsViewAll(siteContent.sectionHeaders?.sweatpants?.viewAllText_en || '');
-
-      setHeroTshirtsTitle(siteContent.banners?.heroTshirts?.title_en || '');
-      setHeroTshirtsSubtitle(siteContent.banners?.heroTshirts?.subtitle_en || '');
-      setHeroTshirtsBtn(siteContent.banners?.heroTshirts?.buttonText_en || '');
-
-      setHeroSweatsTitle(siteContent.banners?.heroSweatpants?.title_en || '');
-      setHeroSweatsSubtitle(siteContent.banners?.heroSweatpants?.subtitle_en || '');
-      setHeroSweatsBtn(siteContent.banners?.heroSweatpants?.buttonText_en || '');
-
-      setNlTitle(siteContent.banners?.newsletter?.title_en || '');
-      setNlSubtitle(siteContent.banners?.newsletter?.subtitle_en || '');
-      setNlBtn(siteContent.banners?.newsletter?.buttonText_en || '');
-
-      setFooterAbout(siteContent.footer?.about_en || '');
-      setFooterAddress(siteContent.footer?.address_en || '');
-    }
+    syncFromContent(siteContent, tab);
   };
+
+  // React to remote cloud updates from Neon
+  useEffect(() => {
+    syncFromContent(siteContent, textLangTab);
+  }, [siteContent, textLangTab]);
 
   const notifySaved = (key) => {
     setSavedKey(key);
